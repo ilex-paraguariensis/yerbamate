@@ -1,0 +1,6 @@
+#!env python
+
+from yerbamate import main
+
+
+main.run()
