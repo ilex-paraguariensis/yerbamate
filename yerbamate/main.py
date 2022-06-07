@@ -12,14 +12,12 @@ from .tune_hyperparameters import tune
 
 
 def run():
-    print('hello from mate!!')
     current_dir = os.path.dirname(os.path.realpath(__file__))
-    # with open(os.path.join("dlm", "default_parameters.json")) as f:
-    #    default_params = json.load(f)
-
     parser = ArgumentParser()
     cur_folder = os.path.dirname(__file__)
-
+    current_path = os.getcwd()
+    root_folder = os.path.basename(current_path)
+    os.chdir("..")
     parser.add_argument(
         "action",
         help="train or test the model",
@@ -46,7 +44,7 @@ def run():
         default="",
         type=str,
         nargs="?",
-        help="Model to use. Must exist in dl/models/",
+        help=f"Model to use. Must exist in {root_folder}/models/",
     )
     parser.add_argument(
         "target",
@@ -54,21 +52,14 @@ def run():
         nargs="?",
         default=os.path.join(current_dir, "results"),
     )
-    """
-    for key, value in default_params.items():
-        parser.add_argument(
-            "--" + key, help=key + " to use", default=value, type=type(value),
-        )
-    """
-
     args = parser.parse_args()
     models_choices = (
         tuple(
             x
-            for x in os.listdir(os.path.join("dl", "models"))
+            for x in os.listdir(os.path.join(root_folder, "models"))
             if not "__" in x
         )
-        if os.path.exists(os.path.join("dl", "models"))
+        if os.path.exists(os.path.join(root_folder, "models"))
         else tuple()
     )
 
@@ -77,13 +68,13 @@ def run():
     cur_folder = os.path.basename(os.path.dirname(__file__))
 
     if args.action == "init":
-        os.system(f"cp -r {os.path.join(cur_folder, 'dl')} .")
+        os.system("touch .mateconfig.json")
 
     elif args.action == "create":
-        os.mkdir(f"{os.path.join('dl', 'models', args.model)}")
-        target_dir = os.path.join("dl", "models", args.model)
+        os.mkdir(f"{os.path.join(root_folder, 'models', args.model)}")
+        target_dir = os.path.join(root_folder, "models", args.model)
         os.system(
-            f"cp -r {os.path.join(cur_folder, 'dl', 'example')}* {os.path.join('dl', 'models', args.model)}"
+            f"cp -r {os.path.join(cur_folder, root_folder, 'example')}* {os.path.join(root_folder, 'models', args.model)}"
         )
         print(f"Created model {args.model} at {target_dir}")
 
@@ -94,14 +85,16 @@ def run():
                 f'Are you sure you want to remove model "{args.model}"? (y/n)\n'
             )
         if action == "y":
-            os.system(f"rm -r {os.path.join('dl', 'models', args.model)}")
+            os.system(
+                f"rm -r {os.path.join(root_folder, 'models', args.model)}"
+            )
             print(f"Removed model {args.model}")
         else:
             print("Ok, exiting.")
 
     elif args.action == "clone":
         os.system(
-            f"cp -r {os.path.join('dl', 'models', args.model)} {os.path.join('dl', 'models', args.target)}"
+            f"cp -r {os.path.join(root_folder, 'models', args.model)} {os.path.join(root_folder, 'models', args.target)}"
         )
 
     elif args.action == "list":
@@ -110,7 +103,7 @@ def run():
     elif args.action == "snapshot-create":
         snapshot_names = [
             name.split("__")
-            for name in os.listdir(os.path.join("dl", "snapshots"))
+            for name in os.listdir(os.path.join(root_folder, "snapshots"))
         ]
         matching_snapshots = [
             name for name in snapshot_names if name[0] == args.model
@@ -122,19 +115,21 @@ def run():
         )
         snapshot_name = f"{args.model}__{max_version_matching + 1}"
         os.system(
-            f"cp -r {os.path.join('dl', 'models', args.model)} {os.path.join('dl', 'snapshots', snapshot_name)}"
+            f"cp -r {os.path.join(root_folder, 'models', args.model)} {os.path.join(root_folder, 'snapshots', snapshot_name)}"
         )
         print(f"Created snapshot {snapshot_name}")
 
     elif args.action == "snapshot-list":
-        print(os.listdir(os.path.join("dl", "snapshots")))
+        print(os.listdir(os.path.join(root_folder, "snapshots")))
 
     else:
         assert (
             args.model in models_choices
         ), f"Model {args.model} does not exist."
         with open(
-            os.path.join("dl", "models", args.model, "default_parameters.json")
+            os.path.join(
+                root_folder, "models", args.model, "default_parameters.json"
+            )
         ) as f:
             params = Namespace()
             params.__dict__ = json.load(f)
@@ -149,10 +144,10 @@ def run():
             fromlist=["models"],
         )
         data_loader_module = __import__(
-            f"dl.data_loader", fromlist=["data_loader"]
+            f"{root_folder}.data_loader", fromlist=["data_loader"]
         )
         logger_module = __import__(f"{cur_folder}.logger", fromlist=["logger"])
-        save_path = os.path.join("dl", "models", args.model)
+        save_path = os.path.join(root_folder, "models", args.model)
         params.save_path = save_path
 
         if args.action in ("train", "test", "restart", "exec"):
@@ -212,9 +207,11 @@ def run():
                 "exec" in params.__dict__
             ), 'No "exec" file defined in parameters.json file.'
             custom_exec = __import__(
-                f"dl.{params.exec}", fromlist=["custom_test"],
+                f"{root_folder}.{params.exec}", fromlist=["custom_test"],
             ).main
             custom_exec(model)
+
+        os.chdir(current_path)
 
 
 if __name__ == "__main__":
