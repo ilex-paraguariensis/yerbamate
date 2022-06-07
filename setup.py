@@ -15,13 +15,13 @@ setup(
 )
 """
 setup(
-    name="yerbamate",
+    name="ymdl",
     description="A cowsay clone for python in one file.",
     author="Giulio Zani, Ali Rahimi",
     author_email="yerba.mate.dl@proton.me",
     url="https://github.com/ilex-paraguariensis/yerbamate",
-    python_requires=">=3.0",
-    version="0.3.6",
+    python_requires=">=3.9",
+    version="0.1",
     packages=["yerbamate"],
     license="Apache License 2.0",
     license_files=("LICENSE.md",),
@@ -33,5 +33,5 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
     ],
-    scripts=["./src/yerbamate"],
+    scripts=["./src/ymdl"],
 )
