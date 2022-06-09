@@ -33,5 +33,5 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
     ],
-    scripts=["./src/ymdl"],
+    scripts=["./src/mate"],
 )
