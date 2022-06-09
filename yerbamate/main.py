@@ -10,7 +10,7 @@ from .tune_hyperparameters import tune
 
 # FIXME: cannot run snapshost due to name
 
-
+'''
 def run():
     current_dir = os.path.dirname(os.path.realpath(__file__))
     parser = ArgumentParser()
@@ -67,10 +67,7 @@ def run():
 
     cur_folder = os.path.basename(os.path.dirname(__file__))
 
-    if args.action == "init":
-        os.system("touch .mateconfig.json")
-
-    elif args.action == "create":
+    if args.action == "create":
         os.mkdir(f"{os.path.join(root_folder, 'models', args.model)}")
         target_dir = os.path.join(root_folder, "models", args.model)
         os.system(
@@ -212,7 +209,7 @@ def run():
             custom_exec(model)
 
         os.chdir(current_path)
-
+'''
 
 if __name__ == "__main__":
     run()
