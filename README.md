@@ -2,7 +2,7 @@
 
 ## What is Mate?
 It is a tool for building research projects in the field of deep learning with pytorch.
-It makes development fast, easy, and the results will be easily replicable. You can focus more on the model, and less on the implementation.
+It makes development fast, easy, and the results replicable. You can focus more on the model, and less on boilerplate code.
 
 ## Quick Start
 Install a model:
