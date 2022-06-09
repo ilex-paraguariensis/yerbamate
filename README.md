@@ -1,6 +1,8 @@
 # Mate 🧉
 
 ## What is Mate?
+It is a tool for building research projects in the field of deep learning with pytorch.
+It makes development fast, easy, and the results will be easily replicable. You can focus more on the model, and less on the implementation.
 
 ## Quick Start
 Install a model:
@@ -17,7 +19,42 @@ If however you want to test a model once again, you can run:
 ```bash
 mate test ResNet
 ```
-Example commands:
+
+## Example Folder Structure
+```
+├── classification-demo
+│   ├── base_lightning
+│   │   └── BaseClassificationLightningModule.py
+│   ├── data
+│   │   ├── cifar10
+│   │   │   ├── data_loader.py
+│   │   │   └── parameters.json
+│   │   └── imagenet
+│   │       ├── data_loader.py
+│   │       ├── parameters.json
+│   │       └── pre_processing.py
+│   ├── env_parameters.json
+│   ├── models
+│   │   ├── convlstm
+│   │   │   ├── convlstmcell
+│   │   │   │   ├── convlstmcell.py
+│   │   │   │   └── parameters.json
+│   │   │   ├── convlstm.py
+│   │   │   ├── model.py
+│   │   │   └── parameters.json
+│   │   └── resnet
+│   │       ├── model.py
+│   │       ├── parameters.json
+│   │       └── resnet.py
+│   ├── parameters.json
+│   └── snapshots
+│       └── resnet__1
+│           ├── model.py
+│           ├── parameters.json
+│           └── resnet.py
+├── mate.json
+└── README.md
+```
 
 ## Create your own packages
 
@@ -29,7 +66,4 @@ Or, if the repo is on github, you can use the shorthand notation:
 ```
 mate install ilex-paraguariensis/ResNet
 ```
-If you want to start from a custom model:
-
-##  [sub-section](./child.md#test)    
 
