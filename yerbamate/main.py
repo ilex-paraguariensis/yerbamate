@@ -10,7 +10,7 @@ from .tune_hyperparameters import tune
 
 # FIXME: cannot run snapshost due to name
 
-'''
+
 def run():
     current_dir = os.path.dirname(os.path.realpath(__file__))
     parser = ArgumentParser()
@@ -140,9 +140,7 @@ def run():
             f"dl.{'models' if args.action != 'snapshot-run' else 'snapshots'}.{args.model}.model",
             fromlist=["models"],
         )
-        data_loader_module = __import__(
-            f"{root_folder}.data_loader", fromlist=["data_loader"]
-        )
+        data_loader_module = __import__(f"{root_folder}.data_loader")
         logger_module = __import__(f"{cur_folder}.logger", fromlist=["logger"])
         save_path = os.path.join(root_folder, "models", args.model)
         params.save_path = save_path
@@ -209,7 +207,7 @@ def run():
             custom_exec(model)
 
         os.chdir(current_path)
-'''
+
 
 if __name__ == "__main__":
     run()
