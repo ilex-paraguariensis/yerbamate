@@ -5,50 +5,13 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import EarlyStopping
 from types import SimpleNamespace
 from torch import nn
+from .logger import CustomLogger
 import torch as t
 import ipdb
 import json
 import sys
 # TODO: find root recursively
 # TODO:
-
-import imp
-import sys
-
-
-# dynamic import
-def dynamic_imp(name, class_name):
-
-    # find_module() method is used
-    # to find the module and return
-    # its description and path
-    try:
-
-        ipdb.set_trace()
-        fp, path, desc = imp.find_module(name)
-
-    except ImportError:
-        print("module not found: " + name)
-
-    try:
-        # load_modules loads the module
-        # dynamically ans takes the filepath
-        # module and description as parameter
-        example_package = imp.load_module(name, fp, path, desc)
-
-    except Exception as e:
-        print(e)
-
-    try:
-        myclass = imp.load_module(
-            "% s.% s" % (name, class_name), fp, path, desc
-        )
-
-    except Exception as e:
-        print(e)
-
-    return example_package, myclass
-
 
 class Mate:
     def __init__(self):
@@ -84,7 +47,9 @@ class Mate:
         ).Model
 
     def __load_logger_class(self):
-        return __import__(f"{self.current_folder}.logger").CustomLogger
+        #sys.path += self.current_folder
+        #return __import__(f"{self.current_folder}.logger", fromlist=['logger']).CustomLogger
+        return CustomLogger
 
     def __load_data_loader_class(self, data_loader_name: str):
         return __import__(
@@ -106,6 +71,7 @@ class Mate:
 
     def __get_trainer(self, model_name: str):
         params = self.__read_parameters(model_name)
+        params.save_path = os.path.join(self.root_folder, "models", model_name)
         model = self.__load_model_class(model_name)(params)
         data_module = self.__load_data_loader_class(params.data_loader)(
             params
