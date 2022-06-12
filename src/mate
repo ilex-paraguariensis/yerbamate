@@ -1,6 +1,8 @@
 #!env python
 
-from yerbamate import main
+from yerbamate import mate_cli
 
+mate_cli.main()
+# from yerbamate import main
 
-main.run()
+# main.run()

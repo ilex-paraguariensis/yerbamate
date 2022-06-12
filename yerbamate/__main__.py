@@ -1,5 +1,6 @@
-from .mate_cli import main
+#from .mate_cli import main
+import main
 
 
 if __name__ == "__main__":
-    main()
+    main.run()

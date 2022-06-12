@@ -17,7 +17,7 @@ def run():
     cur_folder = os.path.dirname(__file__)
     current_path = os.getcwd()
     root_folder = os.path.basename(current_path)
-    os.chdir("..")
+    os.chdir("..") 
     parser.add_argument(
         "action",
         help="train or test the model",
@@ -53,6 +53,7 @@ def run():
         default=os.path.join(current_dir, "results"),
     )
     args = parser.parse_args()
+    print(f"{root_folder=}")
     models_choices = (
         tuple(
             x
@@ -62,7 +63,7 @@ def run():
         if os.path.exists(os.path.join(root_folder, "models"))
         else tuple()
     )
-
+    print(f"{models_choices}")
     # assert "__" not in params.model, "Models cannot have '__' in their name"
 
     cur_folder = os.path.basename(os.path.dirname(__file__))
@@ -120,12 +121,13 @@ def run():
         print(os.listdir(os.path.join(root_folder, "snapshots")))
 
     else:
+        import ipdb
         assert (
             args.model in models_choices
         ), f"Model {args.model} does not exist."
         with open(
             os.path.join(
-                root_folder, "models", args.model, "default_parameters.json"
+                root_folder, "models", args.model, "parameters.json"
             )
         ) as f:
             params = Namespace()
@@ -136,11 +138,18 @@ def run():
         #    args.__dict__[key] = val
 
         print(json.dumps(params.__dict__, indent=4))
+
+        print(os.listdir())
+        import sys
+        sys.path += ['.']
+        #data_loader_module = exec("import gan.models.cocyclegan.model as m")
+        # data_loader_module = exec("import gan")
+    
         model_module = __import__(
-            f"dl.{'models' if args.action != 'snapshot-run' else 'snapshots'}.{args.model}.model",
+            f"{root_folder}.{'models' if args.action != 'snapshot-run' else 'snapshots'}.{args.model}.model",
             fromlist=["models"],
-        )
-        data_loader_module = __import__(f"{root_folder}.data_loader")
+        ).Model
+        data_loader_module = __import__(f"{root_folder}.data_loader.sea_coastal")
         logger_module = __import__(f"{cur_folder}.logger", fromlist=["logger"])
         save_path = os.path.join(root_folder, "models", args.model)
         params.save_path = save_path

@@ -21,7 +21,7 @@ setup(
     author_email="yerba.mate.dl@proton.me",
     url="https://github.com/ilex-paraguariensis/yerbamate",
     python_requires=">=3.9",
-    version="0.1",
+    version="0.2",
     packages=["yerbamate"],
     license="Apache License 2.0",
     license_files=("LICENSE.md",),

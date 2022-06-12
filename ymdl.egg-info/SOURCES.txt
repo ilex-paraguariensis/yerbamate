@@ -1,11 +1,13 @@
 README.md
 setup.cfg
 setup.py
-./src/ymdl
+./src/mate
 yerbamate/__init__.py
 yerbamate/__main__.py
 yerbamate/logger.py
 yerbamate/main.py
+yerbamate/mate.py
+yerbamate/mate_cli.py
 yerbamate/plot.py
 yerbamate/tune_hyperparameters.py
 ymdl.egg-info/PKG-INFO
