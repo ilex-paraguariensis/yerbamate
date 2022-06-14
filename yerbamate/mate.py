@@ -11,8 +11,13 @@ import ipdb
 import json
 import sys
 import importlib
+
 # TODO: find root recursively
 # TODO:
+import pkgutil
+from setuptools import find_packages
+from pkgutil import iter_modules
+
 
 class Mate:
     def __init__(self):
@@ -21,6 +26,7 @@ class Mate:
         self.current_folder = os.path.dirname(__file__)
         self.__findroot()
         self.models = self.__list_packages("models")
+        self.__import_submodules(self.root_folder)
 
     def __list_packages(self, folder: str):
         return (
@@ -39,24 +45,24 @@ class Mate:
         current_path = os.getcwd()
         self.root_folder = os.path.basename(current_path)
         os.chdir("..")
-        sys.path += [os.getcwd()]
+        sys.path.insert(0, os.getcwd())
 
     def __load_model_class(self, model_name: str, folder="models"):
-        importlib.invalidate_caches()
-        return  __import__(
+        # print(sys.meta_path)
+        return __import__(
             f"{self.root_folder}.{folder}.{model_name}.model",
             fromlist=[folder],
         ).Model
 
     def __load_logger_class(self):
-        #sys.path += self.current_folder
-        #return __import__(f"{self.current_folder}.logger", fromlist=['logger']).CustomLogger
+        # sys.path += self.current_folder
+        # return __import__(f"{self.current_folder}.logger", fromlist=['logger']).CustomLogger
         return CustomLogger
 
     def __load_data_loader_class(self, data_loader_name: str):
         return __import__(
             f"{self.root_folder}.data_loader.{data_loader_name}",
-            fromlist=['data_loader']
+            fromlist=["data_loader"],
         ).CustomDataModule
 
     def __set_save_path(self, model_name: str):
@@ -64,9 +70,7 @@ class Mate:
 
     def __read_parameters(self, model_name: str):
         with open(
-            os.path.join(
-                self.root_folder, "models", model_name, "parameters.json"
-            )
+            os.path.join(self.root_folder, "models", model_name, "parameters.json")
         ) as f:
             params = json.load(f)
         print(json.dumps(params, indent=4))
@@ -76,9 +80,7 @@ class Mate:
         params = self.__read_parameters(model_name)
         params.save_path = os.path.join(self.root_folder, "models", model_name)
         model = self.__load_model_class(model_name)(params)
-        data_module = self.__load_data_loader_class(params.data_loader)(
-            params
-        )
+        data_module = self.__load_data_loader_class(params.data_loader)(params)
         logger_module = self.__load_logger_class()
         return (
             Trainer(
@@ -103,9 +105,7 @@ class Mate:
             print(f"\nLoading model from checkpoint:'{checkpoint_path}'\n")
             model.load_state_dict(t.load(checkpoint_path))
         else:
-            raise Exception(
-                "No checkpoint found. You must train the model first!"
-            )
+            raise Exception("No checkpoint found. You must train the model first!")
 
     def init(self):
         pass
@@ -120,19 +120,13 @@ class Mate:
                 f'Are you sure you want to remove model "{model_name}"? (y/n)\n'
             )
         if action == "y":
-            os.system(
-                f"rm -r {os.path.join(self.root_folder, 'models', model_name)}"
-            )
+            os.system(f"rm -r {os.path.join(self.root_folder, 'models', model_name)}")
             print(f"Removed model {model_name}")
         else:
             print("Ok, exiting.")
 
     def list(self, folder: str):
-        print(
-            "\n".join(
-                tuple("\t" + str(m) for m in self.__list_packages(folder))
-            )
-        )
+        print("\n".join(tuple("\t" + str(m) for m in self.__list_packages(folder))))
 
     def clone(self, source_model: str, target_model: str):
         os.system(
@@ -144,9 +138,7 @@ class Mate:
         trainer.fit(model, datamodule=data_module)
 
     def train(self, model_name: str):
-        assert (
-            model_name in self.models
-        ), f'Model "{model_name}" does not exist.'
+        assert model_name in self.models, f'Model "{model_name}" does not exist.'
 
         save_path = os.path.join(self.root_folder, "models", model_name)
         checkpoint_path = os.path.join(save_path, "checkpoint.pt")
@@ -175,3 +167,23 @@ class Mate:
 
     def exec(self, model: str, file: str = ""):
         pass
+
+
+
+    """ Import all submodules of a module, recursively, including subpackages
+    :param package: package (name or actual module)
+    :type package: str | module
+    :rtype: dict[str, types.ModuleType]
+    """
+
+    def __import_submodules(self, package, recursive=True):
+
+        if isinstance(package, str):
+            package = importlib.import_module(package)
+        results = {}
+        for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
+            full_name = package.__name__ + "." + name
+            results[full_name] = importlib.import_module(full_name)
+            if recursive and is_pkg:
+                results.update(self.__import_submodules(full_name))
+        return results
