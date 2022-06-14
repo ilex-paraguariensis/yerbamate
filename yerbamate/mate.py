@@ -38,7 +38,7 @@ class Mate:
         current_path = os.getcwd()
         self.root_folder = os.path.basename(current_path)
         os.chdir("..")
-        sys.path += '.'
+        sys.path += os.getcwd()
 
     def __load_model_class(self, model_name: str, folder="models"):
         return  __import__(
