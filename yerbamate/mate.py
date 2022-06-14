@@ -67,6 +67,7 @@ class Mate:
             )
         ) as f:
             params = json.load(f)
+        print(json.dumps(params, indent=4))
         return SimpleNamespace(**params)
 
     def __get_trainer(self, model_name: str):
