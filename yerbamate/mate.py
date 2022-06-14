@@ -10,6 +10,7 @@ import torch as t
 import ipdb
 import json
 import sys
+import importlib
 # TODO: find root recursively
 # TODO:
 
@@ -41,6 +42,7 @@ class Mate:
         sys.path += [os.getcwd()]
 
     def __load_model_class(self, model_name: str, folder="models"):
+        importlib.invalidate_caches()
         return  __import__(
             f"{self.root_folder}.{folder}.{model_name}.model",
             fromlist=[folder],
