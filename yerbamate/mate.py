@@ -100,13 +100,6 @@ class Mate:
             data_module,
         )
 
-    def __load_model(self, checkpoint_path: str, model: nn.Module):
-        if os.path.exists(checkpoint_path):
-            print(f"\nLoading model from checkpoint:'{checkpoint_path}'\n")
-            model.load_state_dict(t.load(checkpoint_path))
-        else:
-            raise Exception("No checkpoint found. You must train the model first!")
-
     def init(self):
         pass
 
@@ -135,13 +128,17 @@ class Mate:
 
     def __fit(self, model_name: str):
         trainer, model, data_module = self.__get_trainer(model_name)
+        checkpoint_path = os.path.join(self.save_path, "model.pt")
+        if os.path.exists(checkpoint_path):
+            model.load_state_dict(t.load(checkpoint_path))
+            print(f"Loaded model from {checkpoint_path}")
         trainer.fit(model, datamodule=data_module)
 
     def train(self, model_name: str):
         assert model_name in self.models, f'Model "{model_name}" does not exist.'
 
         save_path = os.path.join(self.root_folder, "models", model_name)
-        checkpoint_path = os.path.join(save_path, "checkpoint.pt")
+        checkpoint_path = os.path.join(save_path, "model.pt")
         action = "go"
         if os.path.exists(checkpoint_path):
             while action not in ("y", "n", ""):
