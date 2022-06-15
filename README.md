@@ -1,4 +1,4 @@
-# Mate 🧉
+# Maté 🧉
 
 ## What is Mate?
 It is a tool for building research projects in the field of deep learning with pytorch.
