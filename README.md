@@ -4,6 +4,18 @@
 It is a tool for building research projects in the field of deep learning with pytorch.
 It makes development fast, easy, and the results replicable. You can focus more on the model, and less on boilerplate code.
 
+## Installation
+Install the stable version via pip:
+```
+pip install ymdl
+```
+To have the latest development version, use the following command:
+```
+git clone https://github.com/ilex-paraguariensis/yerbamate 
+cd yerbamate
+python update_local.py
+```
+
 ## Quick Start
 Install a model:
 ```bash
