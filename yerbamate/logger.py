@@ -1,4 +1,4 @@
-from pytorch_lightning.loggers import LightningLoggerBase
+from pytorch_lightning.loggers import LightningLoggerBase, TensorBoardLogger
 import torch as t
 import json
 import csv
@@ -7,7 +7,14 @@ import ipdb
 from argparse import Namespace
 
 
-class CustomLogger(LightningLoggerBase):
+class CustromLogger(TensorBoardLogger):
+    def __init__(self, params: Namespace):
+        super().__init__("logs", params.model)
+        # ipdb.set_trace()
+        self.params = params
+
+
+class CustomLoggerz(LightningLoggerBase):
     def __init__(
         self,
         params: Namespace,
@@ -23,13 +30,11 @@ class CustomLogger(LightningLoggerBase):
 
     def write_performance_csv(self, name, metrics):
         if name == "test":
-            metrics['epoch'] = 1
+            metrics["epoch"] = 1
         performance_name = f"{name}_performance"
-        file_path = os.path.join(
-            self.params.save_path, f"{performance_name}.csv"
-        )
-        if metrics['epoch'] > 0:
-            if metrics['epoch'] == 1:
+        file_path = os.path.join(self.params.save_path, f"{performance_name}.csv")
+        if metrics["epoch"] > 0:
+            if metrics["epoch"] == 1:
                 if os.path.exists(file_path):
                     os.remove(file_path)
                 with open(file_path, "w") as f:
@@ -38,7 +43,9 @@ class CustomLogger(LightningLoggerBase):
 
             with open(file_path, "a") as f:
                 writer = csv.writer(f)
-                writer.writerow(tuple(val for _, val in metrics[performance_name].items()))
+                writer.writerow(
+                    tuple(val for _, val in metrics[performance_name].items())
+                )
 
     def log_metrics(self, metrics, step: int):
         for condition in ["train", "val", "test"]:

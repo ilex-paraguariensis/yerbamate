@@ -153,6 +153,7 @@ def run():
         logger_module = __import__(f"{cur_folder}.logger", fromlist=["logger"])
         save_path = os.path.join(root_folder, "models", args.model)
         params.save_path = save_path
+        ipdb.set_trace()
 
         if args.action in ("train", "test", "restart", "exec"):
             model = model_module.Model(params)
@@ -190,6 +191,7 @@ def run():
             if os.path.exists(checkpoint_path):
                 print(f"\nLoading model from checkpoint:'{checkpoint_path}'\n")
                 model.load_state_dict(t.load(checkpoint_path))
+
             else:
                 raise Exception(
                     "No checkpoint found. You must train the model first!"
