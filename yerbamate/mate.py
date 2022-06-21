@@ -10,13 +10,7 @@ import ipdb
 import json
 import sys
 import importlib
-
-# TODO: find root recursively
-# TODO:
 import pkgutil
-from setuptools import find_packages
-from pkgutil import iter_modules
-
 from .logger import CustromLogger
 
 
@@ -56,8 +50,6 @@ class Mate:
         ).Model
 
     def __load_logger_class(self):
-        # sys.path += self.current_folder
-        # return __import__(f"{self.current_folder}.logger", fromlist=['logger']).CustomLogger
         return CustromLogger
 
     def __load_data_loader_class(self, data_loader_name: str):
@@ -67,7 +59,10 @@ class Mate:
         ).CustomDataModule
 
     def __set_save_path(self, model_name: str):
-        self.save_path = os.path.join(self.root_folder, "models", model_name)
+        self.save_path = os.path.join(self.root_folder, "models", model_name, 'results')
+        if not os.path.exists(self.save_path):
+            os.mkdir(self.save_path)
+
 
     def __read_parameters(self, model_name: str):
         with open(
@@ -78,6 +73,7 @@ class Mate:
         return SimpleNamespace(**params)
 
     def __get_trainer(self, model_name: str):
+        self.__set_save_path(model_name)
         params = self.__read_parameters(model_name)
         params.save_path = os.path.join(self.root_folder, "models", model_name)
         model = self.__load_model_class(model_name)(params)
