@@ -77,6 +77,7 @@ class Mate:
         params = self.__read_parameters(model_name)
         params.save_path = os.path.join(self.root_folder, "models", model_name)
         model = self.__load_model_class(model_name)(params)
+        print(model)
         data_module = self.__load_data_loader_class(params.data_loader)(params)
         logger_module = self.__load_logger_class()
         params.model = model_name
