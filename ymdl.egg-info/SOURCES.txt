@@ -5,7 +5,6 @@ setup.py
 yerbamate/__init__.py
 yerbamate/__main__.py
 yerbamate/logger.py
-yerbamate/maaaaate.py
 yerbamate/main.py
 yerbamate/mate.py
 yerbamate/mate_cli.py

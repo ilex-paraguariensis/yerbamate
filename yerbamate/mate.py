@@ -54,7 +54,7 @@ class Mate:
 
     def __load_data_loader_class(self, data_loader_name: str):
         return __import__(
-            f"{self.root_folder}.data_loader.{data_loader_name}",
+            f"{self.root_folder}.data_loaders.{data_loader_name}",
             fromlist=["data_loader"],
         ).CustomDataModule
 
@@ -84,6 +84,12 @@ class Mate:
         data_module = self.__load_data_loader_class(params.data_loader)(params)
         logger_module = self.__load_logger_class()
         params.model = model_name
+
+        checkpoint_path = os.path.join(self.save_path, "model.pt")
+        if os.path.exists(checkpoint_path):
+            print(f"Loaded model from {checkpoint_path}")
+            model.load_state_dict(t.load(checkpoint_path))
+
         return (
             Trainer(
                 max_epochs=params.max_epochs,
@@ -160,10 +166,6 @@ class Mate:
 
     def __fit(self, model_name: str):
         trainer, model, data_module = self.__get_trainer(model_name)
-        checkpoint_path = os.path.join(self.save_path, "model.pt")
-        if os.path.exists(checkpoint_path):
-            print(f"Loaded model from {checkpoint_path}")
-            model.load_state_dict(t.load(checkpoint_path))
         trainer.fit(model, datamodule=data_module)
 
     def train(self, model_name: str):
