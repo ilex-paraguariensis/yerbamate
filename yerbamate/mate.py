@@ -59,14 +59,17 @@ class Mate:
         ).CustomDataModule
 
     def __set_save_path(self, model_name: str):
-        self.save_path = os.path.join(self.root_folder, "models", model_name, 'results')
+        self.save_path = os.path.join(
+            self.root_folder, "models", model_name, "results"
+        )
         if not os.path.exists(self.save_path):
             os.mkdir(self.save_path)
 
-
     def __read_parameters(self, model_name: str):
         with open(
-            os.path.join(self.root_folder, "models", model_name, "parameters.json")
+            os.path.join(
+                self.root_folder, "models", model_name, "parameters.json"
+            )
         ) as f:
             params = json.load(f)
         print(json.dumps(params, indent=4))
@@ -75,7 +78,7 @@ class Mate:
     def __get_trainer(self, model_name: str):
         self.__set_save_path(model_name)
         params = self.__read_parameters(model_name)
-        params.save_path = os.path.join(self.root_folder, "models", model_name)
+        params.save_path = self.save_path
         model = self.__load_model_class(model_name)(params)
         print(model)
         data_module = self.__load_data_loader_class(params.data_loader)(params)
@@ -112,13 +115,19 @@ class Mate:
                 f'Are you sure you want to remove model "{model_name}"? (y/n)\n'
             )
         if action == "y":
-            os.system(f"rm -r {os.path.join(self.root_folder, 'models', model_name)}")
+            os.system(
+                f"rm -r {os.path.join(self.root_folder, 'models', model_name)}"
+            )
             print(f"Removed model {model_name}")
         else:
             print("Ok, exiting.")
 
     def list(self, folder: str):
-        print("\n".join(tuple("\t" + str(m) for m in self.__list_packages(folder))))
+        print(
+            "\n".join(
+                tuple("\t" + str(m) for m in self.__list_packages(folder))
+            )
+        )
 
     def clone(self, source_model: str, target_model: str):
         os.system(
@@ -126,7 +135,7 @@ class Mate:
         )
 
     def snapshot(self, model_name: str):
-        
+
         if not os.path.exists(os.path.join(self.root_folder, "snapshots")):
             os.makedirs(os.path.join(self.root_folder, "snapshots"))
 
@@ -134,7 +143,9 @@ class Mate:
             name.split("__")
             for name in os.listdir(os.path.join(self.root_folder, "snapshots"))
         ]
-        matching_snapshots = [name for name in snapshot_names if name[0] == model_name]
+        matching_snapshots = [
+            name for name in snapshot_names if name[0] == model_name
+        ]
         max_version_matching = (
             max([int(name[1]) for name in matching_snapshots])
             if len(matching_snapshots) > 0
@@ -149,16 +160,16 @@ class Mate:
 
     def __fit(self, model_name: str):
         trainer, model, data_module = self.__get_trainer(model_name)
-        checkpoint_path = os.path.join(
-            os.path.join(self.root_folder, "models", model_name), "model.pt"
-        )
+        checkpoint_path = os.path.join(self.save_path, "model.pt")
         if os.path.exists(checkpoint_path):
             print(f"Loaded model from {checkpoint_path}")
             model.load_state_dict(t.load(checkpoint_path))
         trainer.fit(model, datamodule=data_module)
 
     def train(self, model_name: str):
-        assert model_name in self.models, f'Model "{model_name}" does not exist.'
+        assert (
+            model_name in self.models
+        ), f'Model "{model_name}" does not exist.'
 
         save_path = os.path.join(self.root_folder, "models", model_name)
         checkpoint_path = os.path.join(save_path, "model.pt")
