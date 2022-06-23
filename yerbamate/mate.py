@@ -173,6 +173,7 @@ class Mate:
             model_name in self.models
         ), f'Model "{model_name}" does not exist.'
 
+        self.__set_save_path(model_name)
         checkpoint_path = os.path.join(self.save_path, "model.pt")
         action = "go"
         if os.path.exists(checkpoint_path):
