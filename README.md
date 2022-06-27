@@ -79,3 +79,9 @@ Or, if the repo is on github, you can use the shorthand notation:
 mate install ilex-paraguariensis/ResNet
 ```
 
+## Contact
+
+For questions please contact:
+
+
+yerba.mate.dl(at)proton.me
