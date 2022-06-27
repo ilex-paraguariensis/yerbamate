@@ -63,7 +63,7 @@ class Mate:
             self.root_folder, "models", model_name, "results", params
         )
         if not os.path.exists(self.save_path):
-            os.mkdir(self.save_path)
+            os.makedirs(self.save_path)
 
         # save parameters in results folder
         os.system(
