@@ -64,5 +64,4 @@ def main():
             method_args_types, method_args_defaults, raw_method_args
         )
     )
-    ipdb.set_trace()
     getattr(mate, args.action)(*method_args)
