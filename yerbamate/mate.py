@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 import importlib
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import EarlyStopping
-from types import SimpleNamespace
+from .bunch import Bunch
 from torch import nn
 import torch as t
 import ipdb
@@ -70,7 +70,7 @@ class Mate:
             f"cp {os.path.join(self.root_folder, 'models', model_name, f'{params}.json')} {os.path.join(self.root_folder, 'models', model_name, 'results', params, 'train_parameters.json')}"
         )
 
-    def __read_parameters(self, model_name: str, params: str = "default"):
+    def __read_hyperparameters(self, model_name: str, params: str = "default"):
         with open(
             os.path.join(
                 self.root_folder,
@@ -83,11 +83,11 @@ class Mate:
             params = json.load(f)
         print(json.dumps(params, indent=4))
 
-        return SimpleNamespace(**params)
+        return Bunch(params)
 
     def __get_trainer(self, model_name: str, params: str):
         self.__set_save_path(model_name, params)
-        params = self.__read_parameters(model_name, params)
+        params = self.__read_hyperparameters(model_name, params)
         params.save_path = self.save_path
         model = self.__load_model_class(model_name)(params)
         print(model)
@@ -178,12 +178,13 @@ class Mate:
         trainer, model, data_module = self.__get_trainer(model_name, params)
         trainer.fit(model, datamodule=data_module)
 
-    def train(self, model_name: str, params: str):
+    def train(self, model_name: str, params: str = "default"):
         assert (
             model_name in self.models
         ), f'Model "{model_name}" does not exist.'
-        params = "parameters" if params == "" or params == "None" else params
-        print(f"Training model {model_name} with parameters: {params}.json")
+        print(
+            f"Training model {model_name} with hyperparameters: {params}.json"
+        )
 
         self.__set_save_path(model_name, params)
         checkpoint_path = os.path.join(self.save_path, "model.pt")
@@ -205,7 +206,9 @@ class Mate:
             model_name in self.models
         ), f'Model "{model_name}" does not exist.'
         params = "parameters" if params == "" or params == "None" else params
-        print(f"Testing model {model_name} with parameters: {params}.json")
+        print(
+            f"Testing model {model_name} with hyperparameters: {params}.json"
+        )
 
         trainer, model, data_module = self.__get_trainer(model_name, params)
         trainer.test(model, datamodule=data_module)

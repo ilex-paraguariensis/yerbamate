@@ -9,12 +9,7 @@ from typing import Any
 
 def parse_signature(class_name, method_name: str):
     return tuple(
-        (
-            name,
-            locate(str(val).split(":")[1].strip(" "))
-            if ":" in str(val)
-            else Any,
-        )
+        val
         for (name, val) in inspect.signature(
             getattr(class_name, method_name)
         ).parameters.items()
@@ -36,7 +31,7 @@ def main():
     max_len = max(len(args) for args in methods)
     parser.add_argument(
         "action",
-        choices=tuple(method[0].replace("_", "-") for method in methods),
+        choices=tuple(method.replace("_", "-") for method, _ in methods),
         type=str,
         nargs="?",
     )
@@ -46,10 +41,28 @@ def main():
     args.action = args.action.replace("-", "_")
     mate = Mate()
     method_args_types = tuple(
-        tuple(m[1] for m in ma[1]) for ma in methods if ma[0] == args.action
+        tuple(param.annotation for param in params)
+        for method, params in methods
+        if method == args.action
     )[0]
-    method_args = tuple(
-        method_type(args.__dict__[f"arg_{i}"])
-        for i, method_type in enumerate(method_args_types)
+    method_args_defaults = tuple(
+        tuple(param.default for param in params)
+        for method, params in methods
+        if method == args.action
+    )[0]
+
+    raw_method_args = tuple(
+        args.__dict__[f"arg_{i}"] for i in range(len(method_args_types))
     )
+    method_args = tuple(
+        (
+            method_type(raw_method_arg)
+            if (raw_method_arg is not None)
+            else method_default
+        )
+        for (method_type, method_default, raw_method_arg) in zip(
+            method_args_types, method_args_defaults, raw_method_args
+        )
+    )
+    ipdb.set_trace()
     getattr(mate, args.action)(*method_args)
