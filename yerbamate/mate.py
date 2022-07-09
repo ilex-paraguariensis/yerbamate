@@ -87,6 +87,14 @@ class Mate:
             f"cp {os.path.join(self.root_folder, 'models', model_name, 'hyperparameters' , f'{params}.json')} {os.path.join(self.save_path, 'train_parameters.json')}"
         )
 
+    def __override_params(self, params: Bunch):
+        if "override_params" in self.config and self.config.override_params.enabled:
+            for key, value in self.config.override_params.items():
+                if key == "enabled":
+                    key = "override_params"
+                params[key] = value
+        return params
+
     def __read_hyperparameters(self, model_name: str, params: str = "default"):
         with open(
             os.path.join(
@@ -98,9 +106,10 @@ class Mate:
             )
         ) as f:
             params = json.load(f)
+        params = Bunch(params)
+        params = self.__override_params(params)
         print(json.dumps(params, indent=4))
-
-        return Bunch(params)
+        return params
 
     def __get_trainer(self, model_name: str, params: str):
         self.__set_save_path(model_name, params)
