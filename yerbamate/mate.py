@@ -21,7 +21,7 @@ class Mate:
         self.current_folder = os.path.dirname(__file__)
         self.__findroot()
         self.models = self.__list_packages("models")
-        self.__import_submodules(self.root_folder)
+        # self.__import_submodules(self.root_folder)
 
     def __list_packages(self, folder: str):
         return (
