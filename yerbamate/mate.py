@@ -34,12 +34,28 @@ class Mate:
             else tuple()
         )
 
+    def __load_mate_config(self, path):
+        with open(path) as f:
+            self.config = Bunch(json.load(f))
+
     def __findroot(self):
+        # directory of yerbamate
         current_dir = os.path.dirname(os.path.realpath(__file__))
         cur_folder = os.path.dirname(__file__)
+
+        # path of execution
         current_path = os.getcwd()
-        self.root_folder = os.path.basename(current_path)
-        os.chdir("..")
+
+        if not os.path.exists(os.path.join(current_path, "mate.json")):
+            self.root_folder = os.path.basename(current_path)
+            os.chdir("..")
+            self.__load_mate_config(os.path.join(os.getcwd(), "mate.json"))
+        else:
+            self.__load_mate_config(os.path.join(current_path, "mate.json"))
+            self.root_folder = os.path.basename(
+                os.path.join(current_path, self.config.project)
+            )
+
         sys.path.insert(0, os.getcwd())
 
     def __load_model_class(self, model_name: str, folder="models"):
