@@ -69,8 +69,9 @@ class Mate:
         return CustromLogger
 
     def __load_data_loader_class(self, data_loader_name: str):
+        data_class = f"{self.root_folder}.data_loaders.{data_loader_name}.data_loader"
         return __import__(
-            f"{self.root_folder}.data_loaders.{data_loader_name}",
+            f"{data_class}",
             fromlist=["data_loader"],
         ).CustomDataModule
 
