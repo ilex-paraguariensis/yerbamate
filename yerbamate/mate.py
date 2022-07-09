@@ -67,7 +67,7 @@ class Mate:
 
         # save parameters in results folder
         os.system(
-            f"cp {os.path.join(self.root_folder, 'models', model_name, f'{params}.json')} {os.path.join(self.root_folder, 'models', model_name, 'results', params, 'train_parameters.json')}"
+            f"cp {os.path.join(self.root_folder, 'models', model_name, 'hyperparameters' , f'{params}.json')} {os.path.join(self.save_path, 'train_parameters.json')}"
         )
 
     def __read_hyperparameters(self, model_name: str, params: str = "default"):
@@ -131,19 +131,13 @@ class Mate:
                 f'Are you sure you want to remove model "{model_name}"? (y/n)\n'
             )
         if action == "y":
-            os.system(
-                f"rm -r {os.path.join(self.root_folder, 'models', model_name)}"
-            )
+            os.system(f"rm -r {os.path.join(self.root_folder, 'models', model_name)}")
             print(f"Removed model {model_name}")
         else:
             print("Ok, exiting.")
 
     def list(self, folder: str):
-        print(
-            "\n".join(
-                tuple("\t" + str(m) for m in self.__list_packages(folder))
-            )
-        )
+        print("\n".join(tuple("\t" + str(m) for m in self.__list_packages(folder))))
 
     def clone(self, source_model: str, target_model: str):
         os.system(
@@ -159,9 +153,7 @@ class Mate:
             name.split("__")
             for name in os.listdir(os.path.join(self.root_folder, "snapshots"))
         ]
-        matching_snapshots = [
-            name for name in snapshot_names if name[0] == model_name
-        ]
+        matching_snapshots = [name for name in snapshot_names if name[0] == model_name]
         max_version_matching = (
             max([int(name[1]) for name in matching_snapshots])
             if len(matching_snapshots) > 0
@@ -179,12 +171,8 @@ class Mate:
         trainer.fit(model, datamodule=data_module)
 
     def train(self, model_name: str, params: str = "default"):
-        assert (
-            model_name in self.models
-        ), f'Model "{model_name}" does not exist.'
-        print(
-            f"Training model {model_name} with hyperparameters: {params}.json"
-        )
+        assert model_name in self.models, f'Model "{model_name}" does not exist.'
+        print(f"Training model {model_name} with hyperparameters: {params}.json")
 
         self.__set_save_path(model_name, params)
         checkpoint_path = os.path.join(self.save_path, "model.pt")
@@ -202,21 +190,15 @@ class Mate:
         self.__fit(model_name, params)
 
     def test(self, model_name: str, params: str):
-        assert (
-            model_name in self.models
-        ), f'Model "{model_name}" does not exist.'
+        assert model_name in self.models, f'Model "{model_name}" does not exist.'
         params = "parameters" if params == "" or params == "None" else params
-        print(
-            f"Testing model {model_name} with hyperparameters: {params}.json"
-        )
+        print(f"Testing model {model_name} with hyperparameters: {params}.json")
 
         trainer, model, data_module = self.__get_trainer(model_name, params)
         trainer.test(model, datamodule=data_module)
 
     def restart(self, model_name: str, params: str):
-        assert (
-            model_name in self.models
-        ), f'Model "{model_name}" does not exist.'
+        assert model_name in self.models, f'Model "{model_name}" does not exist.'
         params = "parameters" if params == "" or params == "None" else params
         print(f"Restarting model {model_name} with parameters: {params}.json")
 
