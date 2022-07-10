@@ -2,12 +2,14 @@ README.md
 setup.cfg
 setup.py
 ./src/mate
+mate/__init__.py
+mate/cache.py
+mate/monitor.py
+mate/optimizer.py
 yerbamate/__init__.py
 yerbamate/__main__.py
 yerbamate/bunch.py
-yerbamate/copymate.py
 yerbamate/logger.py
-yerbamate/maaaaate.py
 yerbamate/mate.py
 yerbamate/mate_cli.py
 yerbamate/plot.py

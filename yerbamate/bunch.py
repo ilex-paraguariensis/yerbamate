@@ -6,9 +6,7 @@ import json
 class Bunch(dict):
     def __init__(self, keyvals: dict):
         for key, val in keyvals.items():
-            self.__dict__[key] = (
-                val if not isinstance(val, dict) else Bunch(val)
-            )
+            self.__dict__[key] = val if not isinstance(val, dict) else Bunch(val)
         self.__dict__ = self
 
 
@@ -16,15 +14,16 @@ class Bunch(dict):
     def __init__(self, kwargs):
         super().__init__(kwargs)
         for key, val in kwargs.items():
-            self.__dict__[key] = (
-                val if not isinstance(val, dict) else Bunch(val)
-            )
+            self.__dict__[key] = val if not isinstance(val, dict) else Bunch(val)
 
     def to_dict(self):
         proto = self.__dict__.copy()
         for key, val in proto.items():
             proto[key] = val if not isinstance(val, Bunch) else val.to_dict()
         return proto
+
+    def contains(self, key):
+        return key in self.keys()
 
     def __str__(self):
         return json.dumps(self.to_dict(), indent=4)

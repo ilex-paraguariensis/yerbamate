@@ -12,6 +12,7 @@ import sys
 import importlib
 import pkgutil
 from .logger import CustromLogger
+import mate
 
 
 class Mate:
@@ -21,7 +22,10 @@ class Mate:
         self.current_folder = os.path.dirname(__file__)
         self.__findroot()
         self.models = self.__list_packages("models")
-        # self.__import_submodules(self.root_folder)
+        self.is_restart = False
+
+    def __init_cache(self):
+        self.cache = mate.Cache(self.save_path)
 
     def __list_packages(self, folder: str):
         return (
@@ -86,6 +90,7 @@ class Mate:
         os.system(
             f"cp {os.path.join(self.root_folder, 'models', model_name, 'hyperparameters' , f'{params}.json')} {os.path.join(self.save_path, 'train_parameters.json')}"
         )
+        self.__init_cache()
 
     def __override_params(self, params: Bunch):
         if "override_params" in self.config and self.config.override_params.enabled:
@@ -94,6 +99,22 @@ class Mate:
                     key = "override_params"
                 params[key] = value
         return params
+
+    def __reload_lr_from_cache(self, params: Bunch):
+        if not self.is_restart:
+            return params
+        params["restarted"] = True
+        try:
+            lr = self.cache.get("lr", None)["lr-Adam"]
+            if lr != params.optimizer.lr:
+                optimizer = params.optimizer
+                optimizer.lr = lr
+                params.optimizer = optimizer
+                print(f"Reloaded learning rate to {lr}")
+                return params
+            return params
+        except:
+            return params
 
     def __read_hyperparameters(self, model_name: str, params: str = "default"):
         with open(
@@ -107,6 +128,7 @@ class Mate:
         ) as f:
             params = json.load(f)
         params = Bunch(params)
+        params = self.__reload_lr_from_cache(params)
         params = self.__override_params(params)
         print(json.dumps(params, indent=4))
         return params
@@ -116,7 +138,7 @@ class Mate:
         params = self.__read_hyperparameters(model_name, params)
         params.save_path = self.save_path
         model = self.__load_model_class(model_name)(params)
-        print(model)
+        # print(model)
         data_module = self.__load_data_loader_class(params.data_loader)(params)
         logger_module = self.__load_logger_class()
         params.model = model_name
@@ -126,17 +148,26 @@ class Mate:
             print(f"Loaded model from {checkpoint_path}")
             model.load_state_dict(t.load(checkpoint_path))
 
+        # TODO assert that optimizer is in params
+        callbacks = []
+        if params.contains("optimizer"):
+            if params.optimizer.contains("early_stopping_patience"):
+                early_stopping = EarlyStopping(
+                    monitor=params.optimizer.monitor,
+                    patience=params.optimizer.early_stopping_patience,
+                    verbose=True,
+                )
+                callbacks.append(early_stopping)
+
+            if params.optimizer.contains("lr_scheduler"):
+                callback = mate.LearningRateMonitor(self.cache, "epoch")
+                callbacks.append(callback)
+
         return (
             Trainer(
                 max_epochs=params.max_epochs,
                 gpus=(1 if params.cuda else None),
-                callbacks=[
-                    EarlyStopping(
-                        monitor="val_loss",
-                        patience=params.early_stopping_patience,
-                    ),
-                    # checkpoint_callback,
-                ],
+                callbacks=callbacks,
                 logger=logger_module(params),
                 enable_checkpointing=False,
             ),
@@ -228,6 +259,7 @@ class Mate:
         params = "parameters" if params == "" or params == "None" else params
         print(f"Restarting model {model_name} with parameters: {params}.json")
 
+        self.is_restart = True
         self.__fit(model_name, params)
 
     def tune(self, model: str, params: tuple[str, ...]):
