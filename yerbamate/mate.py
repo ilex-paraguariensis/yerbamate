@@ -2,7 +2,7 @@ import os
 from argparse import ArgumentParser
 import importlib
 from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import EarlyStopping
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from .bunch import Bunch
 from torch import nn
 import torch as t
@@ -107,11 +107,10 @@ class Mate:
         try:
             lr = self.cache.get("lr", None)["lr-Adam"]
             if lr != params.optimizer.lr:
-                optimizer = params.optimizer
-                optimizer.lr = lr
-                params.optimizer = optimizer
+                opt = params.optimizer
+                opt.lr = lr
+                params.optimizer = opt
                 print(f"Reloaded learning rate to {lr}")
-                return params
             return params
         except:
             return params
@@ -143,37 +142,51 @@ class Mate:
         logger_module = self.__load_logger_class()
         params.model = model_name
 
-        checkpoint_path = os.path.join(self.save_path, "model.pt")
-        if os.path.exists(checkpoint_path):
-            print(f"Loaded model from {checkpoint_path}")
-            model.load_state_dict(t.load(checkpoint_path))
+        checkpoint_path = os.path.join(self.save_path, "checkpoint")
+        checkpoint_file = os.path.join(checkpoint_path, "last.ckpt")
+        if os.path.exists(checkpoint_file):
+            print(f"Loaded model from {checkpoint_file}")
+            model = model.load_from_checkpoint(
+                checkpoint_file, params=params, strict=False
+            )
+            # model.params = params
+
+        callbacks = []
+        model_saver_callback = mate.ModelCheckpoint(
+            checkpoint_path,
+            filename="best",
+            save_top_k=1,
+            save_weights_only=False,  # BUG: can't save and reload everything for now, save stats for now
+            save_last=True,
+            verbose=True,
+            monitor="val_loss",
+            mode="min",
+        )
+
+        callbacks.append(model_saver_callback)
 
         # TODO assert that optimizer is in params
-        callbacks = []
         if params.contains("optimizer"):
             if params.optimizer.contains("early_stopping_patience"):
                 early_stopping = EarlyStopping(
                     monitor=params.optimizer.monitor,
                     patience=params.optimizer.early_stopping_patience,
                     verbose=True,
+                    strict=False,
                 )
                 callbacks.append(early_stopping)
 
-            if params.optimizer.contains("lr_scheduler"):
-                callback = mate.LearningRateMonitor(self.cache, "epoch")
-                callbacks.append(callback)
+        monitor = mate.OptimizerMonitor(params, "epoch")
+        callbacks.append(monitor)
 
-        return (
-            Trainer(
-                max_epochs=params.max_epochs,
-                gpus=(1 if params.cuda else None),
-                callbacks=callbacks,
-                logger=logger_module(params),
-                enable_checkpointing=False,
-            ),
-            model,
-            data_module,
+        trainer = Trainer(
+            max_epochs=params.max_epochs,
+            gpus=(1 if params.cuda else None),
+            callbacks=callbacks,
+            logger=logger_module(params),
+            enable_checkpointing=True,
         )
+        return (trainer, model, data_module)
 
     def init(self):
         pass
@@ -225,6 +238,12 @@ class Mate:
 
     def __fit(self, model_name: str, params: str):
         trainer, model, data_module = self.__get_trainer(model_name, params)
+
+        # if self.is_restart:
+        #     checkpoint_path = os.path.join(self.save_path, "checkpoint", "last.ckpt")
+        #     trainer.fit(model, datamodule=data_module, ckpt_path=checkpoint_path)
+        # else:
+        #     trainer.fit(model, datamodule=data_module)
         trainer.fit(model, datamodule=data_module)
 
     def train(self, model_name: str, params: str = "default"):
@@ -232,18 +251,23 @@ class Mate:
         print(f"Training model {model_name} with hyperparameters: {params}.json")
 
         self.__set_save_path(model_name, params)
-        checkpoint_path = os.path.join(self.save_path, "model.pt")
+        checkpoint_path = os.path.join(self.save_path, "checkpoint", "last.ckpt")
         action = "go"
         if os.path.exists(checkpoint_path):
             while action not in ("y", "n", ""):
                 action = input(
                     "Checkpiont file exists. Re-training will erase it. Continue? ([y]/n)\n"
                 )
-            if action in ("y", ""):
-                os.remove(checkpoint_path)
+            if action in ("y", "", "Y"):
+                os.remove(checkpoint_path)            
             else:
                 print("Ok, exiting.")
                 return
+
+        # delete old checkpoints
+        os.system(f"rm {os.path.join(self.save_path, 'checkpoint','optimizer*.pt')}")
+        os.system(f"rm {os.path.join(self.save_path, 'checkpoint','scheduler*.pt')}")
+
         self.__fit(model_name, params)
 
     def test(self, model_name: str, params: str):

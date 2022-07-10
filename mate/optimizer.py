@@ -35,6 +35,7 @@ class Optimizer:
                 lr=self.params.lr,
                 betas=(self.params.beta1, self.params.beta2),
             )
+            
 
     def __init_lr_scheduler(self):
 
@@ -72,3 +73,4 @@ class Optimizer:
                 threshold=self.params.lr_scheduler.threshold,
                 threshold_mode=self.params.lr_scheduler.threshold_mode,
             )
+            

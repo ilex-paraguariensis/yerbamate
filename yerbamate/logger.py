@@ -12,6 +12,7 @@ class CustromLogger(TensorBoardLogger):
         super().__init__("logs", params.model)
         # ipdb.set_trace()
         self.params = params
+        # self.log("val_loss", 0.1)
 
 
 class CustomLoggerz(LightningLoggerBase):

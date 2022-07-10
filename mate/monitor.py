@@ -31,9 +31,15 @@ from pytorch_lightning.utilities.exceptions import MisconfigurationException
 from pytorch_lightning.utilities.rank_zero import rank_zero_deprecation, rank_zero_warn
 from pytorch_lightning.utilities.types import LRSchedulerConfig
 import mate
+from yerbamate.bunch import Bunch
+import os
+import torch as t
+import ipdb
 
 
-class LearningRateMonitor(Callback):
+# USED for storing/restoring lr_scheduler and optimizer state
+
+class OptimizerMonitor(Callback):
     r"""
     Automatically monitor and logs learning rate for learning rate schedulers during training.
 
@@ -90,7 +96,9 @@ class LearningRateMonitor(Callback):
 
     def __init__(
         self,
-        cache: mate.Cache,
+        # cache: mate.Cache,
+        # model: pl.LightningModule,
+        params: Bunch,
         logging_interval: Optional[str] = None,
         log_momentum: bool = False,
     ) -> None:
@@ -103,9 +111,46 @@ class LearningRateMonitor(Callback):
         self.log_momentum = log_momentum
         self.lrs: Dict[str, List[float]] = {}
         self._lr_sch_names: List[str] = []
-        self.cache = cache
+        # self.cache = cache
+        # self.model = model
+        self.params = params
+
+    def _save_opt_states(self, trainer: "pl.Trainer") -> None:
+
+        for i, optimizer in enumerate(trainer.optimizers):
+            file_path = os.path.join(
+                self.params.save_path, "checkpoint", f"optimizer_{i}.pt"
+            )
+            t.save(optimizer.state_dict(), file_path)
+
+        for i, scheduler in enumerate(trainer.lr_schedulers):
+            file_path = os.path.join(
+                self.params.save_path, "checkpoint", f"scheduler_{i}.pt"
+            )
+            t.save(scheduler['scheduler'].state_dict(), file_path)
+
+    def _load_opt_states(self, trainer: pl.Trainer) -> None:
+        # ipdb.set_trace()
+        for i, optimizer in enumerate(trainer.optimizers):
+            file_path = os.path.join(
+                self.params.save_path, "checkpoint", f"optimizer_{i}.pt"
+            )
+            if os.path.exists(file_path):
+                optimizer.load_state_dict(t.load(file_path))
+                print("LOAD OPTIMIZER")
+
+        for i, scheduler in enumerate(trainer.lr_schedulers):
+            file_path = os.path.join(
+                self.params.save_path, "checkpoint", f"scheduler_{i}.pt"
+            )
+            if os.path.exists(file_path):
+                scheduler['scheduler'].load_state_dict(t.load(file_path))
+                print("LOAD SCHEDULER")
 
     def on_train_start(self, trainer: "pl.Trainer", *args: Any, **kwargs: Any) -> None:
+
+        self._load_opt_states(trainer)
+
         """Called before training, determines unique names for all lr schedulers in the case of multiple of the
         same type or in the case of multiple parameter groups.
 
@@ -176,13 +221,13 @@ class LearningRateMonitor(Callback):
                         latest_stat,
                         step=trainer.fit_loop.epoch_loop._batches_that_stepped,
                     )
-                self.save_lr(latest_stat)
+                self.save_lr(trainer)
 
-    def save_lr(self, stats):
-        self.cache.set("lr", stats)        
+    def save_lr(self, trainer):
+        self._save_opt_states(trainer)
+        # self.cache.set("lr", stats)
         # print("lr", stats)
         # print("SAVE LR")
-
 
     def on_train_epoch_start(
         self, trainer: "pl.Trainer", *args: Any, **kwargs: Any
@@ -197,7 +242,7 @@ class LearningRateMonitor(Callback):
                         latest_stat,
                         step=trainer.fit_loop.epoch_loop._batches_that_stepped,
                     )
-                self.save_lr(latest_stat)
+                self.save_lr(trainer)
 
     def _extract_stats(self, trainer: "pl.Trainer", interval: str) -> Dict[str, float]:
         latest_stat = {}
