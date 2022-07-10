@@ -241,7 +241,7 @@ class Mate:
 
         # if self.is_restart:
         #     checkpoint_path = os.path.join(self.save_path, "checkpoint", "last.ckpt")
-        #     trainer.fit(model, datamodule=data_module, ckpt_path=checkpoint_path)
+        # trainer.fit(model, datamodule=data_module, ckpt_path=checkpoint_path)
         # else:
         #     trainer.fit(model, datamodule=data_module)
         trainer.fit(model, datamodule=data_module)
@@ -259,7 +259,7 @@ class Mate:
                     "Checkpiont file exists. Re-training will erase it. Continue? ([y]/n)\n"
                 )
             if action in ("y", "", "Y"):
-                os.remove(checkpoint_path)            
+                os.remove(checkpoint_path)
             else:
                 print("Ok, exiting.")
                 return

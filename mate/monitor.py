@@ -39,6 +39,7 @@ import ipdb
 
 # USED for storing/restoring lr_scheduler and optimizer state
 
+
 class OptimizerMonitor(Callback):
     r"""
     Automatically monitor and logs learning rate for learning rate schedulers during training.
@@ -116,21 +117,25 @@ class OptimizerMonitor(Callback):
         self.params = params
 
     def _save_opt_states(self, trainer: "pl.Trainer") -> None:
+        try:
+            for i, optimizer in enumerate(trainer.optimizers):
+                file_path = os.path.join(
+                    self.params.save_path, "checkpoint", f"optimizer_{i}.pt"
+                )
 
-        for i, optimizer in enumerate(trainer.optimizers):
-            file_path = os.path.join(
-                self.params.save_path, "checkpoint", f"optimizer_{i}.pt"
-            )
-            t.save(optimizer.state_dict(), file_path)
+                t.save(optimizer.state_dict(), file_path)
 
-        for i, scheduler in enumerate(trainer.lr_schedulers):
-            file_path = os.path.join(
-                self.params.save_path, "checkpoint", f"scheduler_{i}.pt"
-            )
-            t.save(scheduler['scheduler'].state_dict(), file_path)
+            for i, scheduler in enumerate(trainer.lr_schedulers):
+                file_path = os.path.join(
+                    self.params.save_path, "checkpoint", f"scheduler_{i}.pt"
+                )
+                t.save(scheduler["scheduler"].state_dict(), file_path)
+        except Exception as e:
+            pass
 
     def _load_opt_states(self, trainer: pl.Trainer) -> None:
         # ipdb.set_trace()
+
         for i, optimizer in enumerate(trainer.optimizers):
             file_path = os.path.join(
                 self.params.save_path, "checkpoint", f"optimizer_{i}.pt"
@@ -144,7 +149,7 @@ class OptimizerMonitor(Callback):
                 self.params.save_path, "checkpoint", f"scheduler_{i}.pt"
             )
             if os.path.exists(file_path):
-                scheduler['scheduler'].load_state_dict(t.load(file_path))
+                scheduler["scheduler"].load_state_dict(t.load(file_path))
                 print("LOAD SCHEDULER")
 
     def on_train_start(self, trainer: "pl.Trainer", *args: Any, **kwargs: Any) -> None:
