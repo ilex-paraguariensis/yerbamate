@@ -23,7 +23,7 @@ def denorm_tanh_to_image(x):
     return (x + 1) / 2
 
 
-class MovingSSIM(torchmetrics.SSIM):
+class MovingSSIM(torchmetrics.StructuralSimilarityIndexMeasure):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
