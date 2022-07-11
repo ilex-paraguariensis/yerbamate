@@ -8,7 +8,7 @@ setup(
     author="Giulio Zani, Ali Rahimi",
     author_email="giulio.zani@gmail.com",
     scripts=["src/run.py"],
-    packages=["src/yerbamate"],
+    packages=["src/yerbamate", "mate"],
     url="https://github.com/giuliozani/mate",
     keywords="deep_learning machine_learning package_manager",
     install_requires=["torch", "pytorch_lightning", "numpy",],

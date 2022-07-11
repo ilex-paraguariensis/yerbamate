@@ -6,7 +6,6 @@ from mate.monitor import OptimizerMonitor
 # import mate.callback as callback
 from mate.metrics import DenormMSE, denorm_tanh_to_image, denorm_image_to_tanh_quantize
 
-
 __all__ = [
     "Cache",
     "Optimizer",
