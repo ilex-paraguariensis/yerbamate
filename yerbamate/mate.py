@@ -137,10 +137,13 @@ class Mate:
         params = self.__read_hyperparameters(model_name, params)
         params.save_path = self.save_path
         model = self.__load_model_class(model_name)(params)
-        # print(model)
         data_module = self.__load_data_loader_class(params.data_loader)(params)
         logger_module = self.__load_logger_class()
         params.model = model_name
+
+        if self.config.contains("print_model"):
+            if self.config.print_model:
+                print(model)
 
         checkpoint_path = os.path.join(self.save_path, "checkpoint")
         checkpoint_file = os.path.join(checkpoint_path, "last.ckpt")

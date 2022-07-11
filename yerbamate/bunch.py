@@ -25,6 +25,9 @@ class Bunch(dict):
     def contains(self, key):
         return key in self.keys()
 
+    def has(self, key):
+        return self.contains(key)
+
     def __str__(self):
         return json.dumps(self.to_dict(), indent=4)
 
