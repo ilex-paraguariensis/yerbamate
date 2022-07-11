@@ -16,7 +16,7 @@ class DenormMSE(torchmetrics.MeanSquaredError):
         self.denorm_fn = denorm_fn
 
     def update(self, preds: t.Tensor, target: t.Tensor) -> None:
-        return super().update(self.denrom_fn(preds), self.denorm_fn(target))
+        return super().update(self.denorm_fn(preds), self.denorm_fn(target))
 
 
 def denorm_tanh_to_image(x):
