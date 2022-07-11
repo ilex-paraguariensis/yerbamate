@@ -13,5 +13,3 @@ mate/metrics.py
 mate/model_checkpoint.py
 mate/monitor.py
 mate/optimizer.py
-mate/metrics/__init__.py
-mate/metrics/denorm_mse.py
