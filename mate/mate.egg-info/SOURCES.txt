@@ -1,9 +1,0 @@
-LICENSE.txt
-README.md
-setup.cfg
-setup.py
-src/mate.egg-info/PKG-INFO
-src/mate.egg-info/SOURCES.txt
-src/mate.egg-info/dependency_links.txt
-src/mate.egg-info/requires.txt
-src/mate.egg-info/top_level.txt

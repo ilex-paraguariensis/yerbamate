@@ -1,3 +1,0 @@
-torch
-pytorch_lightning
-numpy

@@ -4,9 +4,12 @@ setup.py
 ./src/mate
 mate/__init__.py
 mate/cache.py
+mate/met.py
 mate/model_checkpoint.py
 mate/monitor.py
 mate/optimizer.py
+mate/metrics/__init__.py
+mate/metrics/denorm_mse.py
 yerbamate/__init__.py
 yerbamate/__main__.py
 yerbamate/bunch.py
