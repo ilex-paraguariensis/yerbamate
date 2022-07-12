@@ -7,7 +7,7 @@ import ipdb
 from argparse import Namespace
 
 
-class CustromLogger(TensorBoardLogger):
+class CustomLogger(TensorBoardLogger):
     def __init__(self, params: Namespace):
         super().__init__("logs", params.model)
         # ipdb.set_trace()
