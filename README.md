@@ -9,8 +9,8 @@ It makes development fast, easy, and the results replicable. You can focus more 
 Install the stable version via pip:
 ```
 pip install ymdl
--->
 ```
+-->
 To install mate you need to do the following:
 ```
 git clone https://github.com/ilex-paraguariensis/yerbamate 
