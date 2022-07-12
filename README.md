@@ -11,11 +11,11 @@ Install the stable version via pip:
 pip install ymdl
 -->
 ```
-To have the latest development version, use the following command:
+To install mate you need to do the following:
 ```
 git clone https://github.com/ilex-paraguariensis/yerbamate 
 cd yerbamate
-python update_local.py
+python install.py
 ```
 
 ## Quick Start
