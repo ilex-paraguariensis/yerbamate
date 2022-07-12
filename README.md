@@ -1,7 +1,7 @@
 # Maté 🧉
 
 ## What is Mate?
-It is a tool for building research projects in the field of deep learning with pytorch.
+It is a tool for building research projects in the field of deep learning with [Pytorch](https://pytorch.org/) and builds on top of [Lightning](https://www.pytorchlightning.ai/).
 It makes development fast, easy, and the results replicable. You can focus more on the model, and less on boilerplate code.
 
 ## Installation
