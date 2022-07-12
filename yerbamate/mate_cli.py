@@ -104,5 +104,4 @@ def main():
                 method_args_types, method_args_defaults, raw_method_args
             )
         )
-        print(f"{method_args=}")
         getattr(mate, action)(*method_args)
