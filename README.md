@@ -34,6 +34,7 @@ If however you want to test a model once again, you can run:
 mate test ResNet
 ```
 
+<!--
 ## Example Folder Structure
 ```
 ├── classification-demo
@@ -68,6 +69,7 @@ mate test ResNet
 │           └── resnet.py
 ├── mate.json
 └── README.md
+-->
 ```
 
 ## Create your own packages
@@ -84,6 +86,5 @@ mate install ilex-paraguariensis/ResNet
 ## Contact
 
 For questions please contact:
-
 
 yerba.mate.dl(at)proton.me
