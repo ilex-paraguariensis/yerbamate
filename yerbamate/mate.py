@@ -133,22 +133,53 @@ class Mate:
         except:
             return params
 
-    def __read_hyperparameters(self, model_name: str, params: str = "default"):
+    def __read_hyperparameters(
+        self, model_name: str, hparams_name: str = "default"
+    ):
         with open(
             os.path.join(
                 self.root_folder,
                 "models",
                 model_name,
                 "hyperparameters",
-                f"{params}.json",
+                f"{hparams_name}.json",
             )
         ) as f:
-            params = json.load(f)
-        params = Bunch(params)
-        params = self.__reload_lr_from_cache(params)
-        params = self.__override_params(params)
-        print(json.dumps(params, indent=4))
-        return params
+            hparams = json.load(f)
+        env_location = os.path.join(self.root_folder, "env.json",)
+        if not os.path.exists(env_location):
+            print(f"Could not find env.json in {env_location}. Created one.")
+            with open(env_location, "w") as f:
+                json.dump({}, f)
+
+        with open(env_location) as f:
+            env = json.load(f)
+
+        env_in_params = [
+            (key, val)
+            for key, val in hparams.items()
+            if key.startswith("env.")
+        ]
+        modified_env = False
+        for key, val in env_in_params:
+            stripped_key = key[4:]
+            if key not in env:
+                env[stripped_key] = val
+                modified_env = True
+            hparams[stripped_key] = env[stripped_key]
+            hparams.pop(key, None)
+
+        if modified_env:
+            with open(env_location, "w") as f:
+                json.dump(env, f, indent=4)
+            print("Updated env.json")
+            print(json.dumps(env, indent=4))
+
+        hparams = Bunch(hparams)
+        hparams = self.__reload_lr_from_cache(hparams)
+        hparams = self.__override_params(hparams)
+        print(json.dumps(hparams, indent=4))
+        return hparams
 
     def __get_trainer(self, model_name: str, params: str):
         self.__set_save_path(model_name, params)
