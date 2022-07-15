@@ -16,6 +16,7 @@ yerbamate/mate.py
 yerbamate/mate_cli.py
 yerbamate/plot.py
 yerbamate/tune_hyperparameters.py
+yerbamate/utils.py
 ymdl.egg-info/PKG-INFO
 ymdl.egg-info/SOURCES.txt
 ymdl.egg-info/dependency_links.txt
