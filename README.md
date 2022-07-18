@@ -4,13 +4,12 @@
 It is a tool for building research projects in the field of deep learning with [Pytorch](https://pytorch.org/) and builds on top of [Lightning](https://www.pytorchlightning.ai/) and does not intend to replace any of their functionalities.
 It makes development fast, easy, and the results replicable. You can focus more on the model, and less on boilerplate code.
 
+
+### A word of notice
+This project is still at its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
+
 ## Installation
-<!--
-Install the stable version via pip:
-```
-pip install ymdl
-```
--->
+
 To install mate you need to do the following:
 ```
 git clone https://github.com/ilex-paraguariensis/yerbamate 
