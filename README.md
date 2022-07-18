@@ -1,7 +1,7 @@
 # Maté 🧉
 
 ## What is Mate?
-It is a tool for building research projects in the field of deep learning with [Pytorch](https://pytorch.org/) and builds on top of [Lightning](https://www.pytorchlightning.ai/).
+It is a tool for building research projects in the field of deep learning with [Pytorch](https://pytorch.org/) and builds on top of [Lightning](https://www.pytorchlightning.ai/) and does not intend to replace any of their functionalities.
 It makes development fast, easy, and the results replicable. You can focus more on the model, and less on boilerplate code.
 
 ## Installation
@@ -33,47 +33,12 @@ If however you want to test a model once again, you can run:
 ```bash
 mate test ResNet
 ```
-
-<!--
-## Example Folder Structure
+Creating *snapshots*. While developing, it is often useful to freeze the current version of a well-perfoming models. And then keep on developing it.
 ```
-├── classification-demo
-│   ├── base_lightning
-│   │   └── BaseClassificationLightningModule.py
-│   ├── data
-│   │   ├── cifar10
-│   │   │   ├── data_loader.py
-│   │   │   └── parameters.json
-│   │   └── imagenet
-│   │       ├── data_loader.py
-│   │       ├── parameters.json
-│   │       └── pre_processing.py
-│   ├── env_parameters.json
-│   ├── models
-│   │   ├── convlstm
-│   │   │   ├── convlstmcell
-│   │   │   │   ├── convlstmcell.py
-│   │   │   │   └── parameters.json
-│   │   │   ├── convlstm.py
-│   │   │   ├── model.py
-│   │   │   └── parameters.json
-│   │   └── resnet
-│   │       ├── model.py
-│   │       ├── parameters.json
-│   │       └── resnet.py
-│   ├── parameters.json
-│   └── snapshots
-│       └── resnet__1
-│           ├── model.py
-│           ├── parameters.json
-│           └── resnet.py
-├── mate.json
-└── README.md
--->
+mate snapshot ResNet # will create a snapshot of the current model in a separate folder
 ```
-
 ## Create your own packages
-
+```
 You can install a model from a git repository:
 ```
 mate install https://gitlab.com/fancyExampleName/fancyModelRepo
