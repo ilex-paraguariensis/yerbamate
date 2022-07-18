@@ -42,12 +42,14 @@ Creating *snapshots*. While developing, it is often useful to freeze the current
 mate snapshot ResNet # will create a snapshot of the current model in a separate folder
 ```
 ## Create your own packages
-```
+
 You can install a model from a git repository:
+
 ```
 mate install https://gitlab.com/fancyExampleName/fancyModelRepo
 ````
 Or, if the repo is on github, you can use the shorthand notation:
+
 ```
 mate install ilex-paraguariensis/ResNet
 ```
