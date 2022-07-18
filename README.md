@@ -15,7 +15,7 @@ This project is still at its early stages and is not ready for production. Some 
 
 ## Installation
 
-To install mate you need to do the following:
+At the moment it only works on Linux and MacOS. Windows is on its way. To install mate you need to do the following:
 ```
 git clone https://github.com/ilex-paraguariensis/yerbamate 
 cd yerbamate
