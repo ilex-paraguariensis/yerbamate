@@ -241,7 +241,9 @@ class Mate:
         return (trainer, model, data_module)
 
     def init(self):
-        pass
+        os.system("git clone https://github.com/ilex-paraguariensis/init-mate-project")
+        os.system("rm -rf init-mate-project/.git")
+        os.system("mv init-mate-project/* .")
 
     def create(self, path: str):
         pass
