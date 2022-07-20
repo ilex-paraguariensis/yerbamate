@@ -34,7 +34,7 @@ python install.py
 ```
 
 ## Quick Start
-Init a project:
+Create a new project:
 ```
 mate init my-imagenet-classifier --dataset cifar10 --model resnet
 ```
