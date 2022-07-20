@@ -78,7 +78,7 @@ Or, if the repo is on github, you can use the shorthand notation:
 mate install ilex-paraguariensis/ResNet 
 ```
 
-## Contact
+## Contact 🤝 
 
 For questions please contact:
 
