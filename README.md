@@ -38,7 +38,7 @@ Init a project:
 ```
 mate init my-imagenet-classifier --dataset cifar10 --model resnet
 ```
-And then go ahead and train it!
+And then go ahead and train it! (no coding so far)
 ```
 mate train resnet cifar10 
 ```
