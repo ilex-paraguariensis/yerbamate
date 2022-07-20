@@ -64,17 +64,18 @@ mate snapshot ResNet
 ```
 This will create a snapshot of the current model in a separate folder. Keeping track of the version.
 
-## Create your own packages
+## Publish your models
+If you are using mate in a public repo, then anyone can install your models in their own mate project.
 
-You can install a model from a git repository:
 
+To install a model from a git repository:
 ```
 mate install https://gitlab.com/fancyExampleName/fancyModelRepo
 ````
 Or, if the repo is on github, you can use the shorthand notation:
 
 ```
-mate install ilex-paraguariensis/ResNet
+mate install ilex-paraguariensis/ResNet 
 ```
 
 ## Contact
