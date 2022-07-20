@@ -1,7 +1,7 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 
 ## What is Maté?
-It is a tool for building research projects in the field of deep learning with [Pytorch](https://pytorch.org/) and builds on top of [Lightning](https://www.pytorchlightning.ai/) and does not try to replace their functionalities. It targets some of the following issues in DL research:
+It is a tool for building research projects in the field of deep learning with [Pytorch](https://pytorch.org/) and builds on top of [Lightning](https://www.pytorchlightning.ai/) and does not replace their functionalities. It targets some of the following issues in DL research:
 
 - reproducibility
 - replicability
@@ -20,6 +20,8 @@ Finally, you can change **hyperparameters** by editing a `json` file that looks 
 ```
 {
 	"batch_size": 32,
+	"optimizer":...
+	"transformer":...
 	...
 }
 ```
