@@ -29,7 +29,7 @@ mate install ilex-paraguariensis/ResNet
 ```
 Then train it:
 ```bash
-mate train ResNet
+mate train ResNet imagenet
 ```
 The best performing model is saved, along with all of the training hyperparameters, test results, and training logs.
 
