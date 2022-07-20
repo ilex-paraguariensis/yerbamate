@@ -1,6 +1,6 @@
 # Maté 🧉
 
-## What is Mate?
+## What is Maté?
 It is a tool for building research projects in the field of deep learning with [Pytorch](https://pytorch.org/) and builds on top of [Lightning](https://www.pytorchlightning.ai/) and does not intend to replace any of their functionalities. It targets some of the following issues in DL research:
 
 - reproducibility
@@ -13,7 +13,7 @@ It also makes development fast and easy. You can focus more on the model, and le
 This project is still at its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
 
 
-## Is Mate simple to use?
+## Is Maté simple to use?
 Maté models are nothing but regular torch models. And the training loops are lightning models. Also the default training loops for regression and classification will work for most use-cases so no need to create your own.
 
 Finally, you can change **hyperparameters** by editing a `json` file that looks something like:
@@ -34,21 +34,28 @@ python install.py
 ```
 
 ## Quick Start
-Install a model:
-```bash
-mate install ilex-paraguariensis/ResNet
+Init a project:
 ```
-Then train it:
-```bash
-mate train ResNet imagenet
+mate init my-imagenet-classifier --dataset cifar10 --model resnet
+```
+And then go ahead and train it!
+```
+mate train resnet cifar10 
 ```
 The best performing model is saved, along with all of the training hyperparameters, test results, and training logs. In CSV format but also compatible with tensorboard.
+
 
 If however you want to test a model once again, you can run:
 ```bash
 mate test ResNet
 ```
 This will automatically load the best model and test it.
+
+
+Install a new model:
+```bash
+mate install ilex-paraguariensis/UNet
+```
 
 
 Creating *snapshots*. While developing, it is often useful to freeze the current version of a well-perfoming models. And then keep on developing it.
