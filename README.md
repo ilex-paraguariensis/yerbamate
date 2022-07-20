@@ -7,7 +7,7 @@ It is a tool for building research projects in the field of deep learning with [
 - replicability
 - transparency
 
-It also makes development fast and easy. You can focus more on the model, and less on boilerplate code.
+It also makes development fast and easy. You should focus more on the model, and less on boilerplate code.
 
 ### A word of notice
 This project is still at its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
