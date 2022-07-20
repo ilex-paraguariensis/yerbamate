@@ -1,4 +1,4 @@
-# Maté 🧉
+<h1 style="color:green">Maté 🧉</h1>
 
 ## What is Maté?
 It is a tool for building research projects in the field of deep learning with [Pytorch](https://pytorch.org/) and builds on top of [Lightning](https://www.pytorchlightning.ai/) and does not intend to replace any of their functionalities. It targets some of the following issues in DL research:
