@@ -9,9 +9,20 @@ It is a tool for building research projects in the field of deep learning with [
 
 It also makes development fast and easy. You can focus more on the model, and less on boilerplate code.
 
-
 ### A word of notice
 This project is still at its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
+
+
+## Is Mate simple to use?
+Maté models are nothing but regular torch models. And the training loops are lightning models. Also the default training loops for regression and classification will work for most use-cases so no need to create your own.
+
+Finally, you can change **hyperparameters** by editing a `json` file that looks something like:
+```
+{
+	"batch_size": 32,
+	...
+}
+```
 
 ## Installation
 
@@ -31,16 +42,21 @@ Then train it:
 ```bash
 mate train ResNet imagenet
 ```
-The best performing model is saved, along with all of the training hyperparameters, test results, and training logs.
+The best performing model is saved, along with all of the training hyperparameters, test results, and training logs. In CSV format but also compatible with tensorboard.
 
 If however you want to test a model once again, you can run:
 ```bash
 mate test ResNet
 ```
+This will automatically load the best model and test it.
+
+
 Creating *snapshots*. While developing, it is often useful to freeze the current version of a well-perfoming models. And then keep on developing it.
 ```
-mate snapshot ResNet # will create a snapshot of the current model in a separate folder
+mate snapshot ResNet
 ```
+This will create a snapshot of the current model in a separate folder. Keeping track of the version.
+
 ## Create your own packages
 
 You can install a model from a git repository:
