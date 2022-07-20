@@ -24,7 +24,7 @@ Finally, you can change **hyperparameters** by editing a `json` file that looks 
 }
 ```
 
-## Installation
+## Installation 🔌
 
 At the moment it only works on Linux and MacOS. Windows is on its way. To install mate you need to do the following:
 ```
@@ -33,12 +33,12 @@ cd yerbamate
 python install.py
 ```
 
-## Quick Start
+## Quick Start 🔥
 Create a new project:
 ```
 mate init my-imagenet-classifier --dataset cifar10 --model resnet
 ```
-And then go ahead and train it! (no coding so far)
+And then go ahead and train it! (no coding so far 🤗)
 ```
 mate train resnet cifar10 
 ```
@@ -64,7 +64,7 @@ mate snapshot ResNet
 ```
 This will create a snapshot of the current model in a separate folder. Keeping track of the version.
 
-## Publish your models
+## Publish your models 🎁 
 If you are using mate in a public repo, then anyone can install your models in their own mate project.
 
 
