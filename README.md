@@ -58,7 +58,7 @@ mate install ilex-paraguariensis/UNet
 ```
 
 
-Creating *snapshots*. While developing, it is often useful to freeze the current version of a well-perfoming models. And then keep on developing it.
+While developing, it's handy to freeze a *snapshot* the current version of a well-perfoming models. And then keep on developing it.
 ```
 mate snapshot ResNet
 ```
