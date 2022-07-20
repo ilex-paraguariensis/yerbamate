@@ -47,7 +47,7 @@ The best performing model is saved, along with all of the training hyperparamete
 
 If however you want to test a model once again, you can run:
 ```bash
-mate test ResNet
+mate test resnet
 ```
 This will automatically load the best model and test it.
 
