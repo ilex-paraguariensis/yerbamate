@@ -24,6 +24,7 @@ class Mate:
         self.__findroot()
         self.models = self.__list_packages("models")
         self.is_restart = False
+        self.run_params = None
 
     def __init_cache(self):
         self.cache = mate.Cache(self.save_path)
@@ -45,7 +46,7 @@ class Mate:
 
     def __findroot(self):
         """
-        Method in charge of finding the root folder of the project and reading the content of mate.json 
+        Method in charge of finding the root folder of the project and reading the content of mate.json
         """
         # path of execution
         current_path = os.getcwd()
@@ -53,9 +54,7 @@ class Mate:
         while not found:
 
             if os.path.exists(os.path.join(current_path, "mate.json")):
-                self.__load_mate_config(
-                    os.path.join(current_path, "mate.json")
-                )
+                self.__load_mate_config(os.path.join(current_path, "mate.json"))
                 self.root_folder = os.path.basename(
                     os.path.join(current_path, self.config.project)
                 )
@@ -82,16 +81,16 @@ class Mate:
         return CustomLogger
 
     def __load_data_loader_class(self, data_loader_name: str):
-        data_class = (
-            f"{self.root_folder}.data_loaders.{data_loader_name}.data_loader"
-        )
+        data_class = f"{self.root_folder}.data_loaders.{data_loader_name}.data_loader"
         return __import__(
-            f"{data_class}", fromlist=["data_loader"],
+            f"{data_class}",
+            fromlist=["data_loader"],
         ).CustomDataModule
 
     def __load_exec_function(self, exec_file: str):
         return __import__(
-            f"{self.root_folder}.exec.{exec_file}", fromlist=["exec"],
+            f"{self.root_folder}.exec.{exec_file}",
+            fromlist=["exec"],
         ).run
 
     def __set_save_path(self, model_name: str, params: str):
@@ -107,35 +106,40 @@ class Mate:
         )
         self.__init_cache()
 
+    def __override_run_params(self, params: Bunch):
+        if self.run_params == None:
+            return params
+        for key, value in self.run_params.items():
+            if "." in key:
+                len_subs = len(key.split("."))
+                if len_subs == 2:
+                    params[key.split(".")[0]][key.split(".")[1]] = value
+                elif len_subs == 3:
+                    params[key.split(".")[0]][key.split(".")[1]][
+                        key.split(".")[2]
+                    ] = value
+                elif len_subs == 4:
+                    params[key.split(".")[0]][key.split(".")[1]][key.split(".")[2]][
+                        key.split(".")[3]
+                    ] = value
+                elif len_subs == 5:
+                    params[key.split(".")[0]][key.split(".")[1]][key.split(".")[2]][
+                        key.split(".")[3]
+                    ][key.split(".")[4]] = value
+                # for now we only support 5 levels of nesting
+            else:
+                params[key] = value
+        return params
+
     def __override_params(self, params: Bunch):
-        if (
-            "override_params" in self.config
-            and self.config.override_params.enabled
-        ):
+        if "override_params" in self.config and self.config.override_params.enabled:
             for key, value in self.config.override_params.items():
                 if key == "enabled":
                     key = "override_params"
                 params[key] = value
         return params
 
-    def __reload_lr_from_cache(self, params: Bunch):
-        if not self.is_restart:
-            return params
-        params["restarted"] = True
-        try:
-            lr = self.cache.get("lr", None)["lr-Adam"]
-            if lr != params.optimizer.lr:
-                opt = params.optimizer
-                opt.lr = lr
-                params.optimizer = opt
-                print(f"Reloaded learning rate to {lr}")
-            return params
-        except:
-            return params
-
-    def __read_hyperparameters(
-        self, model_name: str, hparams_name: str = "default"
-    ):
+    def __read_hyperparameters(self, model_name: str, hparams_name: str = "default"):
         with open(
             os.path.join(
                 self.root_folder,
@@ -146,7 +150,10 @@ class Mate:
             )
         ) as f:
             hparams = json.load(f)
-        env_location = os.path.join(self.root_folder, "env.json",)
+        env_location = os.path.join(
+            self.root_folder,
+            "env.json",
+        )
         if not os.path.exists(env_location):
             print(f"Could not find env.json in {env_location}. Created one.")
             with open(env_location, "w") as f:
@@ -156,9 +163,7 @@ class Mate:
             env = json.load(f)
 
         env_in_params = [
-            (key, val)
-            for key, val in hparams.items()
-            if key.startswith("env.")
+            (key, val) for key, val in hparams.items() if key.startswith("env.")
         ]
         modified_env = False
         for key, val in env_in_params:
@@ -176,9 +181,11 @@ class Mate:
             print(json.dumps(env, indent=4))
 
         hparams = Bunch(hparams)
-        hparams = self.__reload_lr_from_cache(hparams)
         hparams = self.__override_params(hparams)
+        hparams = self.__override_run_params(hparams)
         print(json.dumps(hparams, indent=4))
+        # trick to save parameters, otherwise changes are not saved after return!
+        hparams = Bunch(json.loads(json.dumps(hparams)))
         return hparams
 
     def __get_trainer(self, model_name: str, params: str):
@@ -255,19 +262,13 @@ class Mate:
                 f'Are you sure you want to remove model "{model_name}"? (y/n)\n'
             )
         if action == "y":
-            os.system(
-                f"rm -r {os.path.join(self.root_folder, 'models', model_name)}"
-            )
+            os.system(f"rm -r {os.path.join(self.root_folder, 'models', model_name)}")
             print(f"Removed model {model_name}")
         else:
             print("Ok, exiting.")
 
     def list(self, folder: str):
-        print(
-            "\n".join(
-                tuple("\t" + str(m) for m in self.__list_packages(folder))
-            )
-        )
+        print("\n".join(tuple("\t" + str(m) for m in self.__list_packages(folder))))
 
     def clone(self, source_model: str, target_model: str):
         os.system(
@@ -283,9 +284,7 @@ class Mate:
             name.split("__")
             for name in os.listdir(os.path.join(self.root_folder, "snapshots"))
         ]
-        matching_snapshots = [
-            name for name in snapshot_names if name[0] == model_name
-        ]
+        matching_snapshots = [name for name in snapshot_names if name[0] == model_name]
         max_version_matching = (
             max([int(name[1]) for name in matching_snapshots])
             if len(matching_snapshots) > 0
@@ -309,17 +308,11 @@ class Mate:
         trainer.fit(model, datamodule=data_module)
 
     def train(self, model_name: str, params: str = "default"):
-        assert (
-            model_name in self.models
-        ), f'Model "{model_name}" does not exist.'
-        print(
-            f"Training model {model_name} with hyperparameters: {params}.json"
-        )
+        assert model_name in self.models, f'Model "{model_name}" does not exist.'
+        print(f"Training model {model_name} with hyperparameters: {params}.json")
 
         self.__set_save_path(model_name, params)
-        checkpoint_path = os.path.join(
-            self.save_path, "checkpoint", "last.ckpt"
-        )
+        checkpoint_path = os.path.join(self.save_path, "checkpoint", "last.ckpt")
         action = "go"
         if os.path.exists(checkpoint_path):
             while action not in ("y", "n", ""):
@@ -333,31 +326,21 @@ class Mate:
                 return
 
         # delete old checkpoints
-        os.system(
-            f"rm {os.path.join(self.save_path, 'checkpoint','optimizer*.pt')}"
-        )
-        os.system(
-            f"rm {os.path.join(self.save_path, 'checkpoint','scheduler*.pt')}"
-        )
+        os.system(f"rm {os.path.join(self.save_path, 'checkpoint','optimizer*.pt')}")
+        os.system(f"rm {os.path.join(self.save_path, 'checkpoint','scheduler*.pt')}")
 
         self.__fit(model_name, params)
 
     def test(self, model_name: str, params: str):
-        assert (
-            model_name in self.models
-        ), f'Model "{model_name}" does not exist.'
+        assert model_name in self.models, f'Model "{model_name}" does not exist.'
         params = "parameters" if params == "" or params == "None" else params
-        print(
-            f"Testing model {model_name} with hyperparameters: {params}.json"
-        )
+        print(f"Testing model {model_name} with hyperparameters: {params}.json")
 
         trainer, model, data_module = self.__get_trainer(model_name, params)
         trainer.test(model, datamodule=data_module)
 
     def restart(self, model_name: str, params: str):
-        assert (
-            model_name in self.models
-        ), f'Model "{model_name}" does not exist.'
+        assert model_name in self.models, f'Model "{model_name}" does not exist.'
         params = "parameters" if params == "" or params == "None" else params
         print(f"Restarting model {model_name} with parameters: {params}.json")
 
@@ -375,9 +358,7 @@ class Mate:
         installs a package
         """
         source_model_base_name = (
-            source_model.split(".")[-1]
-            if "." in source_model
-            else source_model
+            source_model.split(".")[-1] if "." in source_model else source_model
         )
         mate_dir = ".matedir"
         if not os.path.exists(mate_dir):
@@ -390,14 +371,11 @@ class Mate:
             os.path.join(source_model, destination_model)
         )
         old_params_files = [
-            os.path.join("hyperparameters", p)
-            for p in os.listdir("hyperparameters")
+            os.path.join("hyperparameters", p) for p in os.listdir("hyperparameters")
         ]
         for old_params_file in old_params_files:
             params_name = old_params_file.split(".")[0]
-            old_params = self.__read_hyperparameters(
-                destination_model, params_name
-            )
+            old_params = self.__read_hyperparameters(destination_model, params_name)
             old_params[source_model_base_name] = new_parameters
             with open(old_params_file, "w") as f:
                 json.dump(old_params, f)

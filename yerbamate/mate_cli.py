@@ -1,3 +1,6 @@
+import json
+
+from yerbamate.bunch import Bunch
 from .mate import Mate
 import inspect
 import ipdb
@@ -26,9 +29,7 @@ def get_methods_with_arguments(class_name):
 
 def prettify_method(method, in_depth: bool = False):
     def cleanup(ann):
-        return (
-            str(ann).replace("<class ", "").replace(">", "").replace("'", "")
-        )
+        return str(ann).replace("<class ", "").replace(">", "").replace("'", "")
 
     def pretty(m):
         return ",\n\t".join(
@@ -41,9 +42,7 @@ def prettify_method(method, in_depth: bool = False):
 
     source_code = inspect.getsource(getattr(Mate, method[0]))
     description = (
-        source_code.split('"""')[1]
-        if '"""' in source_code and in_depth
-        else ""
+        source_code.split('"""')[1] if '"""' in source_code and in_depth else ""
     )
     return f" {method[0]}\n\t{pretty(method[1])}\n" + description
 
@@ -51,6 +50,27 @@ def prettify_method(method, in_depth: bool = False):
 def print_help(methods):
     for method in methods:
         print(prettify_method(method) + "\n")
+
+
+def convert_str_to_data(input):
+    try:
+        return int(input)
+    except ValueError:
+        try:
+            return float(input)
+        except ValueError:
+            if input in ["True", "true"]:
+                return True
+            elif input in ["False", "false"]:
+                return False
+
+
+def parse_hparams(args: list):
+    params = {}
+    for arg in args:
+        key, value = arg.split("=")
+        params[key[2:]] = convert_str_to_data(value)
+    return params
 
 
 def main():
@@ -75,9 +95,7 @@ def main():
         print_help(methods)
     elif len(args) > 1 and args[1] in ("--help", "-h"):
         print(
-            prettify_method(
-                [m for m in methods if m[0] == args[0]][0], in_depth=True
-            )
+            prettify_method([m for m in methods if m[0] == args[0]][0], in_depth=True)
         )
     # args.action = args.action.replace("-", "_")
     else:
@@ -104,4 +122,9 @@ def main():
                 method_args_types, method_args_defaults, raw_method_args
             )
         )
+        method_args_len = len(method_args)
+        hparams_len = len(raw_method_args) - method_args_len
+        if hparams_len > 0:
+            params = parse_hparams(args[method_args_len + 1 :])
+            mate.run_params = params
         getattr(mate, action)(*method_args)
