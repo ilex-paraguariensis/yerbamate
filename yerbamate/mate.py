@@ -25,6 +25,7 @@ class Mate:
         self.models = self.__list_packages("models")
         self.is_restart = False
         self.run_params = None
+        self.custom_save_path = None
 
     def __init_cache(self):
         self.cache = mate.Cache(self.save_path)
@@ -68,6 +69,7 @@ class Mate:
                     print("Could not find mate.json")
                     sys.exit(1)
 
+        self.root_save_folder = self.root_folder
         sys.path.insert(0, os.getcwd())
 
     def __load_model_class(self, model_name: str, folder="models"):
@@ -95,21 +97,22 @@ class Mate:
 
     def __set_save_path(self, model_name: str, params: str):
         self.save_path = os.path.join(
-            self.root_folder, "models", model_name, "results", params
+            self.root_save_folder, "models", model_name, "results", params
         )
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
 
         # save parameters in results folder
         os.system(
-            f"cp {os.path.join(self.root_folder, 'models', model_name, 'hyperparameters' , f'{params}.json')} {os.path.join(self.save_path, 'train_parameters.json')}"
+            f"cp {os.path.join(self.root_save_folder, 'models', model_name, 'hyperparameters' , f'{params}.json')} {os.path.join(self.save_path, 'train_parameters.json')}"
         )
-        self.__init_cache()
+        # self.__init_cache()
 
     def __override_run_params(self, params: Bunch):
         if self.run_params == None:
             return params
         for key, value in self.run_params.items():
+            # nested parameters
             if "." in key:
                 len_subs = len(key.split("."))
                 if len_subs == 2:
@@ -186,11 +189,15 @@ class Mate:
         print(json.dumps(hparams, indent=4))
         # trick to save parameters, otherwise changes are not saved after return!
         hparams = Bunch(json.loads(json.dumps(hparams)))
+
+        if hparams.has("output"):
+            self.root_save_folder = hparams.output
+
         return hparams
 
-    def __get_trainer(self, model_name: str, params: str):
-        self.__set_save_path(model_name, params)
-        params = self.__read_hyperparameters(model_name, params)
+    def __get_trainer(self, model_name: str, parameters: str):
+        params = self.__read_hyperparameters(model_name, parameters)
+        self.__set_save_path(model_name, parameters)
         params.save_path = self.save_path
         model = self.__load_model_class(model_name)(params)
         data_module = self.__load_data_loader_class(params.data_loader)(params)
@@ -307,11 +314,14 @@ class Mate:
         #     trainer.fit(model, datamodule=data_module)
         trainer.fit(model, datamodule=data_module)
 
-    def train(self, model_name: str, params: str = "default"):
+    def train(self, model_name: str, parameters: str = "default"):
         assert model_name in self.models, f'Model "{model_name}" does not exist.'
-        print(f"Training model {model_name} with hyperparameters: {params}.json")
+        print(f"Training model {model_name} with hyperparameters: {parameters}.json")
 
-        self.__set_save_path(model_name, params)
+        # we need to load hyperparameters before training to set save_path
+        _ = self.__read_hyperparameters(model_name, parameters)
+        self.__set_save_path(model_name, parameters)
+
         checkpoint_path = os.path.join(self.save_path, "checkpoint", "last.ckpt")
         action = "go"
         if os.path.exists(checkpoint_path):
@@ -329,7 +339,7 @@ class Mate:
         os.system(f"rm {os.path.join(self.save_path, 'checkpoint','optimizer*.pt')}")
         os.system(f"rm {os.path.join(self.save_path, 'checkpoint','scheduler*.pt')}")
 
-        self.__fit(model_name, params)
+        self.__fit(model_name, parameters)
 
     def test(self, model_name: str, params: str):
         assert model_name in self.models, f'Model "{model_name}" does not exist.'

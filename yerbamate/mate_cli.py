@@ -64,6 +64,8 @@ def convert_str_to_data(input):
             elif input in ["False", "false"]:
                 return False
 
+    return input
+
 
 def parse_hparams(args: list):
     params = {}
