@@ -51,7 +51,8 @@ class Mate:
         # path of execution
         current_path = os.getcwd()
         found = False
-        while not found:
+        i = 0
+        while not found and i < 6:
 
             if os.path.exists(os.path.join(current_path, "mate.json")):
                 self.__load_mate_config(os.path.join(current_path, "mate.json"))
@@ -62,9 +63,8 @@ class Mate:
             else:
                 os.chdir("..")
                 current_path = os.getcwd()
-                if (
-                    current_path == "/"
-                ):  # FIXME: this is a hack and it only works on linux and mac
+                i += 1
+                if current_path == "/" or i == 6:
                     print("Could not find mate.json")
                     sys.exit(1)
 
