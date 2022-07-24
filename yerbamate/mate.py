@@ -1,3 +1,4 @@
+from curses.panel import new_panel
 import os
 from argparse import ArgumentParser
 import importlib
@@ -364,6 +365,46 @@ class Mate:
         Fine tunes specified hyperparameters. (Not implemented yet)
         """
         pass
+
+    def add(self, model_name: str, repo: str):
+        """
+        Adds a dependency to a model.
+        """
+        mate_dir = ".mate"
+        if not os.path.exists(mate_dir):
+            os.makedirs(mate_dir, exist_ok=True)
+        os.system(f"git clone {repo} {mate_dir}")
+
+        conf = os.path.join(mate_dir, "mate.json")
+        conf = Bunch(json.load(open(conf)))
+
+        dest_dir = os.path.join(self.root_folder, "models", model_name, "modules")
+        os.makedirs(dest_dir, exist_ok=True)
+
+        os.system(f"cp -r {mate_dir}/{conf.export} {dest_dir}")
+        os.system(f"cp {mate_dir}/mate.json {os.path.join(dest_dir,conf.export)}")
+        os.system(f"rm -rf {mate_dir}")
+
+        new_params = {}
+        # ipdb.set_trace()
+        for model in conf.models:
+            new_params[model["class_name"]] = model["params"]
+
+        old_params_files = [
+            os.path.join(self.root_folder, "models", model_name, "hyperparameters", p)
+            for p in os.listdir(
+                os.path.join(self.root_folder, "models", model_name, "hyperparameters")
+            )
+        ]
+        # ipdb.set_trace()
+        for old_params_file in old_params_files:
+            p = Bunch(json.load(open(old_params_file)))
+            p.update(new_params)
+            with open(old_params_file, "w") as f:
+                json.dump(p, f, indent=4)
+            # ipdb.set_trace()
+        # ipdb.set_trace()
+        print(f"Sucessfully added dependency to model {model_name}")
 
     def install(self, repo: str, source_model: str, destination_model: str):
         """
