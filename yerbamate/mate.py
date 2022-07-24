@@ -13,7 +13,7 @@ import importlib
 import pkgutil
 from .logger import CustomLogger
 import mate
-from .utils import get_model_parameters
+from .utils import get_model_parameters, get_function_parameters
 
 
 class Mate:
@@ -57,9 +57,11 @@ class Mate:
 
             if os.path.exists(os.path.join(current_path, "mate.json")):
                 self.__load_mate_config(os.path.join(current_path, "mate.json"))
-                self.root_folder = os.path.basename(
-                    os.path.join(current_path, self.config.project)
-                )
+                self.root_folder = (
+                    os.path.basename(os.path.join(current_path, self.config.project))
+                    if self.config.has("project")
+                    else os.path.basename(os.path.join(current_path))
+                )  # root folder of export is different from root of a project
                 found = True
             else:
                 os.chdir("..")
@@ -396,6 +398,40 @@ class Mate:
         _, model, _ = self.__get_trainer(model, params)
 
         self.__load_exec_function(exec_file)(model)
+
+    def export(self):
+        models = self.config.models
+        for model in models:
+            params = self.__populate_model_params(model)
+            model["params"] = params
+        # save params to mate.json
+        ipdb.set_trace()
+        with open("mate.json", "w") as f:
+            json.dump(self.config, f)
+
+        print("Exported models to mate.json")
+        # ipdb.set_trace()
+
+    def __export_model(self, model: str):
+        export_root = os.path.join(self.root_folder, "export")
+
+        pass
+
+    def __populate_model_params(self, model: dict):
+        export_root = self.config.export
+        model = Bunch(model)
+        
+        model_class = __import__(
+            f"{export_root}.{model.file}", fromlist=[model.file]
+        ).__getattribute__(model.class_name)
+        params = get_function_parameters(model_class.__init__)
+        
+        # convert type class to strings
+        for param in params:
+            if isinstance(params[param], type):
+                params[param] = str(params[param])
+
+        return params
 
     """ Import all submodules of a module, recursively, including subpackages
     :param package: package (name or actual module)
