@@ -405,9 +405,9 @@ class Mate:
             params = self.__populate_model_params(model)
             model["params"] = params
         # save params to mate.json
-        ipdb.set_trace()
+        # ipdb.set_trace()
         with open("mate.json", "w") as f:
-            json.dump(self.config, f)
+            json.dump(self.config, f, indent=4)
 
         print("Exported models to mate.json")
         # ipdb.set_trace()
@@ -420,12 +420,12 @@ class Mate:
     def __populate_model_params(self, model: dict):
         export_root = self.config.export
         model = Bunch(model)
-        
+
         model_class = __import__(
             f"{export_root}.{model.file}", fromlist=[model.file]
         ).__getattribute__(model.class_name)
         params = get_function_parameters(model_class.__init__)
-        
+
         # convert type class to strings
         for param in params:
             if isinstance(params[param], type):
