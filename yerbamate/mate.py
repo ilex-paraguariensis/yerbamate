@@ -47,7 +47,7 @@ class Mate:
             self.config = Bunch(json.load(f))
             assert (
                 "result_folder" in self.config
-            ), 'Please add "results_folder:<path>" in mate.json'
+            ), 'Please add "results_folder":<path> in mate.json'
 
     def __findroot(self):
         """
