@@ -46,7 +46,7 @@ class Mate:
         with open(path) as f:
             self.config = Bunch(json.load(f))
             assert (
-                "result_folder" in self.config
+                "results_folder" in self.config
             ), 'Please add "results_folder":<path> in mate.json'
 
     def __findroot(self):
@@ -173,6 +173,9 @@ class Mate:
         if self.root_folder != self.root_save_folder and os.path.exists(
             possibly_wrong_save_path
         ):
+            print(
+                f"Found results in wrong location: {possibly_wrong_save_path}\nMoving them to the correct one."
+            )
             os.system(f"mv {possibly_wrong_save_path} {self.save_path}")
 
     def __read_hyperparameters(
