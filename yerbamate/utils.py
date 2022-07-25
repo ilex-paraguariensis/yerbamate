@@ -23,9 +23,7 @@ def get_function_parameters(function: Callable):
 
 def get_model_parameters(path: str):
     path = path.replace("/", ".")
-    model_class = __import__(
-        f"{path}.model", fromlist=[path.split(".")[1]],
-    ).Model
+    model_class = __import__(f"{path}.model", fromlist=[path.split(".")[1]],).Model
     return get_function_parameters(model_class.__init__)
 
 
@@ -37,14 +35,7 @@ def is_leaf(path: str):
 def get_leaves_rec(path: str):
     sub = [os.path.join(path, p) for p in os.listdir(path)]
     dirs = list(
-        chain(
-            [
-                get_leaves_rec(s)[0]
-                for s in sub
-                if os.path.isdir(s)
-                if not "__" in s
-            ]
-        )
+        chain([get_leaves_rec(s)[0] for s in sub if os.path.isdir(s) if not "__" in s])
     )
     return dirs if not is_leaf(path) else [path]
 

@@ -78,8 +78,7 @@ class Mate:
     def __load_model_class(self, model_name: str, folder="models"):
         # print(sys.meta_path)
         return __import__(
-            f"{self.root_folder}.{folder}.{model_name}.model",
-            fromlist=[folder],
+            f"{self.root_folder}.{folder}.{model_name}.model", fromlist=[folder],
         ).Model
 
     def __load_logger_class(self):
@@ -87,15 +86,11 @@ class Mate:
 
     def __load_data_loader_class(self, data_loader_name: str):
         data_class = f"{self.root_folder}.data_loaders.{data_loader_name}.data_loader"
-        return __import__(
-            f"{data_class}",
-            fromlist=["data_loader"],
-        ).CustomDataModule
+        return __import__(f"{data_class}", fromlist=["data_loader"],).CustomDataModule
 
     def __load_exec_function(self, exec_file: str):
         return __import__(
-            f"{self.root_folder}.exec.{exec_file}",
-            fromlist=["exec"],
+            f"{self.root_folder}.exec.{exec_file}", fromlist=["exec"],
         ).run
 
     def __set_save_path(self, model_name: str, params: str):
@@ -156,10 +151,7 @@ class Mate:
             )
         ) as f:
             hparams = json.load(f)
-        env_location = os.path.join(
-            self.root_folder,
-            "env.json",
-        )
+        env_location = os.path.join(self.root_folder, "env.json",)
         if not os.path.exists(env_location):
             print(f"Could not find env.json in {env_location}. Created one.")
             with open(env_location, "w") as f:

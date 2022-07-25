@@ -32,9 +32,7 @@ def tune(params: Namespace, model_class, data_loader_class):
             enable_checkpointing=False,
             max_epochs=params.max_epochs,
             gpus=1 if torch.cuda.is_available() else None,
-            callbacks=[
-                PyTorchLightningPruningCallback(trial, monitor="val_acc")
-            ],
+            callbacks=[PyTorchLightningPruningCallback(trial, monitor="val_acc")],
         )
         values = dict(train_batch_size=train_batch_size)
         hyperparameters = Namespace()
@@ -47,9 +45,7 @@ def tune(params: Namespace, model_class, data_loader_class):
     args = Namespace()
     args.pruning = True
     pruner: optuna.pruners.BasePruner = (
-        optuna.pruners.MedianPruner()
-        if args.pruning
-        else optuna.pruners.NopPruner()
+        optuna.pruners.MedianPruner() if args.pruning else optuna.pruners.NopPruner()
     )
     study = optuna.create_study(direction="maximize", pruner=pruner)
     study.optimize(objective, n_trials=100, timeout=600)
