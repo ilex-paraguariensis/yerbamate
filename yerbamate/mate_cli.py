@@ -20,14 +20,14 @@ def parse_signature(class_name, method_name: str):
 
 
 def get_methods_with_arguments(class_name):
-    return tuple(
-        (k, parse_signature(class_name, k))
+    return {
+        k: parse_signature(class_name, k)
         for k in class_name.__dict__.keys()
         if not k.startswith("_")
-    )
+    }
 
 
-def prettify_method(method, in_depth: bool = False):
+def prettify_method(method_name, annotation, in_depth: bool = False):
     def cleanup(ann):
         return str(ann).replace("<class ", "").replace(">", "").replace("'", "")
 
@@ -36,20 +36,19 @@ def prettify_method(method, in_depth: bool = False):
             [
                 f"{m.name}: {cleanup(m.annotation)}"
                 + (f"={m.default}" if m.default != inspect._empty else "")
-                for m in method[1]
+                for m in annotation
             ]
         )
-
-    source_code = inspect.getsource(getattr(Mate, method[0]))
+    source_code = inspect.getsource(getattr(Mate, method_name))
     description = (
         source_code.split('"""')[1] if '"""' in source_code and in_depth else ""
     )
-    return f" {method[0]}\n\t{pretty(method[1])}\n" + description
+    return f" {method_name}\n\t{pretty(annotation)}\n" + description
 
 
 def print_help(methods):
-    for method in methods:
-        print(prettify_method(method) + "\n")
+    for method_name, annotation in methods.keys():
+        print(prettify_method(method_name, annotation) + "\n")
 
 
 def convert_str_to_data(input):
@@ -77,56 +76,52 @@ def parse_hparams(args: list):
 
 def main():
     methods = get_methods_with_arguments(Mate)
-    max_len = max(len(args[1]) for args in methods)
-    """
-    parser.add_argument(
-        "action",
-        choices=tuple(method.replace("_", "-") for method, _ in methods)
-        + ("help",),
-        type=str,
-        nargs="?",
-    )
-    """
     args = sys.argv[1:]
-    actions = tuple(method.replace("_", "-") for method, _ in methods) + (
+    raw_method_args = args[2:]
+    actions = tuple(method.replace("_", "-") for method in methods) + (
         "--help",
         "-h",
     )
-
     if len(args) == 0 or not args[0] in actions or args[0] in ("--help", "-h"):
         print_help(methods)
-    elif len(args) > 1 and args[1] in ("--help", "-h"):
-        print(
-            prettify_method([m for m in methods if m[0] == args[0]][0], in_depth=True)
-        )
-    # args.action = args.action.replace("-", "_")
     else:
-        action = args[0]
-        mate = Mate()
-        method_args_types = tuple(
-            tuple(param.annotation for param in params)
-            for method, params in methods
-            if method == action
-        )[0]
-        method_args_defaults = tuple(
-            tuple(param.default for param in params)
-            for method, params in methods
-            if method == action
-        )[0]
-        raw_method_args = args[1:]
-        method_args = tuple(
-            (
-                method_type(raw_method_arg)
-                if (raw_method_arg is not None)
-                else method_default
+        assert args[0] in actions, print_help(methods)
+        action = args[0].replace("-", "_")
+        if len(args) > 1 and args[1] in ("--help", "-h"):
+            print(
+                prettify_method(action, methods[args[0]], in_depth=True)
             )
-            for (method_type, method_default, raw_method_arg) in zip(
-                method_args_types, method_args_defaults, raw_method_args
+        else:
+            mate = Mate()
+            method_args_types = tuple(param.annotation for param in methods[action])
+            #method_args_types = tuple(
+            #    tuple(param.annotation for param in params)
+            #    for method, params in methods
+            #    if method == action
+            #)[0]
+            #method_args_defaults = tuple(
+            #    tuple(param.default for param in params)
+            #    for method, params in methods
+            #    if method == action
+            #)[0]
+            # rewrites the above but taking into account that methods is a dictionary
+            # and not a list
+            method_args_defaults = tuple(
+                tuple(param.default for param in methods[action])
             )
-        )
-        method_args_len = len(method_args)
-        hparams_len = len(raw_method_args) - method_args_len
-        if hparams_len > 0:
-            params = parse_hparams(args[method_args_len + 1 :])
-            mate.run_params = params
-        getattr(mate, action)(*method_args)
+            method_args = tuple(
+                (
+                    method_type(raw_method_arg)
+                    if (raw_method_arg is not None)
+                    else method_default
+                )
+                for (method_type, method_default, raw_method_arg) in zip(
+                    method_args_types, method_args_defaults, raw_method_args
+                )
+            )
+            method_args_len = len(method_args)
+            hparams_len = len(raw_method_args) - method_args_len
+            if hparams_len > 0:
+                params = parse_hparams(args[method_args_len + 1 :])
+                mate.run_params = params
+            getattr(mate, action)(*method_args)
