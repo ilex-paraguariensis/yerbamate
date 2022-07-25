@@ -70,7 +70,7 @@ class Mate:
                     if self.config.has("project")
                     else os.path.basename(os.path.join(current_path))
                 )  # root folder of export is different from root of a project
-                self.root_save_folder = self.config.result_folder
+                self.root_save_folder = self.config.results_folder
                 found = True
             else:
                 os.chdir("..")
