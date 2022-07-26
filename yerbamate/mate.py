@@ -12,6 +12,7 @@ import json
 import sys
 import importlib
 import pkgutil
+import shutil
 from .logger import CustomLogger
 import mate
 from .utils import get_model_parameters, get_function_parameters
@@ -115,7 +116,7 @@ class Mate:
 
         # save parameters in results folder
         hparams_source_file_name = os.path.join(
-            self.root_save_folder,
+            self.root_folder,
             "models",
             model_name,
             "hyperparameters",
@@ -124,10 +125,7 @@ class Mate:
         hparams_destination_file_name = os.path.join(
             self.save_path, "train_parameters.json"
         )
-        os.system(
-            f"cp {hparams_source_file_name} {hparams_destination_file_name}"
-        )
-        # self.__init_cache()
+        os.rename(hparams_source_file_name, hparams_destination_file_name)
 
     def __override_run_params(self, params: Bunch):
         if self.run_params == None:
@@ -322,8 +320,9 @@ class Mate:
         )
 
     def clone(self, source_model: str, target_model: str):
-        os.system(
-            f"cp -r {os.path.join(self.root_folder, 'models', source_model)} {os.path.join(self.root_folder, 'models', target_model)}"
+        shutil.copytree(
+            os.path.join(self.root_folder, "models", source_model),
+            os.path.join(self.root_folder, "models", target_model),
         )
 
     def snapshot(self, model_name: str):
@@ -345,8 +344,9 @@ class Mate:
         )
         snapshot_name = f"{model_name}__{max_version_matching + 1}"
 
-        os.system(
-            f"cp -r {os.path.join(self.root_folder, 'models', model_name)} {os.path.join(self.root_folder, 'snapshots', snapshot_name)}"
+        shutil.copytree(
+            os.path.join(self.root_folder, "models", model_name),
+            os.path.join(self.root_folder, "snapshots", snapshot_name),
         )
         print(f"Created snapshot {snapshot_name}")
 
@@ -442,9 +442,10 @@ class Mate:
         )
         os.makedirs(dest_dir, exist_ok=True)
 
-        os.system(f"cp -r {mate_dir}/{conf.export} {dest_dir}")
-        os.system(
-            f"cp {mate_dir}/mate.json {os.path.join(dest_dir,conf.export)}"
+        shutil.copytree(os.path.join(mate_dir, conf.export), dest_dir)
+        shutil.copytree(
+            os.path.join(mate_dir, "mate.json"),
+            os.path.join(dest_dir, conf.export),
         )
         os.system(f"rm -rf {mate_dir}")
 

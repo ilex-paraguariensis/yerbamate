@@ -39,6 +39,7 @@ def prettify_method(method_name, annotation, in_depth: bool = False):
                 for m in annotation
             ]
         )
+
     source_code = inspect.getsource(getattr(Mate, method_name))
     description = (
         source_code.split('"""')[1] if '"""' in source_code and in_depth else ""
@@ -77,33 +78,28 @@ def parse_hparams(args: list):
 def main():
     methods = get_methods_with_arguments(Mate)
     args = sys.argv[1:]
-    raw_method_args = args[2:]
-    actions = tuple(method.replace("_", "-") for method in methods) + (
-        "--help",
-        "-h",
-    )
+    raw_method_args = args[1:]
+    actions = tuple(method.replace("_", "-") for method in methods) + ("--help", "-h",)
     if len(args) == 0 or not args[0] in actions or args[0] in ("--help", "-h"):
         print_help(methods)
     else:
         assert args[0] in actions, print_help(methods)
         action = args[0].replace("-", "_")
         if len(args) > 1 and args[1] in ("--help", "-h"):
-            print(
-                prettify_method(action, methods[args[0]], in_depth=True)
-            )
+            print(prettify_method(action, methods[args[0]], in_depth=True))
         else:
             mate = Mate()
             method_args_types = tuple(param.annotation for param in methods[action])
-            #method_args_types = tuple(
+            # method_args_types = tuple(
             #    tuple(param.annotation for param in params)
             #    for method, params in methods
             #    if method == action
-            #)[0]
-            #method_args_defaults = tuple(
+            # )[0]
+            # method_args_defaults = tuple(
             #    tuple(param.default for param in params)
             #    for method, params in methods
             #    if method == action
-            #)[0]
+            # )[0]
             # rewrites the above but taking into account that methods is a dictionary
             # and not a list
             method_args_defaults = tuple(
