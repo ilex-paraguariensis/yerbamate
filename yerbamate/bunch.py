@@ -1,14 +1,7 @@
 from types import SimpleNamespace
 
 import json
-
-
-class Bunch(dict):
-    def __init__(self, keyvals: dict):
-        for key, val in keyvals.items():
-            self.__dict__[key] = val if not isinstance(val, dict) else Bunch(val)
-        self.__dict__ = self
-
+import ipdb
 
 class Bunch(dict):
     def __init__(self, kwargs):
@@ -28,20 +21,27 @@ class Bunch(dict):
     def has(self, key):
         return self.contains(key)
 
+    def clone(self):
+        return Bunch(self.to_dict())
+
     def __str__(self):
-        return json.dumps(self.to_dict(), indent=4)
+        return json.dumps(self.to_dict(), indent=4, default=str)
 
     def __setattr__(self, key, value):
-        self[key] = value
+        self.__setitem__(key, value)
 
     def __dir__(self):
         return self.keys()
 
     def __getattr__(self, key):
-        try:
-            return self[key]
-        except KeyError:
-            raise AttributeError(key)
+        return self.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        self.__dict__[key] = value
+
+    def __getitem__(self, key):
+        return super().__getitem__(key)
 
     def __setstate__(self, state):
         # Bunch pickles generated with scikit-learn 0.16.* have an non

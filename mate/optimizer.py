@@ -1,27 +1,47 @@
 import torch
+import ipdb
 
 
 class Optimizer:
     def __init__(self, params, model):
         self.params = params
         self.model = model
-        self.__init_optimizer()
-        self.__init_lr_scheduler()
+        # self.__init_optimizer()
+        # self.__init_lr_scheduler()
 
-    def get_optimizer(self):
-        if self.lr_scheduler == None:
-            return self.optimizer
+    def __params_to_object(self, module, params):
+        params_without_type = {
+            key: val for key, val in params.items() if key != "type"
+        }
+        return getattr(module, params["type"])(**params_without_type)
 
-        return {
-            "optimizer": self.optimizer,
-            "lr_scheduler": {
-                "scheduler": self.lr_scheduler,
-                "monitor": self.params.lr_scheduler.monitor,
-            },
+    def __call__(self):
+        if "type" in self.params:
+            return self.__params_to_object(
+                torch.optim, self.params | {"params": self.model.parameters()}
+            )
+        else:
+            result = self.params.clone()
+            result["optimizer"] = self.__params_to_object(
+                torch.optim,
+                self.params.optimizer | {"params": self.model.parameters()},
+            )
+            result["lr_scheduler"]["scheduler"] = self.__params_to_object(
+                torch.optim.lr_scheduler,
+                self.params.lr_scheduler.scheduler
+                | {"optimizer": result.optimizer},
+            )
+            return result
+
+    '''
+    def __init_optimizer(self):
+        params_without_type_and_scheduler = {
+            key: val
+            for key, val in self.optim_params.items()
+            if key != "type" and key != "lr_scheduler"
         }
 
-    def __init_optimizer(self):
-
+        """
         if self.params.type == "sgd":
             self.optimizer = torch.optim.SGD(
                 self.model.parameters(),
@@ -35,10 +55,21 @@ class Optimizer:
                 lr=self.params.lr,
                 betas=(self.params.beta1, self.params.beta2),
             )
-            
+        """
+        self.optimizer = torch.optim.__dict__[self.optim_params.type](
+            self.model.parameters(), **params_without_type_and_scheduler
+        )
 
     def __init_lr_scheduler(self):
-
+        params_without_type_and_monitor = {
+            key: val
+            for key, val in self.lr_params.scheduler.items()
+            if key != "type"
+        }
+        self.lr_scheduler = torch.optim.lr_scheduler.__dict__[
+            self.lr_params.scheduler.type
+        ](self.optimizer, **params_without_type_and_monitor)
+        """
         if self.params.lr_scheduler == None:
             return
         if self.params.lr_scheduler.type == "step":
@@ -73,4 +104,5 @@ class Optimizer:
                 threshold=self.params.lr_scheduler.threshold,
                 threshold_mode=self.params.lr_scheduler.threshold_mode,
             )
-            
+        """
+        '''

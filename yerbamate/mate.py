@@ -13,6 +13,7 @@ import sys
 import importlib
 import pkgutil
 import shutil
+from glob import glob
 from .logger import CustomLogger
 import mate
 from .utils import get_model_parameters, get_function_parameters
@@ -49,6 +50,9 @@ class Mate:
             assert (
                 "results_folder" in self.config
             ), 'Please add "results_folder":<path> in mate.json'
+            assert (
+                "project" in self.config
+            ), 'Please add "project":<project name> in mate.json'
 
     def __findroot(self):
         """
@@ -64,15 +68,10 @@ class Mate:
                 self.__load_mate_config(
                     os.path.join(current_path, "mate.json")
                 )
-                self.root_folder = (
-                    os.path.basename(
-                        os.path.join(current_path, self.config.project)
-                    )
-                    if self.config.has("project")
-                    else os.path.basename(os.path.join(current_path))
-                )  # root folder of export is different from root of a project
-                self.root_save_folder = self.config.results_folder
+                self.root_folder = self.config.project
+                # self.__import_submodules(self.root_folder)
                 found = True
+                self.root_save_folder = self.config.results_folder
             else:
                 os.chdir("..")
                 current_path = os.getcwd()
@@ -125,7 +124,7 @@ class Mate:
         hparams_destination_file_name = os.path.join(
             self.save_path, "train_parameters.json"
         )
-        os.rename(hparams_source_file_name, hparams_destination_file_name)
+        shutil.copy(hparams_source_file_name, hparams_destination_file_name)
 
     def __override_run_params(self, params: Bunch):
         if self.run_params == None:
@@ -265,14 +264,10 @@ class Mate:
 
         # TODO assert that optimizer is in params
         if params.contains("optimizer"):
-            if params.optimizer.contains("early_stopping_patience"):
-                early_stopping = EarlyStopping(
-                    monitor=params.optimizer.monitor,
-                    patience=params.optimizer.early_stopping_patience,
-                    verbose=True,
-                    strict=False,
-                )
-                callbacks.append(early_stopping)
+            if params.optimizer.contains("early_stopping"):
+                callbacks.append(EarlyStopping(
+                     **params.early_stopping
+                ))
 
         monitor = mate.OptimizerMonitor(params, "epoch")
         callbacks.append(monitor)
@@ -290,8 +285,8 @@ class Mate:
         os.system(
             "git clone https://github.com/ilex-paraguariensis/init-mate-project"
         )
-        os.system("rm -rf init-mate-project/.git")
-        os.system("mv init-mate-project/* .")
+        shutil.rmtree("init-mate-project/.git")
+        os.rename("init-mate-project/*", ".")  # TODO: not sure this works
         # TODO: add results_folder to mate.json
         # TODO: write mate.json
 
@@ -305,9 +300,7 @@ class Mate:
                 f'Are you sure you want to remove model "{model_name}"? (y/n)\n'
             )
         if action == "y":
-            os.system(
-                f"rm -r {os.path.join(self.root_folder, 'models', model_name)}"
-            )
+            shutil.rmtree(os.path.join(self.root_folder, "models", model_name))
             print(f"Removed model {model_name}")
         else:
             print("Ok, exiting.")
@@ -372,28 +365,22 @@ class Mate:
         _ = self.__read_hyperparameters(model_name, parameters)
         self.__set_save_path(model_name, parameters)
 
-        checkpoint_path = os.path.join(
-            self.save_path, "checkpoint", "last.ckpt"
-        )
+        checkpoint_path = os.path.join(self.save_path, "checkpoint")
+        if not os.path.exists(checkpoint_path):
+            os.mkdir(checkpoint_path)
+        checkpoints = glob(os.path.join(checkpoint_path, "*"))
         action = "go"
-        if os.path.exists(checkpoint_path):
+        if len(checkpoints) > 0:
             while action not in ("y", "n", ""):
                 action = input(
                     "Checkpiont file exists. Re-training will erase it. Continue? ([y]/n)\n"
                 )
             if action in ("y", "", "Y"):
-                os.remove(checkpoint_path)
+                for checkpoint in checkpoints:
+                    os.remove(checkpoint)  # remove all checkpoint files
             else:
                 print("Ok, exiting.")
                 return
-
-        # delete old checkpoints
-        os.system(
-            f"rm {os.path.join(self.save_path, 'checkpoint','optimizer*.pt')}"
-        )
-        os.system(
-            f"rm {os.path.join(self.save_path, 'checkpoint','scheduler*.pt')}"
-        )
 
         self.__fit(model_name, parameters)
 
@@ -447,10 +434,9 @@ class Mate:
             os.path.join(mate_dir, "mate.json"),
             os.path.join(dest_dir, conf.export),
         )
-        os.system(f"rm -rf {mate_dir}")
+        shutil.rmtree(mate_dir)
 
         new_params = {}
-        # ipdb.set_trace()
         for model in conf.models:
             new_params[model["class_name"]] = model["params"]
 
@@ -464,14 +450,11 @@ class Mate:
                 )
             )
         ]
-        # ipdb.set_trace()
         for old_params_file in old_params_files:
             p = Bunch(json.load(open(old_params_file)))
             p.update(new_params)
             with open(old_params_file, "w") as f:
                 json.dump(p, f, indent=4)
-            # ipdb.set_trace()
-        # ipdb.set_trace()
         print(f"Sucessfully added dependency to model {model_name}")
 
     def install(self, repo: str, source_model: str, destination_model: str):
@@ -519,12 +502,10 @@ class Mate:
             params = self.__populate_model_params(model)
             model["params"] = params
         # save params to mate.json
-        # ipdb.set_trace()
         with open("mate.json", "w") as f:
             json.dump(self.config, f, indent=4)
 
         print("Exported models to mate.json")
-        # ipdb.set_trace()
 
     def __export_model(self, model: str):
         export_root = os.path.join(self.root_folder, "export")
@@ -551,10 +532,8 @@ class Mate:
     :param package: package (name or actual module)
     :type package: str | module
     :rtype: dict[str, types.ModuleType]
-    """
-
     def __import_submodules(self, package, recursive=True):
-
+        # print(os.getcwd())
         if isinstance(package, str):
             package = importlib.import_module(package)
         results = {}
@@ -564,3 +543,4 @@ class Mate:
             if recursive and is_pkg:
                 results.update(self.__import_submodules(full_name))
         return results
+    """
