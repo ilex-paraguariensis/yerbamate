@@ -1,13 +1,13 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 
 ## What is Maté?
-It is a tool for building research projects in the field of deep learning with [Pytorch](https://pytorch.org/) and builds on top of [Lightning](https://www.pytorchlightning.ai/) and does not replace their functionalities. It targets some of the following issues in DL research:
+It is a tool for building research projects in the field of deep learning with [Pytorch](https://pytorch.org/) and builds on top of [Lightning](https://www.pytorchlightning.ai/) and does not replaces their functionalities. It targets some of the following issues in DL research:
 
 - reproducibility
 - replicability
 - transparency
 
-It also makes development fast and easy. You should focus more on the model, and less on boilerplate code.
+It also makes development fast and easy. It helps you to focus on the model, and less on boilerplate code.
 
 ### A word of notice
 This project is still at its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
@@ -16,7 +16,7 @@ This project is still at its early stages and is not ready for production. Some 
 ## Is Maté simple to use?
 Maté models are nothing but regular torch models. And the training loops are lightning models. Also the default training loops for regression and classification will work for most use-cases so no need to create your own.
 
-Finally, you can change **hyperparameters** by editing a `json` file that looks something like:
+Finally, you can change **hyperparameters** by editing a `json` file that looks something like the following: ([click here for a detailed example](https://github.com/ilex-paraguariensis/yerbamate/issues/38))
 ```
 {
 	"batch_size": 32,
