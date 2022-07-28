@@ -16,7 +16,7 @@ This project is still at its early stages and is not ready for production. Some 
 ## Is Maté simple to use?
 Maté models are nothing but regular torch models. And the training loops are lightning models. Also the default training loops for regression and classification will work for most use-cases so no need to create your own.
 
-Finally, you can change **hyperparameters** by editing a `json` file that looks something like the following: ([click here for a detailed example](https://github.com/ilex-paraguariensis/yerbamate/issues/38))
+Finally, you can change **hyperparameters** by editing a `json` file that looks something like the following: ([click here for a detailed example](https://github.com/ilex-paraguariensis/yerbamate/wiki/Sample-Hyperparamter))
 ```
 {
 	"batch_size": 32,
