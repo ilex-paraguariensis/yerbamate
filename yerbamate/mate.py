@@ -87,7 +87,7 @@ class Mate:
             f"{self.root_folder}.models.{model_name}.{params.train}",
             fromlist=["models"],
         ).Model(params)
-
+        ipdb.set_trace()
         for m in params.model.keys():
             torch_model = self.__load_torch_model_class(
                 model_name, params, m, parameters_file_name
@@ -111,12 +111,13 @@ class Mate:
             f"{self.root_folder}.models.{model_name}.{conf['module']}",
             fromlist=[conf["module"].split(".")[-1]],
         )
-        model = getattr(module, conf["model"])
+        model_class = getattr(module, conf["model"])
+        ipdb.set_trace()
         if conf.contains("params"):
-            model = model(**dict(conf.params))
+            model = model_class(**dict(conf.params))
         else:
-            print("No parameters found for the model, using default ones")
-            model = model()
+            print(f"No parameters found for model {model_class}, using default ones. They will be added to the hyperparameters file.")
+            model = model_class()
 
             # populate and save parameters
             model_params = get_function_parameters(model.__init__)
@@ -317,10 +318,8 @@ class Mate:
 
         callbacks.append(model_saver_callback)
 
-        # TODO assert that optimizer is in params
-        if params.contains("optimizer"):
-            if params.optimizer.contains("early_stopping"):
-                callbacks.append(EarlyStopping(**params.early_stopping))
+        if params.contains("early_stopping"):
+            callbacks.append(EarlyStopping(**params.early_stopping))
 
         monitor = mate.OptimizerMonitor(params, "epoch")
         callbacks.append(monitor)
