@@ -325,11 +325,9 @@ class ModelCheckpoint(Callback):
             self._save_state_dict()
 
     def _save_state_dict(self):
-        dictionary = self.state_dict()
-        # ipdb.set_trace()
         file_path = os.path.join(self.dirpath, ".checkpoints_state_dict")
         with open(file_path, "wb") as f:
-            torch.save(dictionary, f)
+            torch.save(self.state_dict(), f)
 
     def _load_state_dict(self):
 
