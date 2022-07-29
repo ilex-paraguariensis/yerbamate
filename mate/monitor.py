@@ -28,7 +28,10 @@ from torch.optim.optimizer import Optimizer
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks.base import Callback
 from pytorch_lightning.utilities.exceptions import MisconfigurationException
-from pytorch_lightning.utilities.rank_zero import rank_zero_deprecation, rank_zero_warn
+from pytorch_lightning.utilities.rank_zero import (
+    rank_zero_deprecation,
+    rank_zero_warn,
+)
 from pytorch_lightning.utilities.types import LRSchedulerConfig
 import mate
 from yerbamate.bunch import Bunch
@@ -125,7 +128,7 @@ class OptimizerMonitor(Callback):
 
                 t.save(optimizer.state_dict(), file_path)
 
-            for i, scheduler in enumerate(trainer.lr_schedulers):
+            for i, scheduler in enumerate(trainer.lr_schedulers_configs):
                 file_path = os.path.join(
                     self.params.save_path, "checkpoint", f"scheduler_{i}.pt"
                 )
@@ -144,7 +147,7 @@ class OptimizerMonitor(Callback):
                 optimizer.load_state_dict(t.load(file_path))
                 print("LOAD OPTIMIZER")
 
-        for i, scheduler in enumerate(trainer.lr_schedulers):
+        for i, scheduler in enumerate(trainer.lr_scheduler_configs):
             file_path = os.path.join(
                 self.params.save_path, "checkpoint", f"scheduler_{i}.pt"
             )
@@ -152,7 +155,9 @@ class OptimizerMonitor(Callback):
                 scheduler["scheduler"].load_state_dict(t.load(file_path))
                 print("LOAD SCHEDULER")
 
-    def on_train_start(self, trainer: "pl.Trainer", *args: Any, **kwargs: Any) -> None:
+    def on_train_start(
+        self, trainer: "pl.Trainer", *args: Any, **kwargs: Any
+    ) -> None:
 
         self._load_opt_states(trainer)
 
@@ -178,7 +183,8 @@ class OptimizerMonitor(Callback):
                     )
 
                 return any(
-                    key not in optimizer.defaults for optimizer in trainer.optimizers
+                    key not in optimizer.defaults
+                    for optimizer in trainer.optimizers
                 )
 
             if _check_no_key("momentum") and _check_no_key("betas"):
@@ -208,7 +214,9 @@ class OptimizerMonitor(Callback):
         # Initialize for storing values
         names_flatten = list(itertools.chain.from_iterable(names))
         self.lrs = {name: [] for name in names_flatten}
-        self.last_momentum_values = {name + "-momentum": None for name in names_flatten}
+        self.last_momentum_values = {
+            name + "-momentum": None for name in names_flatten
+        }
 
     def on_train_batch_start(
         self, trainer: "pl.Trainer", *args: Any, **kwargs: Any
@@ -249,7 +257,9 @@ class OptimizerMonitor(Callback):
                     )
                 self.save_lr(trainer)
 
-    def _extract_stats(self, trainer: "pl.Trainer", interval: str) -> Dict[str, float]:
+    def _extract_stats(
+        self, trainer: "pl.Trainer", interval: str
+    ) -> Dict[str, float]:
         latest_stat = {}
 
         (
@@ -261,7 +271,9 @@ class OptimizerMonitor(Callback):
         )
         self._remap_keys(scheduler_hparam_keys)
 
-        for name, config in zip(scheduler_hparam_keys, trainer.lr_scheduler_configs):
+        for name, config in zip(
+            scheduler_hparam_keys, trainer.lr_scheduler_configs
+        ):
             if interval in [config.interval, "any"]:
                 opt = config.scheduler.optimizer
                 current_stat = self._get_lr_momentum_stat(opt, name)
@@ -278,7 +290,9 @@ class OptimizerMonitor(Callback):
         )
         self._remap_keys(optimizer_hparam_keys)
 
-        for opt, names in zip(optimizers_without_scheduler, optimizer_hparam_keys):
+        for opt, names in zip(
+            optimizers_without_scheduler, optimizer_hparam_keys
+        ):
             current_stat = self._get_lr_momentum_stat(opt, names)
             latest_stat.update(current_stat)
 
@@ -303,7 +317,9 @@ class OptimizerMonitor(Callback):
 
         return lr_momentum_stat
 
-    def _extract_lr(self, param_group: Dict[str, Any], name: str) -> Dict[str, Any]:
+    def _extract_lr(
+        self, param_group: Dict[str, Any], name: str
+    ) -> Dict[str, Any]:
         lr = param_group["lr"]
         self.lrs[name].append(lr)
         return {name: lr}
@@ -325,7 +341,9 @@ class OptimizerMonitor(Callback):
             return {}
 
         momentum = (
-            param_group["betas"][0] if use_betas else param_group.get("momentum", 0)
+            param_group["betas"][0]
+            if use_betas
+            else param_group.get("momentum", 0)
         )
         self.last_momentum_values[name] = momentum
         return {name: momentum}
@@ -360,8 +378,13 @@ class OptimizerMonitor(Callback):
             return f"{name}/{pg_name}" if pg_name else name
         return name
 
-    def _duplicate_param_group_names(self, param_groups: List[Dict]) -> Set[str]:
-        names = [pg.get("name", f"pg{i}") for i, pg in enumerate(param_groups, start=1)]
+    def _duplicate_param_group_names(
+        self, param_groups: List[Dict]
+    ) -> Set[str]:
+        names = [
+            pg.get("name", f"pg{i}")
+            for i, pg in enumerate(param_groups, start=1)
+        ]
         unique = set(names)
         if len(names) == len(unique):
             return set()
@@ -371,12 +394,16 @@ class OptimizerMonitor(Callback):
         self,
         lr_scheduler_configs: List[LRSchedulerConfig],
         add_lr_sch_names: bool = True,
-    ) -> Tuple[List[List[str]], List[Optimizer], DefaultDict[Type[Optimizer], int]]:
+    ) -> Tuple[
+        List[List[str]], List[Optimizer], DefaultDict[Type[Optimizer], int]
+    ]:
         # Create unique names in the case we have multiple of the same learning
         # rate scheduler + multiple parameter groups
         names = []
         seen_optimizers: List[Optimizer] = []
-        seen_optimizer_types: DefaultDict[Type[Optimizer], int] = defaultdict(int)
+        seen_optimizer_types: DefaultDict[Type[Optimizer], int] = defaultdict(
+            int
+        )
         for config in lr_scheduler_configs:
             sch = config.scheduler
             if config.name is not None:
@@ -409,7 +436,9 @@ class OptimizerMonitor(Callback):
         for optimizer in optimizers:
             # Deepspeed optimizer wraps the native optimizer
             optimizer = (
-                optimizer.optimizer if hasattr(optimizer, "optimizer") else optimizer
+                optimizer.optimizer
+                if hasattr(optimizer, "optimizer")
+                else optimizer
             )
             if optimizer in seen_optimizers:
                 continue
@@ -439,7 +468,10 @@ class OptimizerMonitor(Callback):
     ) -> List[str]:
         seen_optimizers.append(optimizer)
         optimizer_cls = type(optimizer)
-        if lr_scheduler_config is not None and lr_scheduler_config.name is None:
+        if (
+            lr_scheduler_config is not None
+            and lr_scheduler_config.name is None
+        ):
             seen_optimizer_types[optimizer_cls] += 1
         elif lr_scheduler_config is None:
             seen_optimizer_types[optimizer_cls] += 1
@@ -455,7 +487,8 @@ class OptimizerMonitor(Callback):
 
         name = self._add_prefix(name, optimizer_cls, seen_optimizer_types)
         name_list = [
-            self._add_suffix(name, param_groups, i) for i in range(len(param_groups))
+            self._add_suffix(name, param_groups, i)
+            for i in range(len(param_groups))
         ]
 
         if add_lr_sch_names:

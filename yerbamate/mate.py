@@ -289,7 +289,7 @@ class Mate:
                 print(model)
 
         checkpoint_path = os.path.join(self.save_path, "checkpoint")
-        checkpoint_file = os.path.join(checkpoint_path, "last.ckpt")
+        checkpoint_file = os.path.join(checkpoint_path, "best.ckpt")
         if os.path.exists(checkpoint_file):
             print(f"Loaded model from {checkpoint_file}")
             model = model.load_from_checkpoint(
