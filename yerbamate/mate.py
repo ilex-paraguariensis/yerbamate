@@ -87,7 +87,6 @@ class Mate:
             f"{self.root_folder}.models.{model_name}.{params.train}",
             fromlist=["models"],
         ).Model(params)
-        ipdb.set_trace()
         for m in params.model.keys():
             torch_model = self.__load_torch_model_class(
                 model_name, params, m, parameters_file_name
@@ -103,7 +102,6 @@ class Mate:
         internal_model_name: str,
         parameters_file_name: str,
     ):
-        # ipdb.set_trace()
         conf = Bunch(
             params.model[internal_model_name]
         )  # TODO, bunch does not work for nested dicts
@@ -112,7 +110,6 @@ class Mate:
             fromlist=[conf["module"].split(".")[-1]],
         )
         model_class = getattr(module, conf["model"])
-        ipdb.set_trace()
         if conf.contains("params"):
             model = model_class(**dict(conf.params))
         else:
@@ -299,7 +296,7 @@ class Mate:
         checkpoint_file = os.path.join(checkpoint_path, "best.ckpt")
         if os.path.exists(checkpoint_file):
             print(f"Loaded model from {checkpoint_file}")
-            model = model.load_from_checkpoint(
+            model.load_from_checkpoint(
                 checkpoint_file, params=params, strict=False
             )
             # model.params = params
