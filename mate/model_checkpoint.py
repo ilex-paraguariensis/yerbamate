@@ -325,11 +325,11 @@ class ModelCheckpoint(Callback):
             self._save_state_dict()
 
     def _save_state_dict(self):
-        dict = self.state_dict()
+        dictionary = self.state_dict()
         # ipdb.set_trace()
         file_path = os.path.join(self.dirpath, ".checkpoints_state_dict")
         with open(file_path, "wb") as f:
-            torch.save(dict, f)
+            torch.save(dictionary, f)
 
     def _load_state_dict(self):
 
@@ -345,9 +345,9 @@ class ModelCheckpoint(Callback):
     def state_dict(self) -> Dict[str, Any]:
         return {
             "monitor": self.monitor,
-            "best_model_score": self.best_model_score,
+            "best_model_score": self.best_model_score.item(),
             "best_model_path": self.best_model_path,
-            "current_score": self.current_score,
+            "current_score": self.current_score.item(),
             "dirpath": self.dirpath,
             "best_k_models": self.best_k_models,
             "kth_best_model_path": self.kth_best_model_path,
