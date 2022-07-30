@@ -62,7 +62,9 @@ class Mate:
         while not found and i < 6:
 
             if os.path.exists(os.path.join(current_path, "mate.json")):
-                self.__load_mate_config(os.path.join(current_path, "mate.json"))
+                self.__load_mate_config(
+                    os.path.join(current_path, "mate.json")
+                )
                 self.root_folder = self.config.project
                 # self.__import_submodules(self.root_folder)
                 found = True
@@ -85,7 +87,6 @@ class Mate:
             f"{self.root_folder}.models.{model_name}.{params.train}",
             fromlist=["models"],
         ).Model(params)
-
         for m in params.model.keys():
             torch_model = self.__load_torch_model_class(
                 model_name, params, m, parameters_file_name
@@ -101,7 +102,6 @@ class Mate:
         internal_model_name: str,
         parameters_file_name: str,
     ):
-        # ipdb.set_trace()
         conf = Bunch(
             params.model[internal_model_name]
         )  # TODO, bunch does not work for nested dicts
@@ -109,12 +109,12 @@ class Mate:
             f"{self.root_folder}.models.{model_name}.{conf['module']}",
             fromlist=[conf["module"].split(".")[-1]],
         )
-        model = getattr(module, conf["model"])
+        model_class = getattr(module, conf["model"])
         if conf.contains("params"):
-            model = model(**dict(conf.params))
+            model = model_class(**dict(conf.params))
         else:
-            print("No parameters found for the model, using default ones")
-            model = model()
+            print(f"No parameters found for model {model_class}, using default ones. They will be added to the hyperparameters file.")
+            model = model_class()
 
             # populate and save parameters
             model_params = get_function_parameters(model.__init__)
@@ -147,16 +147,16 @@ class Mate:
         return CustomLogger
 
     def __load_data_loader_class(self, data_loader_name: str):
-        data_class = f"{self.root_folder}.data_loaders.{data_loader_name}.data_loader"
+        data_class = (
+            f"{self.root_folder}.data_loaders.{data_loader_name}.data_loader"
+        )
         return __import__(
-            f"{data_class}",
-            fromlist=["data_loader"],
+            f"{data_class}", fromlist=["data_loader"],
         ).CustomDataModule
 
     def __load_exec_function(self, exec_file: str):
         return __import__(
-            f"{self.root_folder}.exec.{exec_file}",
-            fromlist=["exec"],
+            f"{self.root_folder}.exec.{exec_file}", fromlist=["exec"],
         ).run
 
     def __set_save_path(self, model_name: str, params: str):
@@ -193,20 +193,23 @@ class Mate:
                         key.split(".")[2]
                     ] = value
                 elif len_subs == 4:
-                    params[key.split(".")[0]][key.split(".")[1]][key.split(".")[2]][
-                        key.split(".")[3]
-                    ] = value
+                    params[key.split(".")[0]][key.split(".")[1]][
+                        key.split(".")[2]
+                    ][key.split(".")[3]] = value
                 elif len_subs == 5:
-                    params[key.split(".")[0]][key.split(".")[1]][key.split(".")[2]][
-                        key.split(".")[3]
-                    ][key.split(".")[4]] = value
+                    params[key.split(".")[0]][key.split(".")[1]][
+                        key.split(".")[2]
+                    ][key.split(".")[3]][key.split(".")[4]] = value
                 # for now we only support 5 levels of nesting
             else:
                 params[key] = value
         return params
 
     def __override_params(self, params: Bunch):
-        if "override_params" in self.config and self.config.override_params.enabled:
+        if (
+            "override_params" in self.config
+            and self.config.override_params.enabled
+        ):
             for key, value in self.config.override_params.items():
                 if key == "enabled":
                     key = "override_params"
@@ -225,7 +228,9 @@ class Mate:
             )
             os.system(f"mv {possibly_wrong_save_path} {self.save_path}")
 
-    def __read_hyperparameters(self, model_name: str, hparams_name: str = "default"):
+    def __read_hyperparameters(
+        self, model_name: str, hparams_name: str = "default"
+    ):
         with open(
             os.path.join(
                 self.root_folder,
@@ -236,10 +241,7 @@ class Mate:
             )
         ) as f:
             hparams = json.load(f)
-        env_location = os.path.join(
-            self.root_folder,
-            "env.json",
-        )
+        env_location = os.path.join(self.root_folder, "env.json",)
         if not os.path.exists(env_location):
             print(f"Could not find env.json in {env_location}. Created one.")
             with open(env_location, "w") as f:
@@ -249,7 +251,9 @@ class Mate:
             env = json.load(f)
 
         env_in_params = [
-            (key, val) for key, val in hparams.items() if key.startswith("env.")
+            (key, val)
+            for key, val in hparams.items()
+            if key.startswith("env.")
         ]
         modified_env = False
         for key, val in env_in_params:
@@ -282,22 +286,25 @@ class Mate:
         model = self.__load_lightning_class(model_name, params, parameters)
         data_module = self.__load_data_loader_class(params.data_loader)(params)
         logger_module = self.__load_logger_class()
-        params.model = model_name
+        # params.model = model_name
 
         if self.config.contains("print_model"):
             if self.config.print_model:
                 print(model)
-
         checkpoint_path = os.path.join(self.save_path, "checkpoint")
-        checkpoint_file = os.path.join(checkpoint_path, "last.ckpt")
-        if os.path.exists(checkpoint_file):
-            print(f"Loaded model from {checkpoint_file}")
-            model = model.load_from_checkpoint(
-                checkpoint_file, params=params, strict=False
-            )
-            # model.params = params
+        for torch_model_name in params.model:
+            checkpoint_file = os.path.join(checkpoint_path, torch_model_name + '.pt')
+            if os.path.exists(checkpoint_file):
+                print(f"Loaded model from {checkpoint_file}")
+                model.__dict__[torch_model_name].load_state_dict(t.load(checkpoint_file))
+                #model.load_from_checkpoint(
+                #    checkpoint_file, params=params, strict=False
+                #)
+
+                # model.params = params
 
         callbacks = []
+        """
         model_saver_callback = mate.ModelCheckpoint(
             checkpoint_path,
             filename="best",
@@ -310,26 +317,28 @@ class Mate:
         )
 
         callbacks.append(model_saver_callback)
+        """
+        if params.contains("early_stopping"):
+            callbacks.append(EarlyStopping(**params.early_stopping))
 
-        # TODO assert that optimizer is in params
-        if params.contains("optimizer"):
-            if params.optimizer.contains("early_stopping"):
-                callbacks.append(EarlyStopping(**params.early_stopping))
-
-        monitor = mate.OptimizerMonitor(params, "epoch")
-        callbacks.append(monitor)
+        #monitor = mate.OptimizerMonitor(params, "epoch")
+        #callbacks.append(monitor)
 
         trainer = Trainer(
             max_epochs=params.max_epochs,
             gpus=(1 if params.cuda else None),
             callbacks=callbacks,
-            logger=logger_module(params),
-            enable_checkpointing=True,
+            # logger=logger_module(params),
+            # logger=False,
+            checkpoint_callback=False,
+            enable_checkpointing=False,
         )
         return (trainer, model, data_module)
 
     def init(self, results_folder: str):
-        os.system("git clone https://github.com/ilex-paraguariensis/init-mate-project")
+        os.system(
+            "git clone https://github.com/ilex-paraguariensis/init-mate-project"
+        )
         shutil.rmtree("init-mate-project/.git")
         os.rename("init-mate-project/*", ".")  # TODO: not sure this works
         # TODO: add results_folder to mate.json
@@ -351,7 +360,11 @@ class Mate:
             print("Ok, exiting.")
 
     def list(self, folder: str):
-        print("\n".join(tuple("\t" + str(m) for m in self.__list_packages(folder))))
+        print(
+            "\n".join(
+                tuple("\t" + str(m) for m in self.__list_packages(folder))
+            )
+        )
 
     def clone(self, source_model: str, target_model: str):
         shutil.copytree(
@@ -368,7 +381,9 @@ class Mate:
             name.split("__")
             for name in os.listdir(os.path.join(self.root_folder, "snapshots"))
         ]
-        matching_snapshots = [name for name in snapshot_names if name[0] == model_name]
+        matching_snapshots = [
+            name for name in snapshot_names if name[0] == model_name
+        ]
         max_version_matching = (
             max([int(name[1]) for name in matching_snapshots])
             if len(matching_snapshots) > 0
@@ -393,8 +408,12 @@ class Mate:
         trainer.fit(model, datamodule=data_module)
 
     def train(self, model_name: str, parameters: str = "default"):
-        assert model_name in self.models, f'Model "{model_name}" does not exist.'
-        print(f"Training model {model_name} with hyperparameters: {parameters}.json")
+        assert (
+            model_name in self.models
+        ), f'Model "{model_name}" does not exist.'
+        print(
+            f"Training model {model_name} with hyperparameters: {parameters}.json"
+        )
 
         # we need to load hyperparameters before training to set save_path
         _ = self.__read_hyperparameters(model_name, parameters)
@@ -403,7 +422,7 @@ class Mate:
         checkpoint_path = os.path.join(self.save_path, "checkpoint")
         if not os.path.exists(checkpoint_path):
             os.mkdir(checkpoint_path)
-        checkpoints = glob(os.path.join(checkpoint_path, "*"))
+        checkpoints = [os.path.join(checkpoint_path, p) for p in os.listdir(checkpoint_path)]
         action = "go"
         if len(checkpoints) > 0:
             while action not in ("y", "n", ""):
@@ -420,15 +439,21 @@ class Mate:
         self.__fit(model_name, parameters)
 
     def test(self, model_name: str, params: str):
-        assert model_name in self.models, f'Model "{model_name}" does not exist.'
+        assert (
+            model_name in self.models
+        ), f'Model "{model_name}" does not exist.'
         params = "parameters" if params == "" or params == "None" else params
-        print(f"Testing model {model_name} with hyperparameters: {params}.json")
+        print(
+            f"Testing model {model_name} with hyperparameters: {params}.json"
+        )
 
         trainer, model, data_module = self.__get_trainer(model_name, params)
         trainer.test(model, datamodule=data_module)
 
     def restart(self, model_name: str, params: str):
-        assert model_name in self.models, f'Model "{model_name}" does not exist.'
+        assert (
+            model_name in self.models
+        ), f'Model "{model_name}" does not exist.'
         params = "parameters" if params == "" or params == "None" else params
         print(f"Restarting model {model_name} with parameters: {params}.json")
 
@@ -453,7 +478,9 @@ class Mate:
         conf = os.path.join(mate_dir, "mate.json")
         conf = Bunch(json.load(open(conf)))
 
-        dest_dir = os.path.join(self.root_folder, "models", model_name, "modules")
+        dest_dir = os.path.join(
+            self.root_folder, "models", model_name, "modules"
+        )
         os.makedirs(dest_dir, exist_ok=True)
 
         shutil.copytree(os.path.join(mate_dir, conf.export), dest_dir)
@@ -468,9 +495,13 @@ class Mate:
             new_params[model["class_name"]] = model["params"]
 
         old_params_files = [
-            os.path.join(self.root_folder, "models", model_name, "hyperparameters", p)
+            os.path.join(
+                self.root_folder, "models", model_name, "hyperparameters", p
+            )
             for p in os.listdir(
-                os.path.join(self.root_folder, "models", model_name, "hyperparameters")
+                os.path.join(
+                    self.root_folder, "models", model_name, "hyperparameters"
+                )
             )
         ]
         for old_params_file in old_params_files:
@@ -485,7 +516,9 @@ class Mate:
         installs a package
         """
         source_model_base_name = (
-            source_model.split(".")[-1] if "." in source_model else source_model
+            source_model.split(".")[-1]
+            if "." in source_model
+            else source_model
         )
         mate_dir = ".matedir"
         if not os.path.exists(mate_dir):
@@ -498,11 +531,14 @@ class Mate:
             os.path.join(source_model, destination_model)
         )
         old_params_files = [
-            os.path.join("hyperparameters", p) for p in os.listdir("hyperparameters")
+            os.path.join("hyperparameters", p)
+            for p in os.listdir("hyperparameters")
         ]
         for old_params_file in old_params_files:
             params_name = old_params_file.split(".")[0]
-            old_params = self.__read_hyperparameters(destination_model, params_name)
+            old_params = self.__read_hyperparameters(
+                destination_model, params_name
+            )
             old_params[source_model_base_name] = new_parameters
             with open(old_params_file, "w") as f:
                 json.dump(old_params, f)
