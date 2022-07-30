@@ -11,9 +11,11 @@ mate/optimizer.py
 yerbamate/__init__.py
 yerbamate/__main__.py
 yerbamate/bunch.py
+yerbamate/constants.py
 yerbamate/logger.py
 yerbamate/mate.py
 yerbamate/mate_cli.py
+yerbamate/migrator.py
 yerbamate/plot.py
 yerbamate/tune_hyperparameters.py
 yerbamate/utils.py
