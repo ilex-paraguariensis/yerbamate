@@ -296,7 +296,7 @@ class Mate:
             checkpoint_file = os.path.join(checkpoint_path, torch_model_name + '.pt')
             if os.path.exists(checkpoint_file):
                 print(f"Loaded model from {checkpoint_file}")
-                model.__dict__[torch_model_name].load_state_dict(t.load(checkpoint_file))
+                model.__getattribute__(torch_model_name).load_state_dict(t.load(checkpoint_file))
                 #model.load_from_checkpoint(
                 #    checkpoint_file, params=params, strict=False
                 #)
