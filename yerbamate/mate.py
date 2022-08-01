@@ -92,7 +92,7 @@ class Mate:
             torch_model = self.__load_torch_model_class(
                 model_name, params, m, parameters_file_name
             )
-            model.__setattr__(m, torch_model)
+            setattr(model, m, torch_model)
             
             print(f"Loaded model {m}")
             print(f"Set its attribute on the model. {model.__getattribute__(m)}")
