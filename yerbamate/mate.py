@@ -87,15 +87,14 @@ class Mate:
             f"{self.root_folder}.models.{model_name}.{params.train}",
             fromlist=["models"],
         ).Model(params)
-        print(f"Loading models from disk: {params.model.keys()}")
         for m in params.model.keys():
             torch_model = self.__load_torch_model_class(
                 model_name, params, m, parameters_file_name
             )
             setattr(model, m, torch_model)
-            model.__dict__[m] = torch_model
-            print(f"Loaded model {m}")
-            print(f"Set its attribute on the model. {model.__getattribute__(m)}")
+            model.__dict__[
+                m
+            ] = torch_model  # on some computers only setting it this way works
 
         return model
 
@@ -117,7 +116,9 @@ class Mate:
         if conf.contains("params"):
             model = model_class(**dict(conf.params))
         else:
-            print(f"No parameters found for model {model_class}, using default ones. They will be added to the hyperparameters file.")
+            print(
+                f"No parameters found for model {model_class}, using default ones. They will be added to the hyperparameters file."
+            )
             model = model_class()
 
             # populate and save parameters
@@ -297,13 +298,17 @@ class Mate:
                 print(model)
         checkpoint_path = os.path.join(self.save_path, "checkpoint")
         for torch_model_name in params.model:
-            checkpoint_file = os.path.join(checkpoint_path, torch_model_name + '.pt')
+            checkpoint_file = os.path.join(
+                checkpoint_path, torch_model_name + ".pt"
+            )
             if os.path.exists(checkpoint_file):
                 print(f"Loaded model from {checkpoint_file}")
-                model.__getattribute__(torch_model_name).load_state_dict(t.load(checkpoint_file))
-                #model.load_from_checkpoint(
+                model.__getattribute__(torch_model_name).load_state_dict(
+                    t.load(checkpoint_file)
+                )
+                # model.load_from_checkpoint(
                 #    checkpoint_file, params=params, strict=False
-                #)
+                # )
 
                 # model.params = params
 
@@ -325,8 +330,8 @@ class Mate:
         if params.contains("early_stopping"):
             callbacks.append(EarlyStopping(**params.early_stopping))
 
-        #monitor = mate.OptimizerMonitor(params, "epoch")
-        #callbacks.append(monitor)
+        # monitor = mate.OptimizerMonitor(params, "epoch")
+        # callbacks.append(monitor)
 
         trainer = Trainer(
             max_epochs=params.max_epochs,
@@ -426,7 +431,10 @@ class Mate:
         checkpoint_path = os.path.join(self.save_path, "checkpoint")
         if not os.path.exists(checkpoint_path):
             os.mkdir(checkpoint_path)
-        checkpoints = [os.path.join(checkpoint_path, p) for p in os.listdir(checkpoint_path)]
+        checkpoints = [
+            os.path.join(checkpoint_path, p)
+            for p in os.listdir(checkpoint_path)
+        ]
         action = "go"
         if len(checkpoints) > 0:
             while action not in ("y", "n", ""):
