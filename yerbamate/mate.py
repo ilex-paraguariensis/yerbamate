@@ -87,6 +87,7 @@ class Mate:
             f"{self.root_folder}.models.{model_name}.{params.train}",
             fromlist=["models"],
         ).Model(params)
+        print(f"Loading models from disk: {params.model.keys()}")
         for m in params.model.keys():
             torch_model = self.__load_torch_model_class(
                 model_name, params, m, parameters_file_name
