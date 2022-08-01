@@ -93,7 +93,9 @@ class Mate:
                 model_name, params, m, parameters_file_name
             )
             model.__setattr__(m, torch_model)
-            print(f"Loaded model {m}. Set its attribute on the model. {model.__getattribute__(m)}")
+            
+            print(f"Loaded model {m}")
+            print(f"Set its attribute on the model. {model.__getattribute__(m)}")
 
         return model
 
