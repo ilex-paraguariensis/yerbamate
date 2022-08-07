@@ -328,24 +328,19 @@ class Mate:
             # model.params = params
 
         callbacks = []
-        model_saver_callback = ModelCheckpoint(
-            checkpoint_path,
-            filename="best",
-            save_top_k=1,
-            save_weights_only=False,
-            save_last=True,
-            verbose=True,
-            monitor="val_loss",
-            mode="min",
-        )
-
-        callbacks.append(model_saver_callback)
+        if params.contains("model_checkpoint"):
+            model_saver_callback = ModelCheckpoint(
+                checkpoint_path,
+                filename="best",
+                **dict(params.model_checkpoint),
+            )
+            callbacks.append(model_saver_callback)
 
         if params.contains("early_stopping"):
             callbacks.append(EarlyStopping(**params.early_stopping))
 
-        monitor = mate.OptimizerMonitor(params, "epoch")
-        callbacks.append(monitor)
+        # monitor = mate.OptimizerMonitor(params, "epoch")
+        # callbacks.append(monitor)
 
         trainer = Trainer(
             max_epochs=params.max_epochs,
