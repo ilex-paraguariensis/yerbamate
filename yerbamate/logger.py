@@ -9,7 +9,7 @@ from argparse import Namespace
 
 class CustomLogger(TensorBoardLogger):
     def __init__(self, params: Namespace):
-        super().__init__("logs", params.model)
+        super().__init__("logs", params.model_name)
         # ipdb.set_trace()
         self.params = params
         # self.log("val_loss", 0.1)

@@ -2,7 +2,8 @@ from curses.panel import new_panel
 import os
 from argparse import ArgumentParser
 import importlib
-from pytorch_lightning import Trainer
+from pytorch_lightning import LightningModule, Trainer
+import pytorch_lightning as pl
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 
 from .bunch import Bunch
@@ -110,7 +111,7 @@ class Mate:
 
     def __load_lightning_class(
         self, model_name: str, params: Bunch, parameters_file_name: str
-    ):
+    ) -> LightningModule:
         model = __import__(
             f"{self.root_folder}.models.{model_name}.{params.train}",
             fromlist=["models"],
@@ -312,25 +313,26 @@ class Mate:
         model = self.__load_lightning_class(model_name, params, parameters)
         data_module = self.__load_data_loader_class(params.data_loader)(params)
         logger_module = self.__load_logger_class()
-        params.model = model_name
+        params.model_name = model_name
 
         if self.config.contains("print_model"):
             if self.config.print_model:
                 print(model)
 
         checkpoint_path = os.path.join(self.save_path, "checkpoint")
-        checkpoint_file = os.path.join(checkpoint_path, "best.ckpt")
+        checkpoint_file = os.path.join(checkpoint_path, "last.ckpt")
         if os.path.exists(checkpoint_file):
             print(f"Loaded model from {checkpoint_file}")
+            # model.load_state_dict(t.load(checkpoint_file))
             model.load_from_checkpoint(checkpoint_file, params=params, strict=False)
             # model.params = params
 
         callbacks = []
-        model_saver_callback = mate.ModelCheckpoint(
+        model_saver_callback = ModelCheckpoint(
             checkpoint_path,
             filename="best",
             save_top_k=1,
-            save_weights_only=False,  # BUG: can't save and reload everything for now, save stats for now
+            save_weights_only=False,
             save_last=True,
             verbose=True,
             monitor="val_loss",
@@ -411,12 +413,12 @@ class Mate:
     def __fit(self, model_name: str, params: str):
         trainer, model, data_module = self.__get_trainer(model_name, params)
 
-        # if self.is_restart:
-        #     checkpoint_path = os.path.join(self.save_path, "checkpoint", "last.ckpt")
-        # trainer.fit(model, datamodule=data_module, ckpt_path=checkpoint_path)
-        # else:
-        #     trainer.fit(model, datamodule=data_module)
-        trainer.fit(model, datamodule=data_module)
+        if self.is_restart:
+            checkpoint_path = os.path.join(self.save_path, "checkpoint", "last.ckpt")
+            trainer.fit(model, datamodule=data_module, ckpt_path=checkpoint_path)
+        else:
+            trainer.fit(model, datamodule=data_module)
+        # trainer.fit(model, datamodule=data_module)
 
     def train(self, model_name: str, parameters: str = "default"):
         assert model_name in self.models, f'Model "{model_name}" does not exist.'
@@ -453,7 +455,10 @@ class Mate:
         print(f"Testing model {model_name} with hyperparameters: {params}.json")
 
         trainer, model, data_module = self.__get_trainer(model_name, params)
-        trainer.test(model, datamodule=data_module)
+
+        checkpoint_path = os.path.join(self.save_path, "checkpoint", "best.ckpt")
+
+        trainer.test(model, datamodule=data_module, ckpt_path=checkpoint_path)
 
     def restart(self, model_name: str, params: str):
         assert model_name in self.models, f'Model "{model_name}" does not exist.'
