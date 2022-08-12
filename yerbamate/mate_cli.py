@@ -88,20 +88,7 @@ def main():
         if len(args) > 1 and args[1] in ("--help", "-h"):
             print(prettify_method(action, methods[args[0]], in_depth=True))
         else:
-            mate = Mate()
             method_args_types = tuple(param.annotation for param in methods[action])
-            # method_args_types = tuple(
-            #    tuple(param.annotation for param in params)
-            #    for method, params in methods
-            #    if method == action
-            # )[0]
-            # method_args_defaults = tuple(
-            #    tuple(param.default for param in params)
-            #    for method, params in methods
-            #    if method == action
-            # )[0]
-            # rewrites the above but taking into account that methods is a dictionary
-            # and not a list
             method_args_defaults = tuple(
                 tuple(param.default for param in methods[action])
             )
@@ -115,9 +102,14 @@ def main():
                     method_args_types, method_args_defaults, raw_method_args
                 )
             )
-            method_args_len = len(method_args)
-            hparams_len = len(raw_method_args) - method_args_len
-            if hparams_len > 0:
-                params = parse_hparams(args[method_args_len + 1 :])
-                mate.run_params = params
-            getattr(mate, action)(*method_args)
+
+            if action == "init":
+                Mate.init(*method_args)
+            else:
+                mate = Mate()
+                method_args_len = len(method_args)
+                hparams_len = len(raw_method_args) - method_args_len
+                if hparams_len > 0:
+                    params = parse_hparams(args[method_args_len + 1 :])
+                    mate.run_params = params
+                getattr(mate, action)(*method_args)

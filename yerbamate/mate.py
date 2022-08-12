@@ -24,7 +24,22 @@ from . import __version__
 
 
 class Mate:
-    def __init__(self):
+    @staticmethod
+    def init(project_name:str):
+        assert not os.path.exists(project_name), "Project folder already exists. Please remove it."
+        os.system("git clone https://github.com/ilex-paraguariensis/init-mate-project")
+        shutil.rmtree("init-mate-project/.git")
+        os.rename("init-mate-project/", project_name)
+        with open(os.path.join(project_name, "mate.json")) as f:
+            mate_config = json.load(f)
+        mate_config['project'] = project_name
+        with open(os.path.join(project_name, "mate.json"), "w") as f:
+            json.dump(mate_config, f, indent=4)
+        os.rename(os.path.join(project_name, "project"), os.path.join(project_name, project_name))
+        # TODO: add results_folder to mate.json
+        # TODO: write mate.json
+
+    def __init__(self, init=False):
         self.root_folder = ""
         self.save_path = ""
         self.current_folder = os.path.dirname(__file__)
@@ -102,7 +117,7 @@ class Mate:
                 current_path = os.getcwd()
                 i += 1
                 if current_path == "/" or i == 6:
-                    print("Could not find mate.json")
+                    print("ERROR: Could not find mate.json")
                     sys.exit(1)
 
         # self.root_save_folder = self.root_folder
@@ -351,13 +366,6 @@ class Mate:
         )
         return (trainer, model, data_module)
 
-    def init(self, results_folder: str):
-        os.system("git clone https://github.com/ilex-paraguariensis/init-mate-project")
-        shutil.rmtree("init-mate-project/.git")
-        os.rename("init-mate-project/*", ".")  # TODO: not sure this works
-        # TODO: add results_folder to mate.json
-        # TODO: write mate.json
-
     def create(self, path: str):
         pass
 
@@ -494,7 +502,7 @@ class Mate:
         new_params = {}
         for model in conf.models:
             new_params[model["class_name"]] = model["params"]
-
+        ipdb.set_trace()
         old_params_files = [
             os.path.join(self.root_folder, "models", model_name, "hyperparameters", p)
             for p in os.listdir(
