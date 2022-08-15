@@ -28,6 +28,14 @@ Finally, you can change **hyperparameters** by editing a `json` file that looks 
 	...
 }
 ```
+And then, you can run, train and test your models:
+```
+mate run imagen --input_txt="A Flower in space"
+mate train imagen
+mate restart imagen
+mate snapshot imagen
+mate clone imogen exp_imogen
+```
 
 ## Installation 🔌
 
