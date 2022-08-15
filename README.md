@@ -1,7 +1,7 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 
 ## What is Maté?
-Maté is a deep learning framework built upon Pytorch and soon Tensorflow. It serves as a package and project manager for deep learning projects. With Maté you can add neural network dependencies such as  ResNet or ViT variants to your projects with a simple command line. As a project manager, Maté provides easy to use functionalities for training, evaluating, and experimenting with various architectures on different datasets while preserving results of your experiments.
+Maté is a deep learning framework built upon Pytorch and soon Tensorflow. It serves as a package and project manager for deep learning projects. With Maté you can add neural network dependencies such as  ResNet or ViT variants to your projects with a simple command line. As a project manager, Maté provides easy to use functionalities for training, evaluating, and experimenting with various architectures on different datasets while preserving results of your experiments. 
 
 
 Maté targets some of the following issues in DL research:
@@ -93,6 +93,11 @@ Or, if the repo is on github, you can use the shorthand notation:
 ```
 mate install ilex-paraguariensis/ResNet 
 ```
+
+## FAQ
+**Q: Does Maté works with colab?**
+
+**A**: Yes! Maté works with colab with little to no effort, in training with colab you need give access to your google drive account and store the dataset and project in your google drive account.
 
 ## Contact 🤝 
 
