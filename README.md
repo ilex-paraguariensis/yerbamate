@@ -1,7 +1,10 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 
 ## What is Maté?
-It is a tool for building research projects in the field of deep learning with [Pytorch](https://pytorch.org/) and builds on top of [Lightning](https://www.pytorchlightning.ai/) and does not replaces their functionalities. It targets some of the following issues in DL research:
+Maté is a deep learning framework built upon Pytorch and soon Tensorflow. It serves as a package and project manager for deep learning projects. With Maté you can add neural network dependencies such as  ResNet or ViT variants to your projects with a simple command line. As a project manager, Maté provides easy to use functionalities for training, evaluating, and experimenting with various architectures on different datasets while preserving results of your experiments.
+
+
+Maté targets some of the following issues in DL research:
 
 - reproducibility
 - replicability
@@ -28,7 +31,13 @@ Finally, you can change **hyperparameters** by editing a `json` file that looks 
 
 ## Installation 🔌
 
-At the moment it only works on Linux and MacOS. Windows is on its way. To install mate you need to do the following:
+At the moment it only works on Linux and MacOS. Windows is on its way.
+To install the stable version of mate you need to do the following:
+```
+pip install yerbamate
+```
+
+To install the latest development version:
 ```
 git clone https://github.com/ilex-paraguariensis/yerbamate 
 cd yerbamate
@@ -45,6 +54,11 @@ And then go ahead and train it (no coding so far 🤗).
 mate train resnet cifar10 
 ```
 The best performing model is saved, along with all of the training hyperparameters, test results, and training logs. In CSV format but also compatible with tensorboard.
+
+Adding dependencies:
+```
+mate add myvideoprediction ViT CrossFormer CvT
+```
 
 
 If however you want to test a model once again, you can run:
