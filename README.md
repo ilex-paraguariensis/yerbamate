@@ -1,14 +1,14 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 ## What is Maté?
-Maté is a deep learning framework built upon Pytorch(and soon Tensorflow). It is a package and project manager for deep learning projects. With Maté you can add neural network dependencies such as CNN, RNN, Transformer, and ViT variants to your projects with a simple command line. As a project manager, Maté trains and evaluates models; it is built for experimenting with various architectures on different datasets while being fully reproducible. Mate adds the source code of the dependencies to your project, making it fully customizable.
+Maté is a deep learning framework built upon Pytorch(and soon Tensorflow). It is a package and project manager for deep learning projects. 
+With Maté you can add neural network dependencies such as CNN, RNN, Transformer, and ViT variants to your projects with a simple command line. As a project manager, Maté trains, evaluates models and keep tracks of your numerous experiments. Mate adds the source code of the dependencies to your project, making it fully customizable.
 
-Maté is an experimental deep learning framework built for researchers. Maté tries to remove the boilerplate code you need to write for just saving weights, visualizing metrics, or running training. 
 
 ### A word of notice
 This project is still in its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
 
 ## HelloMatéWorld
-Maté reads a `mate.json` configuration filw and runs the experiment of the configu. In this file you can select tasks, models, optimizers, and datasets e.g., Classification ResNet Adam ImageNet.  
+Maté reads a `mate.json` configuration filw and runs the experiment. In this file you can select tasks, models, optimizers, and datasets e.g.,
 ```
 {
 	"batch_size": 32,
@@ -24,7 +24,6 @@ Maté reads a `mate.json` configuration filw and runs the experiment of the conf
 
 ## Is Maté simple to use
 
-And then, you can run, train and test your models:
 ```
 mate run imagen --input_txt="A Flower in space"
 mate train imagen # Tooks while... and doesnt stops training if you do not have a stopper.
@@ -33,6 +32,7 @@ mate snapshot imagen # reproducible snapshop, keep on experimenting
 mate clone imogen exp_imogen # fork a expriment, to keep safe of imogen you have
 mate train exp_imogen 
 ```
+
 
 ## Installation 🔌
 
@@ -102,7 +102,7 @@ mate install ilex-paraguariensis/ResNet
 ## FAQ
 **Q: Does Maté works with colab?**
 
-**A**: Yes! Maté works with colab with little to no effort, in training with colab you need give access to your google drive account and store the dataset and project in your google drive account.
+**A**: Yes! Maté works with colab with little to no effort, in training with colab you need give access to your google drive account and store the dataset and project in your own account.
 
 ## Contact 🤝 
 
