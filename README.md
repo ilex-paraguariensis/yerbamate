@@ -1,40 +1,37 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
-
 ## What is Maté?
-Maté is a deep learning framework built upon Pytorch and soon Tensorflow. It serves as a package and project manager for deep learning projects. With Maté you can add neural network dependencies such as  ResNet or ViT variants to your projects with a simple command line. As a project manager, Maté provides easy to use functionalities for training, evaluating, and experimenting with various architectures on different datasets while preserving results of your experiments. 
+Maté is a deep learning framework built upon Pytorch(and soon Tensorflow). It is a package and project manager for deep learning projects. With Maté you can add neural network dependencies such as CNN, RNN, Transformer, and ViT variants to your projects with a simple command line. As a project manager, Maté trains and evaluates models; it is built for experimenting with various architectures on different datasets while being fully reproducible. Mate adds the source code of the dependencies to your project, making it fully customizable.
 
-
-Maté targets some of the following issues in DL research:
-
-- reproducibility
-- replicability
-- transparency
-
-It also makes development fast and easy. It helps you to focus on the model, and less on boilerplate code.
+Maté is an experimental deep learning framework built for researchers. Maté tries to remove the boilerplate code you need to write for just saving weights, visualizing metrics, or running training. 
 
 ### A word of notice
-This project is still at its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
+This project is still in its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
 
-
-## Is Maté simple to use?
-Maté models are nothing but regular torch models. And the training loops are lightning models. Also the default training loops for regression and classification will work for most use-cases so no need to create your own.
-
-Finally, you can change **hyperparameters** by editing a `json` file that looks something like the following: ([click here for a detailed example](https://github.com/ilex-paraguariensis/yerbamate/wiki/Sample-Hyperparameter))
+## HelloMatéWorld
+Maté reads a `mate.json` configuration filw and runs the experiment of the configu. In this file you can select tasks, models, optimizers, and datasets e.g., Classification ResNet Adam ImageNet.  
 ```
 {
 	"batch_size": 32,
-	"optimizer":...
-	"transformer":...
+	"task" : "classification",
+	"optimizer":...	
+	"transformer":..,
+	"resnet":"...
 	...
 }
 ```
+
+
+
+## Is Maté simple to use
+
 And then, you can run, train and test your models:
 ```
 mate run imagen --input_txt="A Flower in space"
-mate train imagen
-mate restart imagen
-mate snapshot imagen
-mate clone imogen exp_imogen
+mate train imagen # Tooks while... and doesnt stops training if you do not have a stopper.
+mate restart imagen 
+mate snapshot imagen # reproducible snapshop, keep on experimenting
+mate clone imogen exp_imogen # fork a expriment, to keep safe of imogen you have
+mate train exp_imogen 
 ```
 
 ## Installation 🔌
