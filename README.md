@@ -1,13 +1,13 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 
-Maté is a deep learning framework compatible with Pytorch and Tensorflow. It is a package and project manager for deep learning projects. 
+Maté is a deep learning framework compatible with Pytorch and Tensorflow. It is a package and project manager for deep learning. 
 With Maté you can add neural network dependencies such as CNN, RNN, Transformer, and ViT variants to your projects with a simple command line. As a project manager, Maté evaluates, trains, and keep track of your numerous experiments. Mate adds the source code of the dependencies to your project, making it fully customizable and reprodocible.
 
 
 ### A word of notice
 This project is still in its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
 
-## HelloMatéWorld
+## Hello World in Maté
 Maté first is born as a `mate.json` configuration file then baptized to generate code, the code will be used to train a model. In this file you can select and modify hyperparameters of your architecture. 
 ```
 {
@@ -24,6 +24,7 @@ Maté first is born as a `mate.json` configuration file then baptized to generat
 
 
 ## Is Maté simple to use
+A Maté project is just like any other deep learning project with Tensorflow or Pytorch, but the difference is a standard project structure. There is no such thing as Maté models, it is just Pytorch/Tensorflow models that follow Maté standard.
 
 ```
 mate run imagen --input_txt="A Flower in space"
@@ -33,6 +34,26 @@ mate snapshot imagen # reproducible snapshop, keep on experimenting
 mate clone imogen exp_imogen # fork a expriment, to keep safe of imogen you have
 mate train exp_imogen 
 ```
+
+## What is the Maté standard?
+It is a tree structure of foolders an files. 
+
+The root folder contrains the follwing folders: 
+* Models
+* Data
+* Executables
+
+Inside the Models folder have your models, e.g.,
+* ResNet
+* ResNetBig
+* YetABiggerResNet
+
+Inside the `Model` folder, you would need to have the source of of the models and trainers.
+
+Inside the `Data` folder, you would have your dataloaders, augmentation and preprocessings.
+
+The `Excetuables` can be used to run a trained model. 
+
 
 
 ## Installation 🔌
