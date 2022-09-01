@@ -50,7 +50,7 @@ cd yerbamate
 python install.py
 ```
 
-## Quick Start 🔥
+## Quick Start ⚡
 Create a new project:
 ```
 mate init my-imagenet-classifier --dataset cifar10 --model resnet
