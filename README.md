@@ -22,7 +22,7 @@ mate train exp_imogen
 ```
 
 ## What is the Maté standard?
-It is a tree structure of foolders an files. It enforces the location of your python files, not what is is inside, or how do you define your models, dataloaders or training procedure.
+It is a tree structure of foolders and files. It enforces the location of your python files, not what is is inside or how do you define your models, dataloaders or training procedure.
 
 The root folder contrains the follwing folders: 
 * Models
