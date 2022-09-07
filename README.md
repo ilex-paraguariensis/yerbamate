@@ -10,15 +10,17 @@ This project is still in its early stages and is not ready for production. Some 
 
 
 ## Is Maté simple to use
-A Maté project is just like any other deep learning project with Tensorflow or Pytorch, but the difference is a standard project structure. There is no such thing as Maté models, it is just Pytorch/Tensorflow models that follow Maté standard.
+A Maté project is just like any other deep learning project with Tensorflow or Pytorch, but the difference is a standard project structure. There is no such thing as Maté models, it is just Pytorch/Tensorflow models that follow Maté standard. As of now Maté is a command line tool, and soon Maté commands will be accessible from a web interface. Here are some sample commands that you need in your experiments:
 
 ```
-mate run imagen --input_txt="A Flower in space"
-mate train imagen # Tooks while... and doesnt stops training if you do not have a early stopper.
+mate run imagen --input_txt="A Flower in space" # run pretraied model with custom input 
+mate train imagen # Tooks while to train... and doesnt stops training if you do not have a early stopper.
 mate restart imagen # restart the training
 mate snapshot imagen # reproducible snapshop, keep on experimenting
 mate clone imogen exp_imogen # fork a expriment, to keep safe of imogen you have
-mate train exp_imogen 
+mate train exp_imogen # change the code, and keep on experimenting!
+mate train videoprediction moving_mnist # run videoprediction model with moving_mnist
+mate train videoprediction kth # train videoprediction model with kth dataset
 ```
 
 ## What is the Maté standard?
