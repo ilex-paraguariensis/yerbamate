@@ -1,7 +1,7 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 
 Maté is a deep learning framework compatible with Pytorch and Tensorflow. It is a package and project manager for deep learning. 
-With Maté you can add neural network dependencies such as CNN, RNN, Transformer, and ViT variants to your projects with a simple command line. As a project manager, Maté evaluates, trains, and keeps track of your numerous experiments. Mate adds the source code of the dependencies to your project, making it fully customizable and reprodocible. 
+With Maté you can add neural network model dependencies such as ResNet, CNN, RNN, Transformer, and ViT variants to your projects with a simple command line. As a project manager, Maté evaluates, trains, and keeps track of your numerous experiments. Mate adds the source code of the dependencies to your project, making it fully customizable and reprodocible.
 
 
 ### A word of notice
@@ -10,15 +10,16 @@ This project is still in its early stages and is not ready for production. Some 
 
 
 ## Is Maté simple to use
-A Maté project is just like any other deep learning project with Tensorflow or Pytorch, but the difference is a standard project structure. There is no such thing as Maté models, it is just Pytorch/Tensorflow models that follow Maté standard. As of now Maté is a command line tool, and soon Maté commands will be accessible from a web interface. Here are some sample commands that you need in your experiments:
+A Maté project is just like any other deep learning project with Tensorflow or Pytorch, but the difference is a standard project structure. As of now Maté is a command line tool, and soon Maté commands will be accessible from a web interface. Here are some sample commands that you might need in your experiments:
 
 ```
+mate add imagen UNet # adds a UNet model with its source code to your project
 mate run imagen --input_txt="A Flower in space" # run pretraied model with custom input 
-mate train imagen # Tooks while to train... and doesnt stops training if you do not have a early stopper.
-mate restart imagen # restart the training
-mate snapshot imagen # reproducible snapshop, keep on experimenting
-mate clone imogen exp_imogen # fork a expriment, to keep safe of imogen you have
-mate train exp_imogen # change the code, and keep on experimenting!
+mate train imagen # Takes while to train... 
+mate restart imagen # Restart the training
+mate snapshot imagen # Reproducible snapshop, keep on experimenting
+mate clone imogen exp_imogen # Fork a expriment to keep safe of imogen you have
+mate train exp_imogen # Change the code and keep on experimenting!
 mate train videoprediction moving_mnist # run videoprediction model with moving_mnist
 mate train videoprediction kth # train videoprediction model with kth dataset
 ```
