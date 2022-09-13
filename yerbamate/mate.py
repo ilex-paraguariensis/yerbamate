@@ -25,9 +25,11 @@ from . import __version__
 
 class Mate:
     @staticmethod
-    def init(project_name:str):
-        assert not os.path.exists(project_name), "Project folder already exists. Please remove it."
-        os.system("git clone https://github.com/ilex-paraguariensis/init-mate-project")
+    def init(project_name: str):
+        assert not os.path.exists(
+            project_name), "Project folder already exists. Please remove it."
+        os.system(
+            "git clone https://github.com/ilex-paraguariensis/init-mate-project")
         shutil.rmtree("init-mate-project/.git")
         os.rename("init-mate-project/", project_name)
         with open(os.path.join(project_name, "mate.json")) as f:
@@ -35,7 +37,8 @@ class Mate:
         mate_config['project'] = project_name
         with open(os.path.join(project_name, "mate.json"), "w") as f:
             json.dump(mate_config, f, indent=4)
-        os.rename(os.path.join(project_name, "project"), os.path.join(project_name, project_name))
+        os.rename(os.path.join(project_name, "project"),
+                  os.path.join(project_name, project_name))
         # TODO: add results_folder to mate.json
         # TODO: write mate.json
 
@@ -192,6 +195,15 @@ class Mate:
     def __load_logger_class(self):
         return CustomLogger
 
+    def __get_logger(self, params: Bunch):
+        if not params.contains("logger"):
+            return self.__load_logger_class()
+        logger = __import__(params.logger.module, fromlist=[
+                            params.logger["class"]])
+        logger_class = getattr(logger, params.logger["class"])
+        logger = logger_class(**params.logger.params)
+        return logger
+
     def __load_data_loader_class(self, data_loader_name: str):
         data_class = f"{self.root_folder}.data_loaders.{data_loader_name}.data_loader"
         return __import__(
@@ -327,8 +339,8 @@ class Mate:
         params.save_path = self.save_path
         model = self.__load_lightning_class(model_name, params, parameters)
         data_module = self.__load_data_loader_class(params.data_loader)(params)
-        logger_module = self.__load_logger_class()
         params.model_name = model_name
+        logger = self.__get_logger(params)
 
         if self.config.contains("print_model"):
             if self.config.print_model:
@@ -336,11 +348,12 @@ class Mate:
 
         checkpoint_path = os.path.join(self.save_path, "checkpoint")
         checkpoint_file = os.path.join(checkpoint_path, "last.ckpt")
-        if os.path.exists(checkpoint_file):
-            print(f"Loaded model from {checkpoint_file}")
-            # model.load_state_dict(t.load(checkpoint_file))
-            model.load_from_checkpoint(checkpoint_file, params=params, strict=False)
-            # model.params = params
+        # if os.path.exists(checkpoint_file):
+        #     print(f"Loaded model from {checkpoint_file}")
+        #     # model.load_state_dict(t.load(checkpoint_file))
+        #     model.load_from_checkpoint(
+        #         checkpoint_file, params=params, strict=False)
+        # model.params = params
 
         callbacks = []
         if params.contains("model_checkpoint"):
@@ -361,7 +374,7 @@ class Mate:
             max_epochs=params.max_epochs,
             gpus=(1 if params.cuda else None),
             callbacks=callbacks,
-            logger=logger_module(params),
+            logger=logger,
             enable_checkpointing=True,
         )
         return (trainer, model, data_module)
@@ -382,7 +395,8 @@ class Mate:
             print("Ok, exiting.")
 
     def list(self, folder: str):
-        print("\n".join(tuple("\t" + str(m) for m in self.__list_packages(folder))))
+        print("\n".join(tuple("\t" + str(m)
+              for m in self.__list_packages(folder))))
 
     def clone(self, source_model: str, target_model: str):
         shutil.copytree(
@@ -399,7 +413,8 @@ class Mate:
             name.split("__")
             for name in os.listdir(os.path.join(self.root_folder, "snapshots"))
         ]
-        matching_snapshots = [name for name in snapshot_names if name[0] == model_name]
+        matching_snapshots = [
+            name for name in snapshot_names if name[0] == model_name]
         max_version_matching = (
             max([int(name[1]) for name in matching_snapshots])
             if len(matching_snapshots) > 0
@@ -417,15 +432,18 @@ class Mate:
         trainer, model, data_module = self.__get_trainer(model_name, params)
 
         if self.is_restart:
-            checkpoint_path = os.path.join(self.save_path, "checkpoint", "last.ckpt")
-            trainer.fit(model, datamodule=data_module, ckpt_path=checkpoint_path)
+            checkpoint_path = os.path.join(
+                self.save_path, "checkpoint", "last.ckpt")
+            trainer.fit(model, datamodule=data_module,
+                        ckpt_path=checkpoint_path)
         else:
             trainer.fit(model, datamodule=data_module)
         # trainer.fit(model, datamodule=data_module)
 
     def train(self, model_name: str, parameters: str = "default"):
         assert model_name in self.models, f'Model "{model_name}" does not exist.'
-        print(f"Training model {model_name} with hyperparameters: {parameters}.json")
+        print(
+            f"Training model {model_name} with hyperparameters: {parameters}.json")
 
         # we need to load hyperparameters before training to set save_path
         _ = self.__read_hyperparameters(model_name, parameters)
@@ -455,11 +473,13 @@ class Mate:
     def test(self, model_name: str, params: str):
         assert model_name in self.models, f'Model "{model_name}" does not exist.'
         params = "parameters" if params == "" or params == "None" else params
-        print(f"Testing model {model_name} with hyperparameters: {params}.json")
+        print(
+            f"Testing model {model_name} with hyperparameters: {params}.json")
 
         trainer, model, data_module = self.__get_trainer(model_name, params)
 
-        checkpoint_path = os.path.join(self.save_path, "checkpoint", "best.ckpt")
+        checkpoint_path = os.path.join(
+            self.save_path, "checkpoint", "best.ckpt")
 
         trainer.test(model, datamodule=data_module, ckpt_path=checkpoint_path)
 
@@ -489,7 +509,8 @@ class Mate:
         conf = os.path.join(mate_dir, "mate.json")
         conf = Bunch(json.load(open(conf)))
 
-        dest_dir = os.path.join(self.root_folder, "models", model_name, "modules")
+        dest_dir = os.path.join(
+            self.root_folder, "models", model_name, "modules")
         os.makedirs(dest_dir, exist_ok=True)
 
         shutil.copytree(os.path.join(mate_dir, conf.export), dest_dir)
@@ -504,9 +525,11 @@ class Mate:
             new_params[model["class_name"]] = model["params"]
         ipdb.set_trace()
         old_params_files = [
-            os.path.join(self.root_folder, "models", model_name, "hyperparameters", p)
+            os.path.join(self.root_folder, "models",
+                         model_name, "hyperparameters", p)
             for p in os.listdir(
-                os.path.join(self.root_folder, "models", model_name, "hyperparameters")
+                os.path.join(self.root_folder, "models",
+                             model_name, "hyperparameters")
             )
         ]
         for old_params_file in old_params_files:
@@ -521,7 +544,8 @@ class Mate:
         installs a package
         """
         source_model_base_name = (
-            source_model.split(".")[-1] if "." in source_model else source_model
+            source_model.split(
+                ".")[-1] if "." in source_model else source_model
         )
         mate_dir = ".matedir"
         if not os.path.exists(mate_dir):
@@ -538,7 +562,8 @@ class Mate:
         ]
         for old_params_file in old_params_files:
             params_name = old_params_file.split(".")[0]
-            old_params = self.__read_hyperparameters(destination_model, params_name)
+            old_params = self.__read_hyperparameters(
+                destination_model, params_name)
             old_params[source_model_base_name] = new_parameters
             with open(old_params_file, "w") as f:
                 json.dump(old_params, f)
