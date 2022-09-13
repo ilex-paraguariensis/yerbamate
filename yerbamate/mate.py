@@ -64,6 +64,7 @@ class Mate:
         )
 
     def __handle_mate_version(self, path: str):
+
         if not self.config.contains("mate_version"):
             self.config.mate_version = "0.2.4"  # TODO: change this to __version__
             with open(path, "w") as f:
@@ -130,10 +131,20 @@ class Mate:
     def __load_lightning_class(
         self, model_name: str, params: Bunch, parameters_file_name: str
     ) -> LightningModule:
-        model = __import__(
-            f"{self.root_folder}.models.{model_name}.{params.train}",
-            fromlist=["models"],
-        ).Model(params)
+
+        if "trainers" in params.trainer.module:
+            trainer_module = __import__(
+                f"{self.root_folder}.{params.trainer.module}",
+                fromlist=[params.trainer["class"]],
+            )
+        else:
+            trainer_module = __import__(
+                f"{self.root_folder}.models.{model_name}.{params.trainer.module}",
+                fromlist=[params.trainer["class"]],
+            )
+        model_class = getattr(trainer_module, params.trainer["class"])
+        model = model_class(params)
+
         for m in params.model.keys():
             torch_model = self.__load_torch_model_class(
                 model_name, params, m, parameters_file_name
@@ -153,8 +164,8 @@ class Mate:
             params.model[internal_model_name]
         )  # TODO, bunch does not work for nested dicts
         module = __import__(
-            f"{self.root_folder}.models.{model_name}.{conf['folder']}",
-            fromlist=[conf["folder"].split(".")[-1]],
+            f"{self.root_folder}.models.{model_name}.{conf['module']}",
+            fromlist=[conf["class"].split(".")[-1]],
         )
         model_class = getattr(module, conf["class"])
         if conf.contains("params"):
