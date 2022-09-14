@@ -1,7 +1,8 @@
 from curses.panel import new_panel
 import os
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 import importlib
+from sre_constants import ASSERT
 from pytorch_lightning import LightningModule, Trainer
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
@@ -128,6 +129,26 @@ class Mate:
         sys.path.insert(0, os.getcwd())
         self.__handle_mate_version(conf_path)
 
+    # Bunch to python object recusirsively
+    def __parse_module_object_recursive(
+        self, object: Bunch
+    ):
+
+        # object should have a module and a class and params in dict keys
+
+        # assert ["module", "class", "params"] in object.keys()
+        module = __import__(object["module"], fromlist=[object["class"]])
+        module_class = getattr(module, object["class"])
+        params = object["params"]
+        new_params = {}
+        # parse params
+        for key, value in object["params"].items():
+            if type(value) == dict and "module" in value.keys():
+                new_params[key] = self.__parse_module_object_recursive(value)
+
+        params.update(new_params)
+        return module_class(**params)
+
     def __load_lightning_class(
         self, model_name: str, params: Bunch, parameters_file_name: str
     ) -> LightningModule:
@@ -143,13 +164,26 @@ class Mate:
                 fromlist=[params.trainer["class"]],
             )
         model_class = getattr(trainer_module, params.trainer["class"])
-        model = model_class(params)
+        trainer_params = params.trainer["params"]
+        new_params = {}
+        # ipdb.set_trace()
+        # parse params
+        for key, value in trainer_params.items():
+            if type(value) == dict and "module" in value.keys():
+                # params[key] = self.__parse_module_object_recursive(value)
+                new_params[key] = self.__parse_module_object_recursive(
+                    value)  # params[key]
 
-        for m in params.model.keys():
-            torch_model = self.__load_torch_model_class(
-                model_name, params, m, parameters_file_name
-            )
-            model.__setattr__(m, torch_model)
+        trainer_params.update(new_params)
+        # copy dict to avoid changing the original
+        # params = params.copy()
+        model = model_class(params=Namespace(**params), **trainer_params)
+
+        # for m in params.model.keys():
+        #     torch_model = self.__load_torch_model_class(
+        #         model_name, params, m, parameters_file_name
+        #     )
+        #     model.__setattr__(m, torch_model)
 
         return model
 
