@@ -25,7 +25,7 @@ mate train videoprediction kth # train videoprediction model with kth dataset
 ```
 
 ## What is the Maté standard?
-It is a tree structure of foolders and files. It enforces the location of your python files, not what is is inside or how do you define your models, dataloaders or training procedure.
+It is a tree structure of foolders and files. It enforces the location of your python files, not what is inside or how do you define your models, dataloaders or training procedure.
 
 The root folder contrains the follwing folders: 
 * Models
@@ -114,9 +114,9 @@ mate install ilex-paraguariensis/ResNet
 ```
 
 ## FAQ
-**Q: Does Maté works with colab?**
+**Q: Does Maté work with colab?**
 
-**A**: Yes! Maté works with colab with little to no effort, in training with colab you need give access to your google drive account and store the dataset and project in your own account.
+**A**: Yes! Maté works with colab as any Maté project is exportable to a juypter notebook.
 
 ## Contact 🤝 
 
