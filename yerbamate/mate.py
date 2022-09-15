@@ -175,7 +175,6 @@ class Mate:
         return module_class(**params)
 
     # Bunch to python class recursively, doesn't creates object but returns class and params
-
     def __parse_module_class_recursive(
         self, object: Bunch, base_module: str = ""
     ):
@@ -329,24 +328,9 @@ class Mate:
 
         return model
 
-    def __load_logger_class(self):
-        return CustomLogger
+    def __load_data_loader(self, params: Bunch):
 
-    def __get_logger(self, params: Bunch):
-        if not params.contains("logger"):
-            return self.__load_logger_class()
-        logger = __import__(params.logger.module, fromlist=[
-            params.logger["class"]])
-        logger_class = getattr(logger, params.logger["class"])
-        logger = logger_class(**params.logger.params)
-        return logger
-
-    def __load_data_loader_class(self, data_loader_name: str):
-        data_class = f"{self.root_folder}.data_loaders.{data_loader_name}.data_loader"
-        return __import__(
-            f"{data_class}",
-            fromlist=["data_loader"],
-        ).CustomDataModule
+        return self.__parse_module_object_recursive(params.data, base_module=f"{self.root_folder}")
 
     def __load_exec_function(self, exec_file: str):
         return __import__(
@@ -476,7 +460,7 @@ class Mate:
         params.save_path = self.save_path
         pl_module = self.__load_lightning_module(
             model_name, params, parameters)
-        data_module = self.__load_data_loader_class(params.data_loader)(params)
+        data_module = self.__load_data_loader(params)
         params.model_name = model_name
 
         if self.config.contains("print_model"):
