@@ -8,6 +8,7 @@ mate/metrics.py
 mate/model_checkpoint.py
 mate/monitor.py
 mate/optimizer.py
+mate/parser.py
 yerbamate/__init__.py
 yerbamate/__main__.py
 yerbamate/bunch.py
@@ -17,6 +18,7 @@ yerbamate/mate.py
 yerbamate/mate_cli.py
 yerbamate/migrator.py
 yerbamate/plot.py
+yerbamate/project_parser.py
 yerbamate/tune_hyperparameters.py
 yerbamate/utils.py
 ymdl.egg-info/PKG-INFO

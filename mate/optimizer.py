@@ -9,7 +9,48 @@ class Optimizer:
         # self.__init_optimizer()
         # self.__init_lr_scheduler()
 
-    def __params_to_object(self, module, params):
+    @staticmethod
+    def optimizers(params, lightning_module):
+
+        results = []
+        for model_name, optimizer_param in params.items():
+            optimizer_module = __import__(optimizer_param["optimizer"]["module"], fromlist=[
+                optimizer_param["optimizer"]["class"]])
+            optimizer_class = getattr(
+                optimizer_module, optimizer_param["optimizer"]["class"])
+
+            model_params = getattr(lightning_module, model_name).parameters()
+            optimizer = optimizer_class(
+                params=model_params, **optimizer_param["optimizer"]["params"])
+
+            result = {
+                "optimizer": optimizer,
+            }
+
+            if "lr_scheduler" in optimizer_param:
+                lr_scheduler_module = __import__(optimizer_param["lr_scheduler"]["scheduler"]["module"], fromlist=[
+                    optimizer_param["lr_scheduler"]["scheduler"]["class"]])
+                lr_scheduler_class = getattr(
+                    lr_scheduler_module, optimizer_param["lr_scheduler"]["scheduler"]["class"])
+
+                lr_scheduler = lr_scheduler_class(
+                    optimizer=optimizer, **optimizer_param["lr_scheduler"]["scheduler"]["params"])
+
+                remaining_args = optimizer_param["lr_scheduler"].copy()
+                del remaining_args["scheduler"]
+
+                result["lr_scheduler"] = {
+                    "scheduler": lr_scheduler,
+                }
+                result["lr_scheduler"].update(remaining_args)
+            results.append(result)
+
+        if len(results) == 1:
+            return results[0]
+        return results
+
+    @staticmethod
+    def __params_to_object(module, params):
         params_without_type = {
             key: val for key, val in params.items() if key != "type"
         }
