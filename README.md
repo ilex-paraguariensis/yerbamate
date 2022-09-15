@@ -58,7 +58,7 @@ pip install yerbamate
 
 Install the lastest dev version from git:
 ```
-git clone https://github.com/ilex-paraguariensis/yerbamate 
+git clone -b lightning https://github.com/ilex-paraguariensis/yerbamate 
 cd yerbamate
 python install.py
 ```

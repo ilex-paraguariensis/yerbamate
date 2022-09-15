@@ -1,25 +1,21 @@
 from curses.panel import new_panel
 import os
 from argparse import ArgumentParser, Namespace
-import importlib
+
 from sre_constants import ASSERT
 from pytorch_lightning import LightningModule, Trainer
-import pytorch_lightning as pl
-from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
+
 
 from .bunch import Bunch
 from .migrator import Migration
-from torch import nn
-import torch as t
+
 import ipdb
 import json
 import sys
-import importlib
-import pkgutil
+
 import shutil
-from glob import glob
-from .logger import CustomLogger
-import mate
+
+
 from .utils import get_model_parameters, get_function_parameters
 from . import __version__
 
@@ -134,44 +130,14 @@ class Mate:
         self, object: Bunch, base_module: str = ""
     ):
 
-        # object should have a module and a class and params in dict keys
-        # assert "module", "class" in object
-
-        # # first try local imports
-        # try:
-        #     module = __import__(
-        #         base_module+"."+object["module"], fromlist=[object["class"]])
-        # except ModuleNotFoundError:
-        #     # now try shared imports
-        #     try:
-        #         module = __import__(
-        #             self.root_folder+"."+object["module"], fromlist=[object["class"]])
-        #     except ModuleNotFoundError:
-        #         # now try global imports
-        #         module = __import__(
-        #             object["module"], fromlist=[object["class"]])
-
-        # module_class = getattr(module, object["class"])
-        # params = object["params"]
-        # new_params = {}
-        # # parse params
-        # for key, value in object["params"].items():
-        #     if type(value) == dict and "module" in value.keys():
-        #         new_params[key] = self.__parse_module_object_recursive(
-        #             value, base_module)
-        #     if type(value) == list:
-        #         new_params[key] = []
-        #         for item in value:
-        #             if type(item) == dict and "module" in item.keys():
-        #                 new_params[key].append(
-        #                     self.__parse_module_object_recursive(item), base_module)
-        #             else:
-        #                 new_params[key].append(item)
-
-        # params.update(new_params)
         module_class, params = self.__parse_module_class_recursive(
             object, base_module
         )
+
+        if "function" in object:
+            function = getattr(module_class, object["function"])
+            return function(**params)
+
         return module_class(**params)
 
     # Bunch to python class recursively, doesn't creates object but returns class and params
@@ -192,7 +158,8 @@ class Mate:
                 module = __import__(
                     self.root_folder+"."+object["module"], fromlist=[object["class"]])
             except ModuleNotFoundError:
-                # now try global imports
+
+                # lastly try global imports
                 module = __import__(
                     object["module"], fromlist=[object["class"]])
 
@@ -216,6 +183,7 @@ class Mate:
 
         params.update(new_params)
 
+        # TODO generalizable way to do this
         # replace {save_dir} values to sef.save_path
         for key, value in params.items():
             if type(value) == str and "{save_dir}" in value:
@@ -227,47 +195,10 @@ class Mate:
         self, model_name: str, params: Bunch, parameters_file_name: str
     ) -> LightningModule:
 
-        # if "trainers" in params.pytorch_lightning_module.module:
-        #     trainer_module = __import__(
-        #         f"{self.root_folder}.{params.pytorch_lightning_module.module}",
-        #         fromlist=[params.pytorch_lightning_module["class"]],
-        #     )
-        # else:
-        #     trainer_module = __import__(
-        #         f"{self.root_folder}.models.{model_name}.{params.pytorch_lightning_module.module}",
-        #         fromlist=[params.pytorch_lightning_module["class"]],
-        #     )
-        # model_class = getattr(trainer_module, params.trainer["class"])
-        # trainer_params = params.trainer["params"]
-        # new_params = {}
-
-        # for key, value in trainer_params.items():
-        #     if type(value) == dict and "module" in value.keys():
-
-        #         new_params[key] = self.__parse_module_object_recursive(
-        #             value)
-        #     if type(value) == list:
-        #         new_params[key] = []
-        #         for item in value:
-        #             if type(item) == dict and "module" in item.keys():
-        #                 new_params[key].append(
-        #                     self.__parse_module_object_recursive(item))
-        #             else:
-        #                 new_params[key].append(item)
-
-        # trainer_params.update(new_params)
-        # copy dict to avoid changing the original
-        # params = params.copy()
         model_class, pl_params = self.__parse_module_class_recursive(
             params.pytorch_lightning_module, base_module=f"{self.root_folder}.models.{model_name}")
 
         model = model_class(params=Namespace(**params), **pl_params)
-
-        # for m in params.model.keys():
-        #     torch_model = self.__load_torch_model_class(
-        #         model_name, params, m, parameters_file_name
-        #     )
-        #     model.__setattr__(m, torch_model)
 
         return model
 
@@ -277,56 +208,6 @@ class Mate:
 
         trainer_object = self.__parse_module_object_recursive(params.trainer)
         return trainer_object
-
-    def __load_torch_model_class(
-        self,
-        model_name,
-        params: Bunch,
-        internal_model_name: str,
-        parameters_file_name: str,
-    ):
-        conf = Bunch(
-            params.model[internal_model_name]
-        )  # TODO, bunch does not work for nested dicts
-        module = __import__(
-            f"{self.root_folder}.models.{model_name}.{conf['module']}",
-            fromlist=[conf["class"].split(".")[-1]],
-        )
-        model_class = getattr(module, conf["class"])
-        if conf.contains("params"):
-            model = model_class(**dict(conf.params))
-        else:
-            print(
-                f"No parameters found for model {model_class}, using default ones. They will be added to the hyperparameters file."
-            )
-            model = model_class()
-
-            # populate and save parameters
-            model_params = get_function_parameters(model.__init__)
-            # convert type class to strings
-            for param in model_params:
-                if isinstance(model_params[param], type):
-                    model_params[param] = str(model_params[param])
-
-            # idk why but without this the parameters are not saved, some bug in Bunch class
-            conf["params"] = model_params
-            params.model[internal_model_name] = conf
-            params["model"] = params.model
-
-            # save parameters
-            hparams_source_file_name = os.path.join(
-                self.root_folder,
-                "models",
-                model_name,
-                "hyperparameters",
-                f"{parameters_file_name}.json",
-            )
-
-            hparams = Bunch(json.loads(json.dumps(params)))
-            with open(hparams_source_file_name, "w") as f:
-                json.dump(hparams, f, indent=4)
-
-        return model
 
     def __load_data_loader(self, params: Bunch):
 
@@ -467,37 +348,6 @@ class Mate:
             if self.config.print_model:
                 print(pl_module)
 
-        checkpoint_path = os.path.join(self.save_path, "checkpoints")
-        checkpoint_file = os.path.join(checkpoint_path, "last.ckpt")
-        # if os.path.exists(checkpoint_file):
-        #     print(f"Loaded model from {checkpoint_file}")
-        #     # model.load_state_dict(t.load(checkpoint_file))
-        #     model.load_from_checkpoint(
-        #         checkpoint_file, params=params, strict=False)
-        # model.params = params
-
-        # callbacks = []
-        # if params.contains("model_checkpoint"):
-        #     model_saver_callback = ModelCheckpoint(
-        #         checkpoint_path,
-        #         filename="best",
-        #         **dict(params.model_checkpoint),
-        #     )
-        #     callbacks.append(model_saver_callback)
-
-        # if params.contains("early_stopping"):
-        #     callbacks.append(EarlyStopping(**params.early_stopping))
-
-        # # monitor = mate.OptimizerMonitor(params, "epoch")
-        # # callbacks.append(monitor)
-
-        # trainer = Trainer(
-        #     max_epochs=params.max_epochs,
-        #     gpus=(1 if params.cuda else None),
-        #     callbacks=callbacks,
-        #     logger=logger,
-        #     enable_checkpointing=True,
-        # )
         trainer = self.__load_pl_trainer(model_name, params, parameters)
         return (trainer, pl_module, data_module)
 
@@ -728,20 +578,3 @@ class Mate:
                 params[param] = str(params[param])
 
         return params
-
-    """ Import all submodules of a module, recursively, including subpackages
-    :param package: package (name or actual module)
-    :type package: str | module
-    :rtype: dict[str, types.ModuleType]
-    def __import_submodules(self, package, recursive=True):
-        # print(os.getcwd())
-        if isinstance(package, str):
-            package = importlib.import_module(package)
-        results = {}
-        for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
-            full_name = package.__name__ + "." + name
-            results[full_name] = importlib.import_module(full_name)
-            if recursive and is_pkg:
-                results.update(self.__import_submodules(full_name))
-        return results
-    """
