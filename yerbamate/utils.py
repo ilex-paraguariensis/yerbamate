@@ -23,35 +23,7 @@ def get_function_parameters(function: Callable):
     return parameters
 
 
-def override_run_parameters(config: Bunch, run_params: dict):
 
-    # run params is a key value pair of parameters to override
-    # keys are formatted as "model.parameters.lr"
-    # values are the new values
-    # we need to override the config with the new values
-
-    if run_params == None:
-        return config
-
-    for key, value in run_params.items():
-        keys = key.split(".")
-        if len(keys) == 1:
-            config[keys[0]] = value
-
-        else:
-            # len = len(keys)
-            # temp = config
-
-            update_dict_in_depth(config, keys, value)
-
-    return config
-
-
-def update_dict_in_depth(d: dict, keys: list, value):
-    if len(keys) == 1:
-        d[keys[0]] = value
-    else:
-        update_dict_in_depth(d[keys[0]], keys[1:], value)
 
 
 def migrate_mate_version(config: Bunch, root_project: str):

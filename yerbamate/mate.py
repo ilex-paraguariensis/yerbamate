@@ -16,9 +16,7 @@ import sys
 import shutil
 
 
-from .utils import get_model_parameters, get_function_parameters, migrate_mate_version
-from yerbamate import utils
-from yerbamate import parser
+from yerbamate import utils, parser, io
 
 
 class Mate:
@@ -50,7 +48,7 @@ class Mate:
         )
 
     def __handle_mate_version(self):
-        migrate_mate_version(self.config, self.root_folder)
+        utils.migrate_mate_version(self.config, self.root_folder)
 
     def __load_mate_config(self, path):
         with open(path) as f:
@@ -91,9 +89,6 @@ class Mate:
         sys.path.insert(0, os.getcwd())
         self.__handle_mate_version()
 
-    def __local_experiment_module(self, model_name: str, params: str):
-        return f"{self.root_folder}.models.{model_name}"
-
     def __load_lightning_module(
         self, model_name: str, params: Bunch, parameters_file_name: str
     ) -> LightningModule:
@@ -130,98 +125,12 @@ class Mate:
         ).run
 
     def __set_save_path(self, model_name: str, params: str):
-        self.save_path = os.path.join(
-            self.root_save_folder, "models", model_name, "results", params
-        )
-        if not os.path.exists(self.save_path):
-            os.makedirs(self.save_path)
-
-        # save parameters in results folder
-        hparams_source_file_name = os.path.join(
-            self.root_folder,
-            "models",
-            model_name,
-            "hyperparameters",
-            f"{params}.json",
-        )
-        hparams_destination_file_name = os.path.join(
-            self.save_path, "train_parameters.json"
-        )
-        shutil.copy(hparams_source_file_name, hparams_destination_file_name)
-
-    def __override_run_params(self, params: Bunch):
-
-        return utils.override_run_parameters(params, self.run_params)
-
-    def __override_params(self, params: Bunch):
-        if "override_params" in self.config and self.config.override_params.enabled:
-            for key, value in self.config.override_params.items():
-                if key == "enabled":
-                    key = "override_params"
-                params[key] = value
-        return params
-
-    def __move_results_in_wrong_location(self, model_name: str, params: str):
-        possibly_wrong_save_path = os.path.join(
-            self.root_folder, "models", model_name, "results", params
-        )
-        if self.root_folder != self.root_save_folder and os.path.exists(
-            possibly_wrong_save_path
-        ):
-            print(
-                f"Found results in wrong location: {possibly_wrong_save_path}\nMoving them to the correct one."
-            )
-            os.system(f"mv {possibly_wrong_save_path} {self.save_path}")
+        self.save_path = io.set_save_path(
+            self.root_save_folder, self.root_folder, model_name, params)
 
     def __read_hyperparameters(self, model_name: str, hparams_name: str = "default"):
-        with open(
-            os.path.join(
-                self.root_folder,
-                "models",
-                model_name,
-                "hyperparameters",
-                f"{hparams_name}.json",
-            )
-        ) as f:
-            hparams = json.load(f)
-        env_location = os.path.join(
-            self.root_folder,
-            "env.json",
-        )
-        if not os.path.exists(env_location):
-            print(f"Could not find env.json in {env_location}. Created one.")
-            with open(env_location, "w") as f:
-                json.dump({}, f)
 
-        with open(env_location) as f:
-            env = json.load(f)
-
-        env_in_params = [
-            (key, val) for key, val in hparams.items() if key.startswith("env.")
-        ]
-        modified_env = False
-        for key, val in env_in_params:
-            stripped_key = key[4:]
-            if key not in env:
-                env[stripped_key] = val
-                modified_env = True
-            hparams[stripped_key] = env[stripped_key]
-            hparams.pop(key, None)
-
-        if modified_env:
-            with open(env_location, "w") as f:
-                json.dump(env, f, indent=4)
-            print("Updated env.json")
-            print(json.dumps(env, indent=4))
-
-        hparams = Bunch(hparams)
-        hparams = self.__override_params(hparams)
-        hparams = self.__override_run_params(hparams)
-        print(json.dumps(hparams, indent=4))
-        # trick to save parameters, otherwise changes are not saved after return!
-        hparams = Bunch(json.loads(json.dumps(hparams)))
-        self.__move_results_in_wrong_location(model_name, hparams_name)
-        return hparams
+        return io.read_hyperparameters(self.config, self.root_folder, model_name, hparams_name)
 
     def __get_trainer(self, model_name: str, parameters: str):
         params = self.__read_hyperparameters(model_name, parameters)
@@ -414,7 +323,7 @@ class Mate:
         os.system(
             f"mv {os.path.join(mate_dir, '*')} {os.path.join(destination_model, source_model_base_name)}"
         )
-        new_parameters = get_model_parameters(
+        new_parameters = utils.get_model_parameters(
             os.path.join(source_model, destination_model)
         )
         old_params_files = [
@@ -458,7 +367,7 @@ class Mate:
         model_class = __import__(
             f"{export_root}.{model.file}", fromlist=[model.file]
         ).__getattribute__(model.class_name)
-        params = get_function_parameters(model_class.__init__)
+        params = utils.get_function_parameters(model_class.__init__)
 
         # convert type class to strings
         for param in params:
