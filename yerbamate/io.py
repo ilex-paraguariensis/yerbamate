@@ -168,3 +168,53 @@ def load_mate_config(path):
             "project" in config
         ), 'Please add "project":<project name> in mate.json'
     return config
+
+
+def remove(root_folder: str, model_name: str):
+    action = "go"
+    while action not in ("y", "n"):
+        action = input(
+            f'Are you sure you want to remove model "{model_name}"? (y/n)\n'
+        )
+    if action == "y":
+        shutil.rmtree(os.path.join(root_folder, "models", model_name))
+        print(f"Removed model {model_name}")
+    else:
+        print("Ok, exiting.")
+
+
+def list(root_folder: str, folder: str):
+    print("\n".join(tuple("\t" + str(m)
+                          for m in list_packages(root_folder, folder))))
+
+
+def clone(root_folder: str, source_model: str, target_model: str):
+    shutil.copytree(
+        os.path.join(root_folder, "models", source_model),
+        os.path.join(root_folder, "models", target_model),
+    )
+
+
+def snapshot(root_folder: str, model_name: str):
+
+    if not os.path.exists(os.path.join(root_folder, "snapshots")):
+        os.makedirs(os.path.join(root_folder, "snapshots"))
+
+    snapshot_names = [
+        name.split("__")
+        for name in os.listdir(os.path.join(root_folder, "snapshots"))
+    ]
+    matching_snapshots = [
+        name for name in snapshot_names if name[0] == model_name]
+    max_version_matching = (
+        max([int(name[1]) for name in matching_snapshots])
+        if len(matching_snapshots) > 0
+        else 0
+    )
+    snapshot_name = f"{model_name}__{max_version_matching + 1}"
+
+    shutil.copytree(
+        os.path.join(root_folder, "models", model_name),
+        os.path.join(root_folder, "snapshots", snapshot_name),
+    )
+    print(f"Created snapshot {snapshot_name}")
