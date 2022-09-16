@@ -194,6 +194,12 @@ class Mate:
         """
         pass
 
+    def generate(self, model_name: str, params: str):
+        pass
+
+    def sample(self, model_name: str, params: str):
+        pass
+
     def add(self, model_name: str, repo: str):
         """
         Adds a dependency to a model.
