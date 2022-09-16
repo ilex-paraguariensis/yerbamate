@@ -18,6 +18,8 @@ yerbamate/mate.py
 yerbamate/mate_cli.py
 yerbamate/migrator.py
 yerbamate/package.py
+yerbamate/parser.py
+yerbamate/pl-mate.py
 yerbamate/plot.py
 yerbamate/project_parser.py
 yerbamate/tune_hyperparameters.py

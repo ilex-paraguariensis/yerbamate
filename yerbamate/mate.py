@@ -18,6 +18,7 @@ import shutil
 
 from .utils import get_model_parameters, get_function_parameters, migrate_mate_version
 from yerbamate import utils
+from yerbamate import parser
 
 
 class Mate:
@@ -90,78 +91,16 @@ class Mate:
         sys.path.insert(0, os.getcwd())
         self.__handle_mate_version()
 
-    # Bunch to python object recusirsively
-    def __parse_module_object_recursive(
-        self, object: Bunch, base_module: str = ""
-    ):
-
-        module_class, params = self.__parse_module_class_recursive(
-            object, base_module
-        )
-
-        if "function" in object:
-            function = getattr(module_class, object["function"])
-            return function(**params)
-
-        return module_class(**params)
-
-    # Bunch to python class recursively, doesn't creates object but returns class and params
-    def __parse_module_class_recursive(
-        self, object: Bunch, base_module: str = ""
-    ):
-
-        # object should have a module and a class and params in dict keys
-        assert "module", "class" in object
-
-        # first try local imports
-        try:
-            module = __import__(
-                base_module+"."+object["module"], fromlist=[object["class"]])
-        except ModuleNotFoundError:
-            # now try shared imports
-            try:
-                module = __import__(
-                    self.root_folder+"."+object["module"], fromlist=[object["class"]])
-            except ModuleNotFoundError:
-
-                # lastly try global imports
-                module = __import__(
-                    object["module"], fromlist=[object["class"]])
-
-        module_class = getattr(module, object["class"])
-        params = object["params"]
-        new_params = {}
-        # parse params
-        for key, value in object["params"].items():
-            if type(value) == dict and "module" in value.keys():
-                new_params[key] = self.__parse_module_object_recursive(
-                    value, base_module)
-            if type(value) == list:
-                new_params[key] = []
-                for item in value:
-                    if type(item) == dict and "module" in item.keys():
-                        new_params[key].append(
-                            self.__parse_module_object_recursive(
-                                item, base_module))
-                    else:
-                        new_params[key].append(item)
-
-        params.update(new_params)
-
-        # TODO generalizable way to do this
-        # replace {save_dir} values to sef.save_path
-        for key, value in params.items():
-            if type(value) == str and "{save_dir}" in value:
-                params[key] = value.replace("{save_dir}", self.save_path)
-
-        return module_class, params
+    def __local_experiment_module(self, model_name: str, params: str):
+        return f"{self.root_folder}.models.{model_name}"
 
     def __load_lightning_module(
         self, model_name: str, params: Bunch, parameters_file_name: str
     ) -> LightningModule:
 
-        model_class, pl_params = self.__parse_module_class_recursive(
-            params.pytorch_lightning_module, base_module=f"{self.root_folder}.models.{model_name}")
+        model_class, pl_params = parser.parse_module_class_recursive(
+            params.pytorch_lightning_module, base_module=f"{self.root_folder}.models.{model_name}", root_module=f"{self.root_folder}", map_key_values={
+                "save_path": self.save_path, "save_dir": self.save_path})
 
         model = model_class(params=Namespace(**params), **pl_params)
 
@@ -171,12 +110,18 @@ class Mate:
         self, model_name: str, params: Bunch, parameters_file_name: str
     ) -> Trainer:
 
-        trainer_object = self.__parse_module_object_recursive(params.trainer)
+        trainer_object = parser.parse_module_object(
+            params.trainer, self.root_folder+".models."+model_name, self.root_folder, {"save_path": self.save_path, "save_dir": self.save_path})
         return trainer_object
 
     def __load_data_loader(self, params: Bunch):
 
-        return self.__parse_module_object_recursive(params.data, base_module=f"{self.root_folder}")
+        return parser.parse_module_object(params.data,
+                                          base_module=f"{self.root_folder}.data",
+                                          root_module=f"{self.root_folder}",
+                                          map_key_values={
+                                              "save_path": self.save_path, "save_dir": self.save_path}
+                                          )
 
     def __load_exec_function(self, exec_file: str):
         return __import__(

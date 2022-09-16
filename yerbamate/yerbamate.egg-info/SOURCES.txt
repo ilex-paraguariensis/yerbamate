@@ -8,6 +8,7 @@ yerbamate/__main__.py
 yerbamate/logger.py
 yerbamate/main.py
 yerbamate/plot.py
+yerbamate/parser.py
 yerbamate/tune_hyperparameters.py
 yerbamate.egg-info/PKG-INFO
 yerbamate.egg-info/SOURCES.txt
