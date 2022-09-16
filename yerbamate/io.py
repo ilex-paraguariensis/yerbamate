@@ -3,6 +3,7 @@
 import os
 import json
 import shutil
+import sys
 from yerbamate.bunch import Bunch
 
 
@@ -113,4 +114,57 @@ def override_run_params(config: Bunch, run_params: dict):
         else:
             update_dict_in_depth(config, keys, value)
 
+    return config
+
+
+def find_root():
+    """
+    Method in charge of finding the root folder of the project and reading the content of mate.json
+    """
+    # path of execution
+    current_path = os.getcwd()
+    found = False
+    i = 0
+    while not found and i < 6:
+
+        if os.path.exists(os.path.join(current_path, "mate.json")):
+            conf_path = os.path.join(current_path, "mate.json")
+            config = load_mate_config(conf_path)
+            root_folder = config.project
+            # self.__import_submodules(self.root_folder)
+            found = True
+        else:
+            os.chdir("..")
+            current_path = os.getcwd()
+            i += 1
+            if current_path == "/" or i == 6:
+                print("ERROR: Could not find mate.json")
+                sys.exit(1)
+
+    # self.root_save_folder = self.root_folder
+    sys.path.insert(0, os.getcwd())
+    return root_folder, config
+
+
+def list_packages(root_folder: str, folder: str):
+    return (
+        tuple(
+            x
+            for x in os.listdir(os.path.join(root_folder, folder))
+            if not "__" in x
+        )
+        if os.path.exists(os.path.join(root_folder, folder))
+        else tuple()
+    )
+
+
+def load_mate_config(path):
+    with open(path) as f:
+        config = Bunch(json.load(f))
+        assert (
+            "results_folder" in config
+        ), 'Please add "results_folder":<path> in mate.json'
+        assert (
+            "project" in config
+        ), 'Please add "project":<project name> in mate.json'
     return config

@@ -31,63 +31,24 @@ class Mate:
         self.save_path = ""
         self.current_folder = os.path.dirname(__file__)
         self.__findroot()
+        self.__update_mate_version()
         self.models = self.__list_packages("models")
         self.is_restart = False
         self.run_params = None
         self.custom_save_path = None
 
     def __list_packages(self, folder: str):
-        return (
-            tuple(
-                x
-                for x in os.listdir(os.path.join(self.root_folder, folder))
-                if not "__" in x
-            )
-            if os.path.exists(os.path.join(self.root_folder, folder))
-            else tuple()
-        )
+        return io.list_packages(self.root_folder, folder)
 
-    def __handle_mate_version(self):
+    def __update_mate_version(self):
         utils.migrate_mate_version(self.config, self.root_folder)
-
-    def __load_mate_config(self, path):
-        with open(path) as f:
-            self.config = Bunch(json.load(f))
-            assert (
-                "results_folder" in self.config
-            ), 'Please add "results_folder":<path> in mate.json'
-            assert (
-                "project" in self.config
-            ), 'Please add "project":<project name> in mate.json'
 
     def __findroot(self):
         """
         Method in charge of finding the root folder of the project and reading the content of mate.json
         """
-        # path of execution
-        current_path = os.getcwd()
-        found = False
-        i = 0
-        while not found and i < 6:
-
-            if os.path.exists(os.path.join(current_path, "mate.json")):
-                conf_path = os.path.join(current_path, "mate.json")
-                self.__load_mate_config(conf_path)
-                self.root_folder = self.config.project
-                # self.__import_submodules(self.root_folder)
-                found = True
-                self.root_save_folder = self.config.results_folder
-            else:
-                os.chdir("..")
-                current_path = os.getcwd()
-                i += 1
-                if current_path == "/" or i == 6:
-                    print("ERROR: Could not find mate.json")
-                    sys.exit(1)
-
-        # self.root_save_folder = self.root_folder
-        sys.path.insert(0, os.getcwd())
-        self.__handle_mate_version()
+        self.root_folder, self.config = io.find_root()
+        self.root_save_folder = self.config.results_folder
 
     def __load_lightning_module(
         self, model_name: str, params: Bunch, parameters_file_name: str
