@@ -67,7 +67,7 @@ def convert_str_to_data(input):
     return input
 
 
-def parse_hparams(args: list):
+def parse_run_params(args: list):
     params = {}
     for arg in args:
         key, value = arg.split("=")
@@ -110,6 +110,6 @@ def main():
                 method_args_len = len(method_args)
                 hparams_len = len(raw_method_args) - method_args_len
                 if hparams_len > 0:
-                    params = parse_hparams(args[method_args_len + 1 :])
-                    mate.run_params = params
+                    run_params = parse_run_params(args[method_args_len + 1 :])
+                    mate.run_params = run_params
                 getattr(mate, action)(*method_args)

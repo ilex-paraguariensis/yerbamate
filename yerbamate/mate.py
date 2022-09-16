@@ -17,27 +17,15 @@ import shutil
 
 
 from .utils import get_model_parameters, get_function_parameters, migrate_mate_version
-from . import __version__
+from yerbamate import utils
 
 
 class Mate:
+
     @staticmethod
     def init(project_name: str):
-        assert not os.path.exists(
-            project_name), "Project folder already exists. Please remove it."
-        os.system(
-            "git clone https://github.com/ilex-paraguariensis/init-mate-project")
-        shutil.rmtree("init-mate-project/.git")
-        os.rename("init-mate-project/", project_name)
-        with open(os.path.join(project_name, "mate.json")) as f:
-            mate_config = json.load(f)
-        mate_config['project'] = project_name
-        with open(os.path.join(project_name, "mate.json"), "w") as f:
-            json.dump(mate_config, f, indent=4)
-        os.rename(os.path.join(project_name, "project"),
-                  os.path.join(project_name, project_name))
-        # TODO: add results_folder to mate.json
-        # TODO: write mate.json
+        # should actually be a package install
+        pass
 
     def __init__(self, init=False):
         self.root_folder = ""
@@ -217,30 +205,8 @@ class Mate:
         shutil.copy(hparams_source_file_name, hparams_destination_file_name)
 
     def __override_run_params(self, params: Bunch):
-        if self.run_params == None:
-            return params
-        for key, value in self.run_params.items():
-            # nested parameters
-            if "." in key:
-                len_subs = len(key.split("."))
-                if len_subs == 2:
-                    params[key.split(".")[0]][key.split(".")[1]] = value
-                elif len_subs == 3:
-                    params[key.split(".")[0]][key.split(".")[1]][
-                        key.split(".")[2]
-                    ] = value
-                elif len_subs == 4:
-                    params[key.split(".")[0]][key.split(".")[1]][key.split(".")[2]][
-                        key.split(".")[3]
-                    ] = value
-                elif len_subs == 5:
-                    params[key.split(".")[0]][key.split(".")[1]][key.split(".")[2]][
-                        key.split(".")[3]
-                    ][key.split(".")[4]] = value
-                # for now we only support 5 levels of nesting
-            else:
-                params[key] = value
-        return params
+
+        return utils.override_run_parameters(params, self.run_params)
 
     def __override_params(self, params: Bunch):
         if "override_params" in self.config and self.config.override_params.enabled:
