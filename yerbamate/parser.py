@@ -5,7 +5,35 @@ import re
 from yerbamate.bunch import Bunch
 import ipdb
 
-# tryies to import module from first with local base_module, then shared module from root_module and then from global modules
+
+"""
+
+Function to parse a nested dict of python modules, classes and functions
+
+Example:
+{
+    "module": "torch",
+    "class": "optim",
+    "function": "Adam",
+    "params": {
+        "lr": 0.001,
+        "weight_decay": 0.0001
+        ...
+}
+
+
+Parameters
+----------
+object : dict | Bunch
+    A nested dict of python modules, classes and functions
+base_module : str
+    The base module to import from first
+root_module : str
+    The root module to import from if base_module fails
+map_key_values : dict
+    A dict of key value pairs to replace in the params
+
+"""
 
 
 def parse_module_object(
@@ -21,9 +49,7 @@ def parse_module_object(
 
     return module_class(**params)
 
-# Bunch to python class recursively, doesn't creates object but returns class and params
-
-
+# Function to parse a nested dict of python modules, classes and functions
 def parse_module_class_recursive(
     object: Bunch, base_module: str = "", root_module: str = "", map_key_values: dict = {}
 
