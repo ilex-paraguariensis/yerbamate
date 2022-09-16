@@ -6,8 +6,8 @@ from sre_constants import ASSERT
 from pytorch_lightning import LightningModule, Trainer
 
 
-from .bunch import Bunch
-from .migrator import Migration
+from yerbamate.bunch import Bunch
+from yerbamate.migrator import Migration
 
 import ipdb
 import json
@@ -16,7 +16,7 @@ import sys
 import shutil
 
 
-from .utils import get_model_parameters, get_function_parameters
+from .utils import get_model_parameters, get_function_parameters, migrate_mate_version
 from . import __version__
 
 
@@ -60,31 +60,8 @@ class Mate:
             else tuple()
         )
 
-    def __handle_mate_version(self, path: str):
-
-        if not self.config.contains("mate_version"):
-            self.config.mate_version = "0.2.4"  # TODO: change this to __version__
-            with open(path, "w") as f:
-                json.dump(self.config, f, indent=4)
-
-        if self.config.mate_version != __version__:
-            print(
-                f"New mate version has been installed. Going to handle migration from {self.config.mate_version} to {__version__}"
-            )
-            migrator = Migration(
-                self.root_folder, self.config.mate_version, __version__
-            )
-            success = migrator.migrate()
-            if not success:
-                print(
-                    "Migration failed... please check the logs and make an issue on github"
-                )
-                # sys.exit(1)
-            else:
-                self.config.mate_version = __version__
-                with open(path, "w") as f:
-                    json.dump(self.config, f, indent=4)
-                print("Migration successful")
+    def __handle_mate_version(self):
+        migrate_mate_version(self.config, self.root_folder)
 
     def __load_mate_config(self, path):
         with open(path) as f:
@@ -123,7 +100,7 @@ class Mate:
 
         # self.root_save_folder = self.root_folder
         sys.path.insert(0, os.getcwd())
-        self.__handle_mate_version(conf_path)
+        self.__handle_mate_version()
 
     # Bunch to python object recusirsively
     def __parse_module_object_recursive(

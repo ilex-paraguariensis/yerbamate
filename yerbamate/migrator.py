@@ -1,7 +1,7 @@
 import json
 import os
 
-from .bunch import Bunch
+from yerbamate.bunch import Bunch
 
 
 class Migration:

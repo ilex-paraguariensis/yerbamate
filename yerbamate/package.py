@@ -7,7 +7,6 @@
 import os
 import sys
 import shutil
-import torch as t
 import urllib
 
 
