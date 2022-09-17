@@ -20,7 +20,6 @@ from yerbamate import utils, parser, io
 
 
 class Mate:
-
     @staticmethod
     def init(project_name: str):
         # should actually be a package install
@@ -55,8 +54,11 @@ class Mate:
     ) -> LightningModule:
 
         model_class, pl_params = parser.parse_module_class_recursive(
-            params.pytorch_lightning_module, base_module=f"{self.root_folder}.models.{model_name}", root_module=f"{self.root_folder}", map_key_values={
-                "save_path": self.save_path, "save_dir": self.save_path})
+            params.pytorch_lightning_module,
+            base_module=f"{self.root_folder}.models.{model_name}",
+            root_module=f"{self.root_folder}",
+            map_key_values={"save_path": self.save_path, "save_dir": self.save_path},
+        )
 
         model = model_class(params=Namespace(**params), **pl_params)
 
@@ -67,17 +69,21 @@ class Mate:
     ) -> Trainer:
 
         trainer_object = parser.parse_module_object(
-            params.trainer, self.root_folder+".models."+model_name, self.root_folder, {"save_path": self.save_path, "save_dir": self.save_path})
+            params.trainer,
+            self.root_folder + ".models." + model_name,
+            self.root_folder,
+            {"save_path": self.save_path, "save_dir": self.save_path},
+        )
         return trainer_object
 
     def __load_data_loader(self, params: Bunch):
 
-        return parser.parse_module_object(params.data,
-                                          base_module=f"{self.root_folder}.data",
-                                          root_module=f"{self.root_folder}",
-                                          map_key_values={
-                                              "save_path": self.save_path, "save_dir": self.save_path}
-                                          )
+        return parser.parse_module_object(
+            params.data,
+            base_module=f"{self.root_folder}.data",
+            root_module=f"{self.root_folder}",
+            map_key_values={"save_path": self.save_path, "save_dir": self.save_path},
+        )
 
     def __load_exec_function(self, exec_file: str):
         return __import__(
@@ -87,18 +93,20 @@ class Mate:
 
     def __set_save_path(self, model_name: str, params: str):
         self.save_path = io.set_save_path(
-            self.root_save_folder, self.root_folder, model_name, params)
+            self.root_save_folder, self.root_folder, model_name, params
+        )
 
     def __read_hyperparameters(self, model_name: str, hparams_name: str = "default"):
 
-        return io.read_hyperparameters(self.config, self.root_folder, model_name, hparams_name)
+        return io.read_hyperparameters(
+            self.config, self.root_folder, model_name, hparams_name
+        )
 
     def __get_trainer(self, model_name: str, parameters: str):
         params = self.__read_hyperparameters(model_name, parameters)
         self.__set_save_path(model_name, parameters)
         params.save_path = self.save_path
-        pl_module = self.__load_lightning_module(
-            model_name, params, parameters)
+        pl_module = self.__load_lightning_module(model_name, params, parameters)
         data_module = self.__load_data_loader(params)
         params.model_name = model_name
 
@@ -129,18 +137,15 @@ class Mate:
         trainer, model, data_module = self.__get_trainer(model_name, params)
 
         if self.is_restart:
-            checkpoint_path = os.path.join(
-                self.save_path, "checkpoints", "last.ckpt")
-            trainer.fit(model, datamodule=data_module,
-                        ckpt_path=checkpoint_path)
+            checkpoint_path = os.path.join(self.save_path, "checkpoints", "last.ckpt")
+            trainer.fit(model, datamodule=data_module, ckpt_path=checkpoint_path)
         else:
             trainer.fit(model, datamodule=data_module)
         # trainer.fit(model, datamodule=data_module)
 
     def train(self, model_name: str, parameters: str = "default"):
         assert model_name in self.models, f'Model "{model_name}" does not exist.'
-        print(
-            f"Training model {model_name} with hyperparameters: {parameters}.json")
+        print(f"Training model {model_name} with hyperparameters: {parameters}.json")
 
         # we need to load hyperparameters before training to set save_path
         _ = self.__read_hyperparameters(model_name, parameters)
@@ -170,13 +175,11 @@ class Mate:
     def test(self, model_name: str, params: str):
         assert model_name in self.models, f'Model "{model_name}" does not exist.'
         params = "parameters" if params == "" or params == "None" else params
-        print(
-            f"Testing model {model_name} with hyperparameters: {params}.json")
+        print(f"Testing model {model_name} with hyperparameters: {params}.json")
 
         trainer, model, data_module = self.__get_trainer(model_name, params)
 
-        checkpoint_path = os.path.join(
-            self.save_path, "checkpoint", "best.ckpt")
+        checkpoint_path = os.path.join(self.save_path, "checkpoint", "best.ckpt")
 
         trainer.test(model, datamodule=data_module, ckpt_path=checkpoint_path)
 
@@ -212,8 +215,7 @@ class Mate:
         conf = os.path.join(mate_dir, "mate.json")
         conf = Bunch(json.load(open(conf)))
 
-        dest_dir = os.path.join(
-            self.root_folder, "models", model_name, "modules")
+        dest_dir = os.path.join(self.root_folder, "models", model_name, "modules")
         os.makedirs(dest_dir, exist_ok=True)
 
         shutil.copytree(os.path.join(mate_dir, conf.export), dest_dir)
@@ -228,11 +230,9 @@ class Mate:
             new_params[model["class_name"]] = model["params"]
         ipdb.set_trace()
         old_params_files = [
-            os.path.join(self.root_folder, "models",
-                         model_name, "hyperparameters", p)
+            os.path.join(self.root_folder, "models", model_name, "hyperparameters", p)
             for p in os.listdir(
-                os.path.join(self.root_folder, "models",
-                             model_name, "hyperparameters")
+                os.path.join(self.root_folder, "models", model_name, "hyperparameters")
             )
         ]
         for old_params_file in old_params_files:
@@ -247,8 +247,7 @@ class Mate:
         installs a package
         """
         source_model_base_name = (
-            source_model.split(
-                ".")[-1] if "." in source_model else source_model
+            source_model.split(".")[-1] if "." in source_model else source_model
         )
         mate_dir = ".matedir"
         if not os.path.exists(mate_dir):
@@ -265,8 +264,7 @@ class Mate:
         ]
         for old_params_file in old_params_files:
             params_name = old_params_file.split(".")[0]
-            old_params = self.__read_hyperparameters(
-                destination_model, params_name)
+            old_params = self.__read_hyperparameters(destination_model, params_name)
             old_params[source_model_base_name] = new_parameters
             with open(old_params_file, "w") as f:
                 json.dump(old_params, f)

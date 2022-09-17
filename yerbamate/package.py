@@ -17,11 +17,11 @@ class Package:
     # Destination could be a local path, for example "models", "trainers", "data", "models/vit", "models/cnn/resnet"
     def __init__(self, type: str, destination: str):
         self.type = type
-        self.source = source # find a way to read the source
+        self.source = source  # find a way to read the source
         self.destination = destination
 
     @staticmethod
-    def install(source:str, destination:str):
+    def install(source: str, destination: str):
         pass
 
     def _generate_signature(self, filename: str) -> dict:

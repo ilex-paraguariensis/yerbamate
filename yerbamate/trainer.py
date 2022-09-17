@@ -20,9 +20,7 @@ from .package import Package
 class Trainer(Package):
     @staticmethod
     def is_component(given_class: Type):
-        return hasattr(given_class, "state_dict") and callable(
-            given_class.state_dict
-        )
+        return hasattr(given_class, "state_dict") and callable(given_class.state_dict)
 
     def __init__(self, dirname: str):
         self.dirname = dirname
@@ -51,9 +49,7 @@ class Trainer(Package):
 class LightningTrainer(Trainer):
     @staticmethod
     def is_component(given_class: Type):
-        return hasattr(given_class, "state_dict") and callable(
-            given_class.state_dict
-        )
+        return hasattr(given_class, "state_dict") and callable(given_class.state_dict)
 
     _module: LightningModule
     _trainer: LightningBuiltinTrainer
@@ -63,9 +59,7 @@ class LightningTrainer(Trainer):
 
     def test(
         self,
-        datamodule: Union[
-            DataLoader, Sequence[DataLoader], LightningDataModule
-        ],
+        datamodule: Union[DataLoader, Sequence[DataLoader], LightningDataModule],
     ):
         self._trainer.test(model=self._module, datamodule=datamodule)
 
@@ -78,18 +72,14 @@ class LightningTrainer(Trainer):
 
     def save(
         self,
-        obj: Union[
-            t.nn.Module, t.optim.Optimizer, t.optim.lr_scheduler.StepLR
-        ],
+        obj: Union[t.nn.Module, t.optim.Optimizer, t.optim.lr_scheduler.StepLR],
         path: str,
     ):
         t.save(obj.state_dict(), path + ".pt")
 
     def load(
         self,
-        obj: Union[
-            t.nn.Module, t.optim.Optimizer, t.optim.lr_scheduler.StepLR
-        ],
+        obj: Union[t.nn.Module, t.optim.Optimizer, t.optim.lr_scheduler.StepLR],
         path: str,
     ):
         obj.load_state_dict(t.load(path))
@@ -107,9 +97,7 @@ keras package structure
 class KerasTrainer(Trainer):
     @staticmethod
     def is_component(given_class: Type):
-        return hasattr(given_class, "state_dict") and callable(
-            given_class.state_dict
-        )
+        return hasattr(given_class, "state_dict") and callable(given_class.state_dict)
 
     model: tf.keras.Model
 
@@ -119,9 +107,7 @@ class KerasTrainer(Trainer):
     def _parse(self, args: dict) -> tuple[tf.keras.Model, callable]:
 
         components = tuple(
-            (key, val)
-            for (key, val) in args.items()
-            if val.get("is_component")
+            (key, val) for (key, val) in args.items() if val.get("is_component")
         )
 
         assert (

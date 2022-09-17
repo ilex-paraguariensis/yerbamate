@@ -26,7 +26,7 @@ class Migration:
 
         def migrate_function(params: Bunch):
             if not params.contains("model"):
-                return None # No changes
+                return None  # No changes
             models = params.model.keys()
             for model in models:
                 params["model"][model]["folder"] = params["model"][model].pop("module")

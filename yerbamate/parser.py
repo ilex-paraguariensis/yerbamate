@@ -6,14 +6,16 @@ from yerbamate.bunch import Bunch
 import ipdb
 
 
-
-
 def parse_module_object(
-    object: Bunch, base_module: str = "", root_module: str = "", map_key_values: dict = {}
+    object: Bunch,
+    base_module: str = "",
+    root_module: str = "",
+    map_key_values: dict = {},
 ):
 
     module_class, params = parse_module_class_recursive(
-        object, base_module, root_module, map_key_values)
+        object, base_module, root_module, map_key_values
+    )
 
     if "function" in object:
         function = getattr(module_class, object["function"])
@@ -21,13 +23,16 @@ def parse_module_object(
 
     return module_class(**params)
 
+
 # Function to parse a nested dict of python modules, classes and functions
 
 
 def parse_module_class_recursive(
-    object: Bunch, base_module: str = "", root_module: str = "", map_key_values: dict = {}, generate_params: bool = True
-
-
+    object: Bunch,
+    base_module: str = "",
+    root_module: str = "",
+    map_key_values: dict = {},
+    generate_params: bool = True,
 ):
 
     # object should have a module and a class and params in dict keys
@@ -36,17 +41,18 @@ def parse_module_class_recursive(
     # first try local imports
     try:
         module = __import__(
-            base_module+"."+object["module"], fromlist=[object["class"]])
+            base_module + "." + object["module"], fromlist=[object["class"]]
+        )
     except ModuleNotFoundError:
         # now try shared imports
         try:
             module = __import__(
-                root_module+"."+object["module"], fromlist=[object["class"]])
+                root_module + "." + object["module"], fromlist=[object["class"]]
+            )
         except ModuleNotFoundError:
 
             # lastly try global imports
-            module = __import__(
-                object["module"], fromlist=[object["class"]])
+            module = __import__(object["module"], fromlist=[object["class"]])
 
     module_class = getattr(module, object["class"])
     params = object["params"]
@@ -55,14 +61,17 @@ def parse_module_class_recursive(
     for key, value in object["params"].items():
         if type(value) == dict and "module" in value.keys():
             new_params[key] = parse_module_object(
-                value, base_module, root_module, map_key_values)
+                value, base_module, root_module, map_key_values
+            )
         if type(value) == list:
             new_params[key] = []
             for item in value:
                 if type(item) == dict and "module" in item.keys():
                     new_params[key].append(
                         parse_module_object(
-                            item, base_module, root_module, map_key_values))
+                            item, base_module, root_module, map_key_values
+                        )
+                    )
                 else:
                     new_params[key].append(item)
 
@@ -77,8 +86,7 @@ def parse_module_class_recursive(
             # get the key name
             key_name = re.search(r"{.*}", value).group(0)[1:-1]
             # replace the value
-            params[key] = value.replace(
-                "{"+key_name+"}", map_key_values[key_name])
+            params[key] = value.replace("{" + key_name + "}", map_key_values[key_name])
 
         # if type(value) == str and "{save_dir}" in value:
         #     params[key] = value.replace("{save_dir}", self.save_path)
