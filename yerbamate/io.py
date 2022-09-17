@@ -1,5 +1,3 @@
-
-
 import os
 import json
 import shutil
@@ -7,10 +5,10 @@ import sys
 from yerbamate.bunch import Bunch
 
 
-def set_save_path(root_save_folder: str, root_folder: str, model_name: str, params: str):
-    save_path = os.path.join(
-        root_save_folder, "models", model_name, "results", params
-    )
+def set_save_path(
+    root_save_folder: str, root_folder: str, model_name: str, params: str
+):
+    save_path = os.path.join(root_save_folder, "models", model_name, "results", params)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -52,7 +50,9 @@ def override_params(config: Bunch, params: Bunch):
     return params
 
 
-def read_hyperparameters(conf: Bunch, root_folder: str,  model_name: str, hparams_name: str = "default"):
+def read_hyperparameters(
+    conf: Bunch, root_folder: str, model_name: str, hparams_name: str = "default"
+):
     with open(
         os.path.join(
             root_folder,
@@ -162,11 +162,7 @@ def find_root():
 
 def list_packages(root_folder: str, folder: str):
     return (
-        tuple(
-            x
-            for x in os.listdir(os.path.join(root_folder, folder))
-            if not "__" in x
-        )
+        tuple(x for x in os.listdir(os.path.join(root_folder, folder)) if not "__" in x)
         if os.path.exists(os.path.join(root_folder, folder))
         else tuple()
     )
@@ -178,18 +174,14 @@ def load_mate_config(path):
         assert (
             "results_folder" in config
         ), 'Please add "results_folder":<path> in mate.json'
-        assert (
-            "project" in config
-        ), 'Please add "project":<project name> in mate.json'
+        assert "project" in config, 'Please add "project":<project name> in mate.json'
     return config
 
 
 def remove(root_folder: str, model_name: str):
     action = "go"
     while action not in ("y", "n"):
-        action = input(
-            f'Are you sure you want to remove model "{model_name}"? (y/n)\n'
-        )
+        action = input(f'Are you sure you want to remove model "{model_name}"? (y/n)\n')
     if action == "y":
         shutil.rmtree(os.path.join(root_folder, "models", model_name))
         print(f"Removed model {model_name}")
@@ -198,8 +190,7 @@ def remove(root_folder: str, model_name: str):
 
 
 def list(root_folder: str, folder: str):
-    print("\n".join(tuple("\t" + str(m)
-                          for m in list_packages(root_folder, folder))))
+    print("\n".join(tuple("\t" + str(m) for m in list_packages(root_folder, folder))))
 
 
 def clone(root_folder: str, source_model: str, target_model: str):
@@ -215,11 +206,9 @@ def snapshot(root_folder: str, model_name: str):
         os.makedirs(os.path.join(root_folder, "snapshots"))
 
     snapshot_names = [
-        name.split("__")
-        for name in os.listdir(os.path.join(root_folder, "snapshots"))
+        name.split("__") for name in os.listdir(os.path.join(root_folder, "snapshots"))
     ]
-    matching_snapshots = [
-        name for name in snapshot_names if name[0] == model_name]
+    matching_snapshots = [name for name in snapshot_names if name[0] == model_name]
     max_version_matching = (
         max([int(name[1]) for name in matching_snapshots])
         if len(matching_snapshots) > 0

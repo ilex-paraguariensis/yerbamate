@@ -79,7 +79,10 @@ def main():
     methods = get_methods_with_arguments(Mate)
     args = sys.argv[1:]
     raw_method_args = args[1:]
-    actions = tuple(method.replace("_", "-") for method in methods) + ("--help", "-h",)
+    actions = tuple(method.replace("_", "-") for method in methods) + (
+        "--help",
+        "-h",
+    )
     if len(args) == 0 or not args[0] in actions or args[0] in ("--help", "-h"):
         print_help(methods)
     else:

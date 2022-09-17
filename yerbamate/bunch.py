@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import json
 import ipdb
 
+
 class Bunch(dict):
     def __init__(self, kwargs):
         super().__init__(kwargs)
