@@ -24,12 +24,17 @@ class Package:
     def install(source:str, destination:str):
         pass
 
-    def _generate(self, filename: str) -> dict:
+    def _generate_signature(self, filename: str) -> dict:
         pass
 
-    def _parse(self, args: dict) -> object:
+    def _parse_signature(self, args: dict) -> object:
         pass
 
-    # we can add more methods here, like uninstall, update, etc.
+    def update(self) -> None:
+        pass
+
+    def uninstall(self) -> None:
+        pass
+
     def __str__(self):
         return f"Package: {self.type} {self.source}"
