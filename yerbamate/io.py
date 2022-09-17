@@ -15,18 +15,32 @@ def set_save_path(root_save_folder: str, root_folder: str, model_name: str, para
         os.makedirs(save_path)
 
     # save parameters in results folder
-    hparams_source_file_name = os.path.join(
-        root_folder,
-        "models",
-        model_name,
-        "hyperparameters",
-        f"{params}.json",
-    )
-    hparams_destination_file_name = os.path.join(
-        save_path, "train_parameters.json"
-    )
-    shutil.copy(hparams_source_file_name, hparams_destination_file_name)
+    # hparams_source_file_name = os.path.join(
+    #     root_folder,
+    #     "models",
+    #     model_name,
+    #     "hyperparameters",
+    #     f"{params}.json",
+    # )
+    # hparams_destination_file_name = os.path.join(
+    #     save_path, "train_parameters.json"
+    # )
+    # shutil.copy(hparams_source_file_name, hparams_destination_file_name)
     return save_path
+
+
+def update_hyperparameters(root_folder: str, model_name: str, params: str, hparams: Bunch):
+    with open(
+        os.path.join(
+            root_folder,
+            "models",
+            model_name,
+            "hyperparameters",
+            f"{params}.json",
+        ),
+        "w",
+    ) as f:
+        json.dump(hparams, f, indent=4)
 
 
 def override_params(config: Bunch, params: Bunch):
