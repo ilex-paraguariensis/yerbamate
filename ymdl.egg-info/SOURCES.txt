@@ -23,6 +23,7 @@ yerbamate/parser.py
 yerbamate/pl-mate.py
 yerbamate/plot.py
 yerbamate/project_parser.py
+yerbamate/trainer.py
 yerbamate/tune_hyperparameters.py
 yerbamate/utils.py
 ymdl.egg-info/PKG-INFO
