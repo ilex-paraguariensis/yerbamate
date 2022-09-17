@@ -25,6 +25,9 @@ def parse_module_object(
         function = getattr(module_class, object["function"])
         return function(**params)
 
+    if "self" in object:
+        return module_class
+
     return module_class(**params)
 
 
@@ -152,6 +155,9 @@ def load_python_object(
         and object.params.params.self == True
     ):
         obj_params["params"] = Namespace(**root.clone())
+
+    if "self" in object:
+        return model_class
 
     return model_class(**obj_params)
 
