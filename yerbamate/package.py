@@ -66,7 +66,7 @@ class Package:
         self.root = root
         self.backbone = backbone
         self.url = url
-        # self.params
+        self.params = params
         # self.export
         self.description = description
         self.version = version
@@ -83,6 +83,9 @@ class Package:
     def _parse_signature(self, args: dict) -> object:
         pass
 
+    def _object(self):
+        return self._parse_signature(self.params)
+        
     def update(self) -> None:
         pass
 
