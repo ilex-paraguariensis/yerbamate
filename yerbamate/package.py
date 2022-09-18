@@ -9,16 +9,69 @@ import sys
 import shutil
 import urllib
 
+"""
+{
+    "root": "vit",
+    "backbone": "torch",
+    "source": "pip-package-source",
+    "type": "model",
+    "url": "https://github.com/lucidrains/vit-pytorch",
+    "params": {
+        "pip_package": "vit-pytorch",
+        "pip_version": "0.22.0",
+        "pip_requirements": "requirements.txt"
+    },
+    "export": {
+        "type": "models",
+        "root_dir": "vit",
+        "models": [
+            "ViT",
+            "Dino",
+            "CrossViT",
+            "DeepViT",
+            "CaiT",
+            "T2TViT"
+        ],
+        "full_param_export_fle": "vit_full_params.json"
+    },
+    "description": "Vision Transformer (ViT) in PyTorch",
+    "version": "0.22.0",
+    "author": "lucidrains",
+    "license": "MIT"
+}
+"""
+from bunch import Bunch
+
 
 class Package:
 
     # Type could become Enum, for now it's a string e.g. "model", "trainer"
     # Source could be a URL, or a local path?
     # Destination could be a local path, for example "models", "trainers", "data", "models/vit", "models/cnn/resnet"
-    def __init__(self, type: str, destination: str):
+    def __init__(
+        self,
+        root: str,
+        backbone: str,
+        source: str,
+        url: str,
+        params: Bunch,
+        export: Bunch,
+        description: str,
+        version: str,
+        author: str,
+        type: str,
+    ):
         self.type = type
         self.source = source  # find a way to read the source
-        self.destination = destination
+        self.root = root
+        self.backbone = backbone
+        self.url = url
+        self.params = params
+        # self.export
+        self.description = description
+        self.version = version
+        self.author = author
+        self.type = type
 
     @staticmethod
     def install(source: str, destination: str):
@@ -30,6 +83,9 @@ class Package:
     def _parse_signature(self, args: dict) -> object:
         pass
 
+    def _object(self):
+        return self._parse_signature(self.params)
+        
     def update(self) -> None:
         pass
 
