@@ -26,7 +26,7 @@ class Trainer(Package):
         self.data_module = data_module
         super().__init__(**params)
 
-    def is_component(backbone:str, given_class: Type):
+    def is_component(self, backbone:str, given_class: Type):
         return hasattr(given_class, "state_dict") and callable(given_class.state_dict)
 
     def fit(self) -> None:
