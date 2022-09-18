@@ -48,6 +48,37 @@ class Mate:
         """
         self.root_folder, self.config = io.find_root()
         self.root_save_folder = self.config.results_folder
+        self.save_path = self.root_save_folder
+
+    def __validate_missing_params(
+        self,
+        root: Bunch,
+        model_name: str,
+        experiment: str,
+        generate_defaults: bool = False,
+    ):
+        """
+        Validates that all the required parameters are present in the params file
+        """
+
+        root_module = f"{self.root_folder}"
+        base_module = f"{self.root_folder}.models.{model_name}"
+
+        parsed_params, errors = parser.generate_params(
+            root, base_module, root_module, generate_defaults
+        )
+
+        if len(errors) > 0:
+            print(f"Errors in {model_name}/{experiment}")
+            for error in errors:
+                print(error)
+
+            io.update_hyperparameters(
+                self.root_folder, model_name, experiment, parsed_params
+            )
+            sys.exit(1)
+
+        return parsed_params
 
     def __load_python_object(
         self,
@@ -117,9 +148,20 @@ class Mate:
 
     def __read_hyperparameters(self, model_name: str, hparams_name: str = "default"):
 
-        return io.read_hyperparameters(
-            self.config, self.root_folder, model_name, hparams_name
+        hp = io.read_hyperparameters(
+            self.config, self.root_folder, model_name, hparams_name, self.run_params
         )
+
+        # this function will exit the program if there are missing parameters
+        self.__validate_missing_params(hp, model_name, hparams_name)
+
+        # all params are now validated, we can update the whole generated file
+        all_params = self.__validate_missing_params(
+            hp, model_name, hparams_name, generate_defaults=True
+        )
+        io.save_train_hyperparameters(self.save_path, all_params, self.config)
+
+        return hp
 
     def __get_trainer(self, model_name: str, parameters: str):
         params = self.__read_hyperparameters(model_name, parameters)
@@ -128,6 +170,8 @@ class Mate:
         pl_module = self.__load_lightning_module(model_name, params, parameters)
         data_module = self.__load_data_loader(params)
         params.model_name = model_name
+
+        print(params)
 
         if self.config.contains("print_model"):
             if self.config.print_model:

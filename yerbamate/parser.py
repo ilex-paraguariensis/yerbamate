@@ -4,12 +4,32 @@
 from argparse import Namespace
 import io
 import re
+from typing import Callable
 from yerbamate import utils
 from yerbamate import bunch
 from yerbamate.bunch import Bunch
 import ipdb
 
 
+def parse_py_module_to_dict(
+    definition: dict,
+    object,
+    generate_defauls: bool = False,
+):
+
+    # type annotation
+    if "self" in definition and definition["self"] == True:
+        return definition
+
+    merged_params, error = utils.get_function_parameters(
+        object, definition, generate_defauls
+    )
+    definition["params"] = merged_params.copy()
+
+    return definition, error
+
+
+# creates a module object from a dict and calls it with the params
 def parse_module_object(
     object: Bunch,
     base_module: str = "",
@@ -21,31 +41,21 @@ def parse_module_object(
         object, base_module, root_module, map_key_values
     )
 
-    if "function" in object:
+    if "function" in object.keys():
         function = getattr(module_class, object["function"])
         return function(**params)
 
-    if "self" in object:
+    if "self" in object.keys() and object["self"] == True:
         return module_class
 
     return module_class(**params)
 
 
-# Function to parse a nested dict of python modules, classes and functions
+# Loads a module from a dict, importing hiearchy is local -> base -> global
+def load_module(object: Bunch, base_module: str, root_module: str):
 
-
-def parse_module_class_recursive(
-    object: Bunch,
-    base_module: str = "",
-    root_module: str = "",
-    map_key_values: dict = {},
-    generate_params: bool = True,
-):
-
-    # object should have a module and a class and params in dict keys
     assert "module" in object
     assert "class" or "function" in object
-    # first try local imports
     fromlist = [object["class"]] if "class" in object else [object["function"]]
     try:
         module = __import__(base_module + "." + object["module"], fromlist=fromlist)
@@ -61,8 +71,20 @@ def parse_module_class_recursive(
     if "class" in object:
         module = getattr(module, object["class"])
 
+    return module
+
+
+# Function to generate children of a object
+def __generate_children(
+    object: Bunch,
+    base_module: str,
+    root_module: str,
+    map_key_values: dict = {},
+):
+
     try:
-        params = object["params"]
+        if "params" in object:
+            params = object.get("params", {}).copy()
     except KeyError:
         params = {}
         object["params"] = {}
@@ -74,25 +96,33 @@ def parse_module_class_recursive(
     new_params = {}
     # parse params
     for key, value in object["params"].items():
-        if type(value) == dict and "module" in value.keys():
-            new_params[key] = parse_module_object(
+        if type(value) == dict and (
+            "module" and ("class" or "function") in value.keys()
+        ):
+
+            # recursively parse the child
+            parsed_module = parse_module_object(
                 value, base_module, root_module, map_key_values
             )
+
+            new_params[key] = parsed_module
+
         if type(value) == list:
             new_params[key] = []
+
             for item in value:
-                if type(item) == dict and "module" in item.keys():
-                    new_params[key].append(
-                        parse_module_object(
-                            item, base_module, root_module, map_key_values
-                        )
+                if type(item) == dict and (
+                    "module" and ("class" or "function") in item.keys()
+                ):
+                    parsed_module = parse_module_object(
+                        item, base_module, root_module, map_key_values
                     )
+
                 else:
                     new_params[key].append(item)
 
     params.update(new_params)
 
-    # TODO generalizable way to do this
     # replace {regex} with values from map_key_values
     for key, value in params.items():
 
@@ -103,30 +133,126 @@ def parse_module_class_recursive(
             # replace the value
             params[key] = value.replace("{" + key_name + "}", map_key_values[key_name])
 
-    # inspect the signature of the function
-    if "class" or "function" in object:
+    return params
 
-        function = object["function"] if "function" in object else "__init__"
-        callable = getattr(module, function)
-        default_params = utils.get_function_parameters(callable)
-        # ipdb.set_trace()
-        # combine default params with params
 
-        # for key, value in default_params.items():
-        #     if key not in params.keys() and value != None:
-        #         # params[key] = value
-        #         object["params"][key] = value
-        #         params[key] = value
+# Function to parse a nested dict of python modules, classes and functions
+def parse_module_class_recursive(
+    object: dict,
+    base_module: str = "",
+    root_module: str = "",
+    map_key_values: dict = {},
+):
 
-        # if key in default_params and key not in params:
-        #     params[key] = default_params[key]
-        # if key not in default_params and key not in params:
-        #     raise Exception(
-        #         f"Parameter {key} not found in function {function} of module {module}")
+    module = load_module(object, base_module, root_module)
 
-        return module, params
+    if "self" in object:
+        return module, {}
+
+    params = __generate_children(object, base_module, root_module, map_key_values)
 
     return module, params
+
+
+def generate_params_no_depth(
+    object: Bunch,
+    base_module: str,
+    root_module: str,
+    generate_defauls: bool = False,
+):
+
+    if "self" in object and object["self"] == True:
+        return object, None
+
+    module = load_module(object, base_module, root_module)
+
+    callable = object["function"] if "function" in object else "__init__"
+
+    object_definition, error = parse_py_module_to_dict(
+        object, getattr(module, callable), generate_defauls
+    )
+
+    return object_definition, error
+
+
+def generate_params_recursively(
+    object: Bunch,
+    base_module: str,
+    root_module: str,
+    generate_default_params: bool = False,
+):
+
+    if "self" in object and object["self"] == True:
+        return object, None
+
+    assert "module" in object
+
+    object, error = generate_params_no_depth(
+        object, base_module, root_module, generate_default_params
+    )
+    errors = [error] if error else []
+
+    if "params" in object:
+        for key, value in object["params"].items():
+            if type(value) == dict and (
+                "module" and ("class" or "function") in value.keys()
+            ):
+                # ipdb.set_trace()
+                obj_def, error = generate_params_recursively(
+                    value, base_module, root_module, generate_default_params
+                )
+                object["params"][key] = obj_def.copy()
+                errors += [error] if error else []
+
+            if type(value) == list:
+
+                for index, item in enumerate(value):
+                    if type(item) == dict and (
+                        "module" and ("class" or "function") in item.keys()
+                    ):
+
+                        obj_def, error = generate_params_recursively(
+                            item, base_module, root_module, generate_default_params
+                        )
+                        object["params"][key][index] = obj_def.copy()
+                        errors += [error] if error else []
+
+    return object, errors
+
+
+def generate_params(
+    root: Bunch,
+    base_module: str,
+    root_module: str,
+    generate_defauls: bool = False,
+):
+
+    # params = root.copy()
+
+    errors = []
+    root = root.copy()
+
+    # # first generate the params for the root
+    # if "module" in root:
+    #     root, error = generate_params_no_depth(root, base_module, root_module)
+    #     errors += [error] if error else []
+
+    # then generate the params for the children
+    for key, value in root.items():
+        if type(value) == dict and (
+            "module" and ("class" or "function") in value.keys()
+        ):
+            gen_def, err = generate_params_recursively(
+                root[key], base_module, root_module, generate_defauls
+            )
+            root[key] = gen_def.copy()
+
+            errors += err
+
+    # remove None from erros
+    errors = [error for error in errors if error]
+
+    return root, errors
 
 
 # maybe we need model_name and experiment for populating the params
@@ -140,6 +266,8 @@ def load_python_object(
     map_key_values: dict = {},
 ):
 
+    # _, _ = generate_full_params(root, base_module, root_module)
+
     model_class, obj_params = parse_module_class_recursive(
         object,
         base_module=base_module,
@@ -147,17 +275,18 @@ def load_python_object(
         map_key_values=map_key_values,
     )
 
+    if "self" in object and object["self"] == True:
+        return model_class
+
     if (
         root != None
         and "params" in object.params
         and "module" in object.params.params
         and object.params.params.module == "argparse"
+        and "self" in object.params.params
         and object.params.params.self == True
     ):
         obj_params["params"] = Namespace(**root.clone())
-
-    if "self" in object:
-        return model_class
 
     return model_class(**obj_params)
 

@@ -1,7 +1,9 @@
-import os
 import json
+import os
 import shutil
 import sys
+import ipdb
+
 from yerbamate.bunch import Bunch
 
 
@@ -12,22 +14,19 @@ def set_save_path(
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
-    # save parameters in results folder
-    # hparams_source_file_name = os.path.join(
-    #     root_folder,
-    #     "models",
-    #     model_name,
-    #     "hyperparameters",
-    #     f"{params}.json",
-    # )
-    # hparams_destination_file_name = os.path.join(
-    #     save_path, "train_parameters.json"
-    # )
-    # shutil.copy(hparams_source_file_name, hparams_destination_file_name)
     return save_path
 
 
-def update_hyperparameters(root_folder: str, model_name: str, params: str, hparams: Bunch):
+def save_train_hyperparameters(save_path, hparams: Bunch, conf: Bunch):
+    params = hparams.copy()
+    params["mate"] = conf.copy()
+    with open(os.path.join(save_path, "train.json"), "w") as f:
+        json.dump(params, f, indent=4)
+
+
+def update_hyperparameters(
+    root_folder: str, model_name: str, params: str, hparams: Bunch
+):
     with open(
         os.path.join(
             root_folder,
@@ -42,7 +41,8 @@ def update_hyperparameters(root_folder: str, model_name: str, params: str, hpara
 
 
 def override_params(config: Bunch, params: Bunch):
-    if "override_params" in config and config.override_params.enabled:
+
+    if "override_params" in config and config.override_params["enabled"] == True:
         for key, value in config.override_params.items():
             if key == "enabled":
                 key = "override_params"
@@ -51,7 +51,11 @@ def override_params(config: Bunch, params: Bunch):
 
 
 def read_hyperparameters(
-    conf: Bunch, root_folder: str, model_name: str, hparams_name: str = "default"
+    conf: Bunch,
+    root_folder: str,
+    model_name: str,
+    hparams_name: str = "default",
+    run_params: dict = None,
 ):
     with open(
         os.path.join(
@@ -91,12 +95,11 @@ def read_hyperparameters(
         with open(env_location, "w") as f:
             json.dump(env, f, indent=4)
         print("Updated env.json")
-        print(json.dumps(env, indent=4))
+        # print(json.dumps(env, indent=4))
 
     hparams = Bunch(hparams)
     hparams = override_params(conf, hparams)
-    hparams = override_run_params(conf, hparams)
-    print(json.dumps(hparams, indent=4))
+    hparams = override_run_params(hparams, run_params)
 
     # trick to save parameters, otherwise changes are not saved after return!
     hparams = Bunch(json.loads(json.dumps(hparams)))
@@ -104,7 +107,7 @@ def read_hyperparameters(
     return hparams
 
 
-def override_run_params(config: Bunch, run_params: dict):
+def override_run_params(hparams: Bunch, run_params: dict):
 
     # run params is a key value pair of parameters to override
     # keys are formatted as "model.parameters.lr"
@@ -112,7 +115,7 @@ def override_run_params(config: Bunch, run_params: dict):
     # we need to override the config with the new values
 
     if run_params == None:
-        return config
+        return hparams
 
     def update_dict_in_depth(d: dict, keys: list, value):
         if len(keys) == 1:
@@ -123,12 +126,12 @@ def override_run_params(config: Bunch, run_params: dict):
     for key, value in run_params.items():
         keys = key.split(".")
         if len(keys) == 1:
-            config[keys[0]] = value
+            hparams[keys[0]] = value
 
         else:
-            update_dict_in_depth(config, keys, value)
+            update_dict_in_depth(hparams, keys, value)
 
-    return config
+    return hparams
 
 
 def find_root():
@@ -157,7 +160,7 @@ def find_root():
 
     # self.root_save_folder = self.root_folder
     sys.path.insert(0, os.getcwd())
-    return root_folder, config
+    return root_folder, Bunch(config)
 
 
 def list_packages(root_folder: str, folder: str):

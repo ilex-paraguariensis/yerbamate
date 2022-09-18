@@ -7,20 +7,56 @@ import json
 
 from .bunch import Bunch
 
-default_dict = {str: "", int: 0, float: 0.0}
+
+def once(func):
+    def wrapper(*args, **kwargs):
+        if not wrapper.has_run:
+            wrapper.has_run = True
+            return func(*args, **kwargs)
+
+    wrapper.has_run = False
+    return wrapper
 
 
-def get_function_parameters(function: Callable):
-    parameters = {
-        val.name: (
-            val.default
-            if val.default != inspect._empty
-            else default_dict.get(val.annotation, None)
-        )
-        for _, val in inspect.signature(function).parameters.items()
-        if val.name != "self"
-    }
-    return parameters
+def get_function_parameters(
+    function: Callable,
+    object: Bunch,
+    generate_defaults: bool = False,
+    generate_none: bool = False,
+):
+
+    default = {}
+    params = object["params"].copy()
+
+    error = None
+
+    for param_name, param in inspect.signature(function).parameters.items():
+
+        # only add parameters that are not self or exist in the params
+        if param_name in params or param_name == "self":
+            continue
+
+        # only allow named parameters and not *args or **kwargs
+        if param.kind != param.POSITIONAL_OR_KEYWORD:
+            continue
+
+        if param.default is not param.empty:
+            # ignore None values
+            if param.default != None and generate_defaults:
+                default[param_name] = param.default
+            elif generate_none:
+                default[param_name] = None
+
+        elif param.annotation is not param.empty:
+            default[param_name] = f"Fix me! {param.annotation}"
+            error = f"Missing parameter {param_name} for {object['module']}\nHint: {param.annotation}"
+        else:
+            default[param_name] = "Fix me!"
+            error = f"Missing parameter {param_name} for {object['module']}\nHint: Add a default value or type annotation"
+
+    params.update(default)
+
+    return params, error
 
 
 def migrate_mate_version(config: Bunch, root_project: str):
