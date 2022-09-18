@@ -9,7 +9,7 @@ import os
 import torch as t
 from torch.utils.data import DataLoader
 from pytorch_lightning import (
-    Trainer as LightningBuiltinTrainer,
+    Trainer as LightningTrainer,
     LightningModule,
     LightningDataModule,
 )
@@ -18,45 +18,40 @@ from .package import Package
 
 
 class Trainer(Package):
-    @staticmethod
-    def is_component(given_class: Type):
+    _lightnin_module: LightningModule
+    _lightnin_trainer: LightningTrainer
+    _keras_model: tf.keras.Model
+
+    def __init__(self, **params):
+        super().__init__(**params)
+
+    def is_component(backbone:str, given_class: Type):
         return hasattr(given_class, "state_dict") and callable(given_class.state_dict)
 
-    def __init__(self, dirname: str):
-        self.dirname = dirname
-
-    @abstractmethod
     def fit(self, train_loader, val_loader) -> None:
-        pass
+        if self.backbone == "lightning":
+            self._lightning_trainer.fit(
+                model=self._module, train_dataloader=train_loader, val_dataloaders=val_loader
+            )
+        elif:
+            self._keras_model.fit(train_loader, val_loader)
 
-    @abstractmethod
     def test(self, datamodule) -> None:
-        pass
+        if self.backbone == "lightning":
+            self._lightning_trainer.test(
+                model=self._module, test_dataloaders=datamodule
+            )
+        elif self.backbone == "keras":
+            self._keras_model.test(datamodule)
 
-    @abstractmethod
     def save(self, obj: Any, path: str) -> None:
         pass
 
-    @abstractmethod
     def load(self, obj: Any, path: str) -> None:
         pass
 
-    @abstractmethod
-    def models(self) -> list:
-        pass
-
-
-class LightningTrainer(Trainer):
-    @staticmethod
-    def is_component(given_class: Type):
-        return hasattr(given_class, "state_dict") and callable(given_class.state_dict)
-
-    _module: LightningModule
-    _trainer: LightningBuiltinTrainer
-
-    def __init__(self, folder: str):
-        super().__init__(folder)
-
+    
+"""    
     def test(
         self,
         datamodule: Union[DataLoader, Sequence[DataLoader], LightningDataModule],
@@ -83,7 +78,7 @@ class LightningTrainer(Trainer):
         path: str,
     ):
         obj.load_state_dict(t.load(path))
-
+"""
 
 """
 keras package structure
