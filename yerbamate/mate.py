@@ -163,17 +163,16 @@ class Mate:
 
         return hp
 
-    def __get_trainer(self, model_name: str, parameters: str):
-        params = self.__read_hyperparameters(model_name, parameters)
-        self.__set_save_path(model_name, parameters)  #
-        params.save_path = self.save_path
+    # def __get_trainer(self, model_name: str, parameters: str):
+    #     params = self.__read_hyperparameters(model_name, parameters)
+    #     self.__set_save_path(model_name, parameters)  #
+    #     params.save_path = self.save_path
 
-        trainer = Trainer(**params.trainer)
-        data_module = Package(**params.data_loader)
-        # return (trainer, pl_module, data_module)
-        return (trainer, data_module)
+    #     trainer = Trainer(**params.trainer)
+    #     data_module = Package(**params.data_loader)
+    #     # return (trainer, pl_module, data_module)
+    #     return (trainer, data_module)
 
-    """
     def __get_trainer(self, model_name: str, parameters: str):
         params = self.__read_hyperparameters(model_name, parameters)
         self.__set_save_path(model_name, parameters)
@@ -190,7 +189,6 @@ class Mate:
 
         trainer = self.__load_pl_trainer(model_name, params, parameters)
         return (trainer, pl_module, data_module)
-    """
 
     def create(self, path: str):
         pass
