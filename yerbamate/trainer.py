@@ -18,31 +18,32 @@ from .package import Package
 
 
 class Trainer(Package):
-    _lightnin_module: LightningModule
-    _lightnin_trainer: LightningTrainer
+    _lightning_module: LightningModule
+    _lightning_trainer: LightningTrainer
     _keras_model: tf.keras.Model
 
-    def __init__(self, **params):
+    def __init__(self, data_module, **params):
+        self.data_module = data_module
         super().__init__(**params)
 
     def is_component(backbone:str, given_class: Type):
         return hasattr(given_class, "state_dict") and callable(given_class.state_dict)
 
-    def fit(self, train_loader, val_loader) -> None:
+    def fit(self) -> None:
         if self.backbone == "lightning":
             self._lightning_trainer.fit(
-                model=self._module, train_dataloader=train_loader, val_dataloaders=val_loader
+                self._lightning_module, self.data_module.train_loader(), self.data_module.val_loader()
             )
         elif:
-            self._keras_model.fit(train_loader, val_loader)
+            self._keras_model.fit(self.data_module.train_loader(), self.data_module.val_loader())
 
-    def test(self, datamodule) -> None:
+    def test(self) -> None:
         if self.backbone == "lightning":
             self._lightning_trainer.test(
-                model=self._module, test_dataloaders=datamodule
+                self._lightning_module, self.data_module.test_loader()
             )
         elif self.backbone == "keras":
-            self._keras_model.test(datamodule)
+            self._keras_model.test(self.data_module.test_loader())
 
     def save(self, obj: Any, path: str) -> None:
         pass
