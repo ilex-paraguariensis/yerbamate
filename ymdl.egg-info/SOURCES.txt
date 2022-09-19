@@ -22,10 +22,8 @@ yerbamate/mate_cli.py
 yerbamate/migrator.py
 yerbamate/package.py
 yerbamate/package_installer.py
-yerbamate/package_manager.py
 yerbamate/parser.py
 yerbamate/pl-mate.py
-yerbamate/pl_trainer_package.py
 yerbamate/plot.py
 yerbamate/project_parser.py
 yerbamate/trainer.py

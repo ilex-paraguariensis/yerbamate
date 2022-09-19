@@ -8,7 +8,7 @@ from pytorch_lightning import LightningModule, Trainer
 
 from yerbamate.bunch import Bunch
 from yerbamate.migrator import Migration
-from yerbamate.pl_trainer_package import PLTrainerPackage
+
 
 import ipdb
 import json
@@ -17,7 +17,7 @@ import sys
 import shutil
 
 
-from yerbamate import pl_trainer_package, utils, parser, io
+from yerbamate import utils, parser, io, package
 
 
 class Mate:
@@ -88,7 +88,7 @@ class Mate:
         pl_package_params = Bunch({})
         pl_package_params.params = params.clone()
 
-        module_class = PLTrainerPackage
+        module_class = package.PLTrainerPackage
         trainer_package = module_class(**pl_package_params)
 
         map_key_values.update({"save_path": self.save_path, "save_dir": self.save_path})
