@@ -8,6 +8,7 @@ import os
 import sys
 import shutil
 import urllib
+from typing import Union, Callable, Optional, Type
 
 """
 {
@@ -41,6 +42,7 @@ import urllib
 }
 """
 from bunch import Bunch
+import inspect
 
 
 class Package:
@@ -77,13 +79,26 @@ class Package:
     def install(source: str, destination: str):
         pass
 
-    def _generate_signature(self, filename: str) -> dict:
-        pass
+    def _get_package_class(self, package_location: str) -> dict:
+        package_name = package_location.split(".")[-1]
+        package_class_name = package_name.title().replace("_", "")
+        to_load = f"{package_location}.{package_name}"
+        package = __import__(
+            to_load,
+            fromlist=[package_location.split(".")[1]],
+        )
+        package_class = getattr(package, package_class_name)
+        return package_class
+
+    def _generate_signature(self, entrypoint: Union[Type, Callable]) -> dict:
+        return inspect.getfullargspec(
+            entrypoint
+        ).args  # TODO: turn it into a dict
 
     def _parse_signature(self, args: dict) -> object:
-        pass
+        return self._get_package_class(self.source)(**args)
 
-    def _object(self):
+    def _object(self) -> object:
         return self._parse_signature(self.params)
 
     def update(self) -> None:
