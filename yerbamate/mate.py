@@ -112,7 +112,7 @@ class Mate:
 
     def __read_hyperparameters(self, model_name: str, hparams_name: str = "default"):
 
-        hp = io.read_hyperparameters(
+        hp = io.read_experiments(
             self.config, self.root_folder, model_name, hparams_name, self.run_params
         )
 
@@ -124,7 +124,7 @@ class Mate:
             hp, model_name, hparams_name, generate_defaults=True
         )
 
-        io.save_train_hyperparameters(self.save_path, all_params, self.config)
+        io.save_train_experiments(self.save_path, all_params, self.config)
 
         return hp
 
@@ -168,6 +168,7 @@ class Mate:
         io.snapshot(self.root_folder, model_name)
 
     def __fit(self, model_name: str, params: str):
+
         trainer, model, data_module = self.__get_trainer(model_name, params)
 
         if self.is_restart:
@@ -182,11 +183,36 @@ class Mate:
         params = self.__read_hyperparameters(model_name, params)
         self.__set_save_path(model_name, params)
 
+    # model_name can be experiment name
+    def __load_experiment(self, model_name: str, experiment: str = None):
+
+        experiments = io.list_experiments(self.root_folder)
+        ipdb.set_trace()
+        path, names, models = experiments
+
+        assert (
+            model_name in names or model_name in models
+        ), f"Model {model_name} not found"
+
+        # if experiment != None and experiment != "default":
+        #     conf_path = os.path.join(self.root_folder, "models", experiment)
+
+        for path, name, model in experiments:
+            if model_name == name or model_name == model:
+                self.__load_hyperparameter(model, experiment)
+                break
+
+        ipdb.set_trace()
+
+        params = self.__load_hyperparameter(model_name, experiment)
+
     def train(self, model_name: str, parameters: str = "default"):
         assert (
             model_name in self.models or model_name
         ), f'Model "{model_name}" does not exist.'
         print(f"Training model {model_name} with hyperparameters: {parameters}.json")
+
+        # self.__load_experiment(model_name, parameters)
 
         # we need to load hyperparameters before training to set save_path
         _ = self.__read_hyperparameters(model_name, parameters)

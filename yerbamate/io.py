@@ -22,14 +22,14 @@ def set_save_path(
     return save_path
 
 
-def save_train_hyperparameters(save_path, hparams: Bunch, conf: Bunch):
+def save_train_experiments(save_path, hparams: Bunch, conf: Bunch):
     params = hparams.copy()
     params["mate"] = conf.copy()
     with open(os.path.join(save_path, "train.json"), "w") as f:
         json.dump(params, f, indent=4)
 
 
-def update_hyperparameters(
+def update_experiments(
     root_folder: str, model_name: str, params: str, hparams: Bunch
 ):
     with open(
@@ -37,7 +37,7 @@ def update_hyperparameters(
             root_folder,
             "models",
             model_name,
-            "hyperparameters",
+            "experiments",
             f"{params}.json",
         ),
         "w",
@@ -65,7 +65,7 @@ def override_params(config: Bunch, params: Bunch):
 #     )
 
 
-def read_hyperparameters(
+def read_experiments(
     conf: Bunch,
     root_folder: str,
     model_name: str,
@@ -75,12 +75,14 @@ def read_hyperparameters(
     # experiments = list_experiments(root_folder)
     # ipdb.set_trace()
 
+    # if hparams_name == "default" and os.path.exists(os.path.join()):
+
     with open(
         os.path.join(
             root_folder,
             "models",
             model_name,
-            "hyperparameters",
+            "experiments",
             f"{hparams_name}.json",
         )
     ) as f:
@@ -189,28 +191,40 @@ def list_packages(root_folder: str, folder: str):
     )
 
 
-def list_experiments(root_foolder: str):
+def list_experiments(root_foolder: str, log=True):
 
     models = list_packages(root_foolder, "models")
 
     dirs = [
-        os.path.join(root_foolder, "experiments"),
+        (os.path.join(root_foolder, "experiments"), "experiments"),
     ]
     for model in models:
-        dirs.append(os.path.join(root_foolder, "models", model, "experiments"))
+        dirs.append((os.path.join(root_foolder, "models", model, "experiments"), model))
 
     experiments = []
-    for dir in dirs:
+
+    for dir, model in dirs:
         if os.path.exists(dir):
             files = os.listdir(dir)
             for file in files:
                 if not "__" in file and ".json" in file:
-                    experiments.append((dir, file.split(".")[0]))
+                    experiments.append([dir, file.replace(".json", ""), model])
 
-    for dir, file in experiments:
-        print(f"Experiment: {dir} {file}")
+    # ipdb.set_trace()
 
-    return experiments
+    if log:
+        for (
+            dir,
+            param_file,
+            model,
+        ) in experiments:
+            print(f"{model}: {dir} {param_file}")
+
+    paths = [x[0] for x in experiments]
+    names = [x[1] for x in experiments]
+    models = [x[2] for x in experiments]
+
+    return paths, names, models
 
 
 def load_mate_config(path):
