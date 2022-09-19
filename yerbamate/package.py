@@ -9,6 +9,7 @@ import sys
 import shutil
 import urllib
 from typing import Union, Callable, Optional, Type
+from .bunch import Bunch
 
 """
 {
@@ -41,9 +42,8 @@ from typing import Union, Callable, Optional, Type
     "license": "MIT"
 }
 """
-from bunch import Bunch
 import inspect
-
+import ipdb
 
 class Package:
 
@@ -62,6 +62,7 @@ class Package:
         version: str,
         author: str,
         type: str,
+        license:str,
     ):
         self.type = type
         self.source = source  # find a way to read the source
@@ -74,20 +75,21 @@ class Package:
         self.version = version
         self.author = author
         self.type = type
+        self.object = self._object()
 
     @staticmethod
     def install(source: str, destination: str):
         pass
 
-    def _get_package_class(self, package_location: str) -> dict:
-        package_name = package_location.split(".")[-1]
-        package_class_name = package_name.title().replace("_", "")
-        to_load = f"{package_location}.{package_name}"
+    def _get_package_class(self, package_location: str, package_name:str) -> dict:
+        # package_name = package_location.split(".")[-1]
+        # package_class_name = package_name.title().replace("_", "")
         package = __import__(
-            to_load,
+            package_location,
             fromlist=[package_location.split(".")[1]],
         )
-        package_class = getattr(package, package_class_name)
+        package_class = getattr(package, package_name)
+        ipdb.set_trace()
         return package_class
 
     def _generate_signature(self, entrypoint: Union[Type, Callable]) -> dict:
@@ -96,10 +98,11 @@ class Package:
         ).args  # TODO: turn it into a dict
 
     def _parse_signature(self, args: dict) -> object:
-        return self._get_package_class(self.source)(**args)
+        return self._get_package_class(self.root, self.source)(**args)
 
     def _object(self) -> object:
-        return self._parse_signature(self.params)
+        # return self._parse_signature(self.params)
+        return self._get_package_class(self.root, self.source)
 
     def update(self) -> None:
         pass
