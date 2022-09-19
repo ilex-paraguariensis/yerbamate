@@ -11,37 +11,8 @@ import urllib
 from typing import Union, Callable, Optional, Type
 from .bunch import Bunch
 
-"""
-{
-    "root": "vit",
-    "backbone": "torch",
-    "source": "pip-package-source",
-    "type": "model",
-    "url": "https://github.com/lucidrains/vit-pytorch",
-    "params": {
-        "pip_package": "vit-pytorch",
-        "pip_version": "0.22.0",
-        "pip_requirements": "requirements.txt"
-    },
-    "export": {
-        "type": "models",
-        "root_dir": "vit",
-        "models": [
-            "ViT",
-            "Dino",
-            "CrossViT",
-            "DeepViT",
-            "CaiT",
-            "T2TViT"
-        ],
-        "full_param_export_fle": "vit_full_params.json"
-    },
-    "description": "Vision Transformer (ViT) in PyTorch",
-    "version": "0.22.0",
-    "author": "lucidrains",
-    "license": "MIT"
-}
-"""
+from yerbamate import parser
+
 import inspect
 import ipdb
 
@@ -53,18 +24,18 @@ class Package:
     # Destination could be a local path, for example "models", "trainers", "data", "models/vit", "models/cnn/resnet"
     def __init__(
         self,
-        root: str,
-        backbone: str,
-        source: str,
-        package: str,
-        type: str,
-        url: str,
-        params: Bunch,
-        export: Bunch,
-        description: str,
-        version: str,
-        author: str,
-        license: str,
+        params: Bunch = None,
+        root: str = None,
+        backbone: str = None,
+        source: str = None,
+        package: str = None,
+        type: str = None,
+        url: str = None,
+        export: Bunch = None,
+        description: str = None,
+        version: str = None,
+        author: str = None,
+        license: str = None,
         pip: Bunch = None,
     ):
         self.type = type
@@ -81,7 +52,7 @@ class Package:
         self.version = version
         self.author = author
         self.type = type
-        self.object = self._object()
+        # self.object = self._object()
 
     @staticmethod
     def install(source: str, destination: str):
@@ -118,3 +89,47 @@ class Package:
         return f"Package: {self.type} {self.source}"
 
 
+class PLTrainerPackage(Package):
+
+    # only params are required
+    def __init__(
+        self,
+        params: Bunch = None,
+        root: str = None,
+        backbone: str = None,
+        source: str = None,
+        package: str = None,
+        type: str = None,
+        url: str = None,
+        export: Bunch = None,
+        description: str = None,
+        version: str = None,
+    ):
+        super().__init__(
+            root=root,
+            backbone=backbone,
+            source=source,
+            package=package,
+            type=type,
+            url=url,
+            params=params,
+            export=export,
+            description=description,
+            version=version,
+        )
+
+    def install_objects(self, root_module: str, base_module: str, map_key_values: dict):
+
+        assert (
+            "pytorch_lightning_module" and "trainer" and "data" in self.params
+        ), "params must contain pytorch_lightning_module, trainer and data"
+
+        # install objects from params
+        # ipdb.set_trace()
+        objects = parser.load_python_object(
+            self.params, self.params.clone(), root_module, base_module, map_key_values
+        )
+
+        self.objects = objects
+
+        return objects

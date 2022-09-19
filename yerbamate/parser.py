@@ -328,28 +328,30 @@ def load_python_object(
 
     # _, _ = generate_full_params(root, base_module, root_module)
 
-    model_class, obj_params = parse_module_class_recursive(
-        root,
-        object,
-        base_module=base_module,
-        root_module=root_module,
-        map_key_values=map_key_values,
-    )
+    if "module" in object:
+        model_class, obj_params = parse_module_class_recursive(
+            root,
+            object,
+            base_module=base_module,
+            root_module=root_module,
+            map_key_values=map_key_values,
+        )
 
-    if "self" in object and object["self"] == True:
-        return model_class
+        return model_class(**obj_params)
 
-    if (
-        root != None
-        and "params" in object.params
-        and "module" in object.params.params
-        and object.params.params.module == "argparse"
-        and "self" in object.params.params
-        and object.params.params.self == True
-    ):
-        obj_params["params"] = Namespace(**root.clone())
+    result = {}
 
-    return model_class(**obj_params)
+    for key, value in object.items():
+        if type(value) == dict and (
+            "module" and ("class" or "function") in value.keys()
+        ):
+            result[key] = load_python_object(
+                value, root, base_module, root_module, map_key_values
+            )
+        else:
+            result[key] = value
+
+    return result
 
 
 if __name__ == "__main__":

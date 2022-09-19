@@ -7,6 +7,11 @@ import ipdb
 from yerbamate.bunch import Bunch
 
 
+def load_json(path):
+    with open(path) as f:
+        return Bunch(json.load(f))
+
+
 def set_save_path(
     root_save_folder: str, root_folder: str, model_name: str, params: str
 ):
@@ -224,5 +229,3 @@ def snapshot(root_folder: str, model_name: str):
         os.path.join(root_folder, "snapshots", snapshot_name),
     )
     print(f"Created snapshot {snapshot_name}")
-
-

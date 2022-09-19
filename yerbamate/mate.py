@@ -8,6 +8,7 @@ from pytorch_lightning import LightningModule, Trainer
 
 from yerbamate.bunch import Bunch
 from yerbamate.migrator import Migration
+from yerbamate.pl_trainer_package import PLTrainerPackage
 
 import ipdb
 import json
@@ -16,7 +17,7 @@ import sys
 import shutil
 
 
-from yerbamate import utils, parser, io
+from yerbamate import pl_trainer_package, utils, parser, io
 
 
 class Mate:
@@ -80,57 +81,20 @@ class Mate:
 
         return parsed_params
 
-    def __load_python_object(
-        self,
-        model_name: str,
-        experiment: str,
-        object: Bunch,
-        root: Bunch,
-        base_module: str = None,
-        map_key_values: dict = {},
+    def __load_pl_trainer_package(
+        self, params: Bunch, model_name: str, experiment: str, map_key_values: dict = {}
     ):
-        if base_module is None:
-            base_module = f"{self.root_folder}.models.{model_name}"
-        root_module = f"{self.root_folder}"
+
+        pl_package_params = Bunch({})
+        pl_package_params.params = params.clone()
+
+        module_class = PLTrainerPackage
+        trainer_package = module_class(**pl_package_params)
+
         map_key_values.update({"save_path": self.save_path, "save_dir": self.save_path})
 
-        return parser.load_python_object(
-            object,
-            root,
-            base_module,
-            root_module,
-            map_key_values,
-        )
-
-    def __load_lightning_module(
-        self, model_name: str, params: Bunch, parameters_file_name: str
-    ) -> LightningModule:
-
-        return self.__load_python_object(
-            model_name=model_name,
-            experiment=parameters_file_name,
-            object=params.pytorch_lightning_module,
-            root=params,
-        )
-
-    def __load_pl_trainer(
-        self, model_name: str, params: Bunch, parameters_file_name: str
-    ) -> Trainer:
-
-        return self.__load_python_object(
-            model_name=model_name,
-            experiment=parameters_file_name,
-            object=params.trainer,
-            root=params,
-        )
-
-    def __load_data_loader(self, params: Bunch):
-
-        return self.__load_python_object(
-            model_name="",
-            experiment="",
-            object=params.data,
-            root=params,
+        return trainer_package.install_objects(
+            self.root_folder, f"{self.root_folder}.models.{model_name}", map_key_values
         )
 
     def __load_exec_function(self, exec_file: str):
@@ -157,36 +121,30 @@ class Mate:
         all_params = self.__validate_missing_params(
             hp, model_name, hparams_name, generate_defaults=True
         )
+
         io.save_train_hyperparameters(self.save_path, all_params, self.config)
 
         return hp
-
-    # def __get_trainer(self, model_name: str, parameters: str):
-    #     params = self.__read_hyperparameters(model_name, parameters)
-    #     self.__set_save_path(model_name, parameters)  #
-    #     params.save_path = self.save_path
-
-    #     trainer = Trainer(**params.trainer)
-    #     data_module = Package(**params.data_loader)
-    #     # return (trainer, pl_module, data_module)
-    #     return (trainer, data_module)
 
     def __get_trainer(self, model_name: str, parameters: str):
         params = self.__read_hyperparameters(model_name, parameters)
         self.__set_save_path(model_name, parameters)
         params.save_path = self.save_path
-        pl_module = self.__load_lightning_module(model_name, params, parameters)
-        data_module = self.__load_data_loader(params)
-        params.model_name = model_name
 
         print(params)
 
+        objects = self.__load_pl_trainer_package(params, model_name, parameters)
+
         if self.config.contains("print_model"):
             if self.config.print_model:
-                print(pl_module)
+                print(objects["pytorch_lightning_module"])
 
-        trainer = self.__load_pl_trainer(model_name, params, parameters)
-        return (trainer, pl_module, data_module)
+        # trainer = self.__load_pl_trainer(model_name, params, parameters)
+        return (
+            objects["trainer"],
+            objects["pytorch_lightning_module"],
+            objects["data"],
+        )
 
     def create(self, path: str):
         pass
