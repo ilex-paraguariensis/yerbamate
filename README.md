@@ -1,15 +1,13 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 
-Maté is a deep learning framework compatible with Pytorch and Tensorflow. It is a package and project manager for deep learning. 
-With Maté you can add neural networks model dependencies such as ResNet, CNN, RNN, Transformer, and ViT variants to your projects with a simple command. As a project manager, Maté evaluates, trains, and keeps track of your experiments. Mate adds the source code of the dependencies to your project, making it fully customizable and reprodocible.
-
+Maté is a deep learning framework compatible with Pytorch and Tensorflow. It is a package and project manager for deep learning. With Maté, a simple command can add neural network model dependencies such as ResNet, CNN, RNN, Transformer, and ViT variants to your projects. As a project manager, Maté evaluates, trains, and keeps track of your experiments. In addition, mate adds the source code of the dependencies to your project, making it fully customizable and reproducible.
 
 ### A word of notice
 This project is still in its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
 
 
 
-## Is Maté simple to use
+## Is Maté simple to use?
 A Maté project is just like any other deep learning project with Tensorflow or Pytorch, but the difference is a standard project structure. As of now Maté is a command line tool, and soon the standard Maté graphical user interface will be ready, check out (MatéBoard)[https://github.com/ilex-paraguariensis/mateboard].
 
 
