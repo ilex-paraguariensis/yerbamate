@@ -40,6 +40,9 @@ class Mate:
     def __list_packages(self, folder: str):
         return io.list_packages(self.root_folder, folder)
 
+    def experiments(self, model_name: str = None):
+        io.experiments(self.root_folder, model_name)
+
     def __update_mate_version(self):
         utils.migrate_mate_version(self.config, self.root_folder)
 
@@ -138,8 +141,6 @@ class Mate:
         if self.config.contains("print_model"):
             if self.config.print_model:
                 print(objects["pytorch_lightning_module"])
-
-        # trainer = self.__load_pl_trainer(model_name, params, parameters)
         return (
             objects["trainer"],
             objects["pytorch_lightning_module"],
@@ -153,6 +154,11 @@ class Mate:
         io.remove(self.root_folder, model_name)
 
     def list(self, folder: str):
+
+        if folder == "experiments":
+            io.list_experiments(self.root_folder)
+            return
+
         io.list(self.root_folder, folder)
 
     def clone(self, source_model: str, target_model: str):
@@ -172,8 +178,15 @@ class Mate:
             trainer.fit(model, datamodule=data_module)
         # trainer.fit(model, datamodule=data_module)
 
+    def __load_hyperparameter(self, model_name: str, params: str):
+
+        params = self.__read_hyperparameters(model_name, params)
+        self.__set_save_path(model_name, params)
+
     def train(self, model_name: str, parameters: str = "default"):
-        assert model_name in self.models, f'Model "{model_name}" does not exist.'
+        assert (
+            model_name in self.models or model_name
+        ), f'Model "{model_name}" does not exist.'
         print(f"Training model {model_name} with hyperparameters: {parameters}.json")
 
         # we need to load hyperparameters before training to set save_path

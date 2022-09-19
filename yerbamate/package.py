@@ -91,15 +91,17 @@ class Package:
 
 class PLTrainerPackage(Package):
 
+    # TODO automatically parse root, package, version from mate config
+
     # only params are required
     def __init__(
         self,
         params: Bunch = None,
         root: str = None,
-        backbone: str = None,
-        source: str = None,
+        backbone: str = "torch",
+        source: str = "local",
         package: str = None,
-        type: str = None,
+        type: str = "pl_train",
         url: str = None,
         export: Bunch = None,
         description: str = None,

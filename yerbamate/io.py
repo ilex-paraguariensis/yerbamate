@@ -55,6 +55,16 @@ def override_params(config: Bunch, params: Bunch):
     return params
 
 
+# def list_experiments(root_folder: str, model_name: str):
+#     return (
+#         list_packages(root_folder, "experiments")
+#         if model_name == None
+#         else list_packages(
+#             os.path.join(root_folder, "models", model_name), "experiments"
+#         )
+#     )
+
+
 def read_hyperparameters(
     conf: Bunch,
     root_folder: str,
@@ -62,6 +72,9 @@ def read_hyperparameters(
     hparams_name: str = "default",
     run_params: dict = None,
 ):
+    # experiments = list_experiments(root_folder)
+    # ipdb.set_trace()
+
     with open(
         os.path.join(
             root_folder,
@@ -174,6 +187,30 @@ def list_packages(root_folder: str, folder: str):
         if os.path.exists(os.path.join(root_folder, folder))
         else tuple()
     )
+
+
+def list_experiments(root_foolder: str):
+
+    models = list_packages(root_foolder, "models")
+
+    dirs = [
+        os.path.join(root_foolder, "experiments"),
+    ]
+    for model in models:
+        dirs.append(os.path.join(root_foolder, "models", model, "experiments"))
+
+    experiments = []
+    for dir in dirs:
+        if os.path.exists(dir):
+            files = os.listdir(dir)
+            for file in files:
+                if not "__" in file and ".json" in file:
+                    experiments.append((dir, file.split(".")[0]))
+
+    for dir, file in experiments:
+        print(f"Experiment: {dir} {file}")
+
+    return experiments
 
 
 def load_mate_config(path):
