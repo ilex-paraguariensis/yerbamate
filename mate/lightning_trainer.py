@@ -1,9 +1,8 @@
-from package import Package 
-from trainer import Trainer
+from .trainer import Trainer
 from pytorch_lightning import LightningModule, LightningDataModule, Trainer as LightningBuiltinTrainer
 
 
-class LightningMateTrainer(Trainer):
+class LightningTrainer(Trainer):
     _lightning_module: LightningModule
     _lightning_trainer: LightningBuiltinTrainer
 

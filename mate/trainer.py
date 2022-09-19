@@ -1,6 +1,3 @@
-from .package import Package
-
-
 from abc import ABC, abstractmethod
 from pickle import LONG_BINGET
 from typing import Optional, Union, Sequence, Type, Any
@@ -13,8 +10,7 @@ from pytorch_lightning import (
     LightningModule,
     LightningDataModule,
 )
-import tensorflow as tf
-from .package import Package
+# import tensorflow as tf
 
 class Trainer():
 
@@ -30,6 +26,9 @@ class Trainer():
     def load(self, obj: Any, path: str) -> None:
         pass
 
+
+
+"""
 class Trainer:
         _keras_model: tf.keras.Model
 
@@ -64,7 +63,7 @@ class Trainer:
 
     def load(self, obj: Any, path: str) -> None:
         pass
-
+"""
     
 """    
     def test(
@@ -103,7 +102,7 @@ keras package structure
 │   ├── test.py
 """
 
-
+"""
 class KerasTrainer(Trainer):
     @staticmethod
     def is_component(given_class: Type):
@@ -157,3 +156,4 @@ def get_trainer_from_package(backbone: str, dirname: str) -> Trainer:
         return KerasTrainer(dirname)
     elif backbone == "ligntning":
         return LightningTrainer(dirname)
+"""
