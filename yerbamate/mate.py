@@ -3,7 +3,6 @@ import os
 from argparse import ArgumentParser, Namespace
 
 from sre_constants import ASSERT
-from pytorch_lightning import LightningModule, Trainer
 
 
 from yerbamate.bunch import Bunch
