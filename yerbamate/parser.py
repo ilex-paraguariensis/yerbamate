@@ -29,8 +29,11 @@ def parse_py_module_to_dict(
     return definition, error
 
 
+object_dict = {}
+
 # creates a module object from a dict and calls it with the params
 def parse_module_object(
+    root: Bunch,
     object: Bunch,
     base_module: str = "",
     root_module: str = "",
@@ -38,16 +41,41 @@ def parse_module_object(
 ):
 
     module_class, params = parse_module_class_recursive(
-        object, base_module, root_module, map_key_values
+        root, object, base_module, root_module, map_key_values
     )
 
-    if "function" in object.keys():
-        function = getattr(module_class, object["function"])
-        return function(**params)
-
+    # ipdb.set_trace()
     if "self" in object.keys() and object["self"] == True:
         return module_class
 
+    for key, value in params.items():
+        if type(value) == dict and "object_key" in value and not "module" in value:
+            # ipdb.set_trace()
+            # find the object from the root
+            if "function_call" in value:
+                function = value["function_call"]
+                function = getattr(object_dict[value["object_key"]], function)
+                py_object = function(value["object_key"])
+                # object = function(value[obj])
+            else:
+                py_object = object_dict[value["object_key"]]
+            params[key] = py_object
+
+    if "function" in object.keys():
+        function = getattr(module_class, object["function"])
+        py_object = function(**params)
+    else:
+        py_object = module_class(**params)
+
+    # save object in dict for later use
+    if "object_key" in object and "module" in object.keys():
+        # ipdb.set_trace()
+        object_dict[object["object_key"]] = py_object
+
+    return py_object
+
+    # function_name = object["function"] if "function" in object.keys() else "__init__"
+    # function = getattr(module_class, function_name)
     return module_class(**params)
 
 
@@ -74,8 +102,62 @@ def load_module(object: Bunch, base_module: str, root_module: str):
     return module
 
 
+def __parse_dict_object(
+    root: Bunch,
+    object: dict,
+    base_module: str,
+    root_module: str,
+    map_key_values: dict,
+):
+
+    if type(object) == dict:
+
+        if "module" and ("class" or "function") in object.keys():
+            parsed_module = parse_module_object(
+                root, object, base_module, root_module, map_key_values
+            )
+            return parsed_module
+
+        # check if the object is a dict with a function
+        for key, value in object.items():
+            if type(value) == dict and (
+                "module" and ("class" or "function") in value.keys()
+            ):
+                object[key] = parse_module_object(
+                    root, value, base_module, root_module, map_key_values
+                )
+
+            elif type(value) == dict:
+                for _key, _value in value.items():
+                    if type(_value) == dict and (
+                        "module" and ("class" or "function") in _value.keys()
+                    ):
+                        object[key][_key] = parse_module_object(
+                            root, _value, base_module, root_module, map_key_values
+                        )
+
+            if type(value) == list:
+                for index, item in enumerate(value):
+                    if type(item) == dict and (
+                        "module" and ("class" or "function") in item.keys()
+                    ):
+                        object[key][index] = parse_module_object(
+                            root, item, base_module, root_module, map_key_values
+                        )
+
+    if type(object) == list:
+        result = [
+            __parse_dict_object(root, item, base_module, root_module, map_key_values)
+            for item in object
+        ]
+        return result
+
+    return object
+
+
 # Function to generate children of a object
 def __generate_children(
+    root: Bunch,
     object: Bunch,
     base_module: str,
     root_module: str,
@@ -96,30 +178,10 @@ def __generate_children(
     new_params = {}
     # parse params
     for key, value in object["params"].items():
-        if type(value) == dict and (
-            "module" and ("class" or "function") in value.keys()
-        ):
-
-            # recursively parse the child
-            parsed_module = parse_module_object(
-                value, base_module, root_module, map_key_values
+        if type(value) == dict or type(value) == list:
+            new_params[key] = __parse_dict_object(
+                root, value, base_module, root_module, map_key_values
             )
-
-            new_params[key] = parsed_module
-
-        if type(value) == list:
-            new_params[key] = []
-
-            for item in value:
-                if type(item) == dict and (
-                    "module" and ("class" or "function") in item.keys()
-                ):
-                    parsed_module = parse_module_object(
-                        item, base_module, root_module, map_key_values
-                    )
-
-                else:
-                    new_params[key].append(item)
 
     params.update(new_params)
 
@@ -138,6 +200,7 @@ def __generate_children(
 
 # Function to parse a nested dict of python modules, classes and functions
 def parse_module_class_recursive(
+    root: Bunch,
     object: dict,
     base_module: str = "",
     root_module: str = "",
@@ -149,7 +212,7 @@ def parse_module_class_recursive(
     if "self" in object:
         return module, {}
 
-    params = __generate_children(object, base_module, root_module, map_key_values)
+    params = __generate_children(root, object, base_module, root_module, map_key_values)
 
     return module, params
 
@@ -255,10 +318,7 @@ def generate_params(
     return root, errors
 
 
-# maybe we need model_name and experiment for populating the params
 def load_python_object(
-    model_name: str,
-    experiment: str,
     object: Bunch,
     root: Bunch,
     base_module: str,
@@ -269,6 +329,7 @@ def load_python_object(
     # _, _ = generate_full_params(root, base_module, root_module)
 
     model_class, obj_params = parse_module_class_recursive(
+        root,
         object,
         base_module=base_module,
         root_module=root_module,

@@ -224,3 +224,5 @@ def snapshot(root_folder: str, model_name: str):
         os.path.join(root_folder, "snapshots", snapshot_name),
     )
     print(f"Created snapshot {snapshot_name}")
+
+

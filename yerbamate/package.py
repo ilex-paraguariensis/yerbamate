@@ -45,6 +45,7 @@ from .bunch import Bunch
 import inspect
 import ipdb
 
+
 class Package:
 
     # Type could become Enum, for now it's a string e.g. "model", "trainer"
@@ -55,14 +56,16 @@ class Package:
         root: str,
         backbone: str,
         source: str,
+        package: str,
+        type: str,
         url: str,
         params: Bunch,
         export: Bunch,
         description: str,
         version: str,
         author: str,
-        type: str,
-        license:str,
+        license: str,
+        pip: Bunch = None,
     ):
         self.type = type
         self.source = source  # find a way to read the source
@@ -70,7 +73,10 @@ class Package:
         self.backbone = backbone
         self.url = url
         self.params = params
-        # self.export
+
+        self.export = export
+        self.package = package
+
         self.description = description
         self.version = version
         self.author = author
@@ -81,7 +87,7 @@ class Package:
     def install(source: str, destination: str):
         pass
 
-    def _get_package_class(self, package_location: str, package_name:str) -> dict:
+    def _get_package_class(self, package_location: str, package_name: str) -> dict:
         # package_name = package_location.split(".")[-1]
         # package_class_name = package_name.title().replace("_", "")
         package = __import__(
@@ -93,9 +99,7 @@ class Package:
         return package_class
 
     def _generate_signature(self, entrypoint: Union[Type, Callable]) -> dict:
-        return inspect.getfullargspec(
-            entrypoint
-        ).args  # TODO: turn it into a dict
+        return inspect.getfullargspec(entrypoint).args  # TODO: turn it into a dict
 
     def _parse_signature(self, args: dict) -> object:
         return self._get_package_class(self.root, self.source)(**args)

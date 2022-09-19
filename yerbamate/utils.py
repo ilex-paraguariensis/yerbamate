@@ -8,6 +8,7 @@ import json
 from .bunch import Bunch
 
 
+
 def once(func):
     def wrapper(*args, **kwargs):
         if not wrapper.has_run:
@@ -17,6 +18,7 @@ def once(func):
     wrapper.has_run = False
     return wrapper
 
+print_once = once(print)
 
 def get_function_parameters(
     function: Callable,

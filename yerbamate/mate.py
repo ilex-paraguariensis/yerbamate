@@ -95,8 +95,6 @@ class Mate:
         map_key_values.update({"save_path": self.save_path, "save_dir": self.save_path})
 
         return parser.load_python_object(
-            model_name,
-            experiment,
             object,
             root,
             base_module,

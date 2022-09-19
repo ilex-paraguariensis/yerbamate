@@ -4,10 +4,13 @@ setup.py
 ./src/mate
 mate/__init__.py
 mate/cache.py
+mate/keras_trainer.py
+mate/lightning_trainer.py
 mate/metrics.py
 mate/model_checkpoint.py
 mate/monitor.py
 mate/optimizer.py
+mate/trainer.py
 yerbamate/__init__.py
 yerbamate/__main__.py
 yerbamate/bunch.py
@@ -18,6 +21,7 @@ yerbamate/mate.py
 yerbamate/mate_cli.py
 yerbamate/migrator.py
 yerbamate/package.py
+yerbamate/package_manager.py
 yerbamate/parser.py
 yerbamate/pl-mate.py
 yerbamate/plot.py
