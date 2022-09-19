@@ -10,52 +10,20 @@ This project is still in its early stages and is not ready for production. Some 
 
 
 ## Is Maté simple to use
-A Maté project is just like any other deep learning project with Tensorflow or Pytorch, but the difference is a standard project structure. As of now Maté is a command line tool, and soon Maté commands will be accessible from a web interface. Here are some sample commands that you might need in your experiments:
-
-```
-mate add imagen UNet # adds a UNet model with its source code to your project
-mate run imagen --input_txt="A Flower in space" # run pretraied model with custom input 
-mate train imagen # Takes while to train... 
-mate restart imagen # Restart the training
-mate snapshot imagen # Reproducible snapshop, keep on experimenting
-mate clone imogen exp_imogen # Fork a expriment to keep safe of imogen you have
-mate train exp_imogen # Change the code and keep on experimenting!
-mate train videoprediction moving_mnist # run videoprediction model with moving_mnist
-mate train videoprediction kth # train videoprediction model with kth dataset
-```
-
-## What is the Maté standard?
-It is a tree structure of foolders and files. It enforces the location of your python files, not what is inside or how do you define your models, dataloaders or training procedure.
-
-The root folder contrains the follwing folders: 
-* Models
-* Data
-* Executables
-
-Inside the Models folder have your experiments, e.g.,
-* ResNet
-* ResNetBig
-* YetABiggerResNet
-* ViT
-
-Inside the `Model` folder, you would need to have the source of of the models and trainers.
-
-Inside the `Data` folder, you would have your dataloaders, augmentation and preprocessings.
-
-The `Excetuables` can be used to run a trained model. 
+A Maté project is just like any other deep learning project with Tensorflow or Pytorch, but the difference is a standard project structure. As of now Maté is a command line tool, and soon the standard Maté graphical user interface will be ready, check out (MatéBoard)[https://github.com/ilex-paraguariensis/mateboard].
 
 
 
 ## Installation 🔌
 
 At the moment it only works on Linux and MacOS. Windows is on its way.
-
+<!--
 Install the stable version via pip:
 
 ```
 pip install yerbamate
 ```
-
+-->
 Install the lastest dev version from git:
 ```
 git clone https://github.com/ilex-paraguariensis/yerbamate 
@@ -112,6 +80,28 @@ Or, if the repo is on github, you can use the shorthand notation:
 ```
 mate install ilex-paraguariensis/ResNet 
 ```
+
+## What is the Maté standard?
+It is a tree structure of folders and files. It enforces the location of your python files, not what is inside or how do you define your models, dataloaders or training procedure.
+
+The root folder contrains the follwing folders: 
+* Models
+* Data
+* Executables
+
+Inside the Models folder have your experiments, e.g.,
+* ResNet
+* ResNetBig
+* YetABiggerResNet
+* ViT
+
+Inside the `Model` folder, you would need to have the source of of the models and trainers.
+
+Inside the `Data` folder, you would have your dataloaders, augmentation and preprocessings.
+
+The `Excetuables` can be used to run a trained model. 
+
+
 
 ## FAQ
 **Q: Does Maté work with colab?**
