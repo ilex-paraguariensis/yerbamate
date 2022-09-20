@@ -3,10 +3,14 @@ import os
 from argparse import ArgumentParser, Namespace
 
 from sre_constants import ASSERT
+import yerbamate
 
 
 from yerbamate.bunch import Bunch
 from yerbamate.migrator import Migration
+
+# from yerbamate.trainer import Trainer
+from yerbamate import trainer as mate_trainer
 
 
 import ipdb
@@ -35,6 +39,7 @@ class Mate:
         self.is_restart = False
         self.run_params = None
         self.custom_save_path = None
+        self.trainer: mate_trainer.Trainer = None
 
     def __list_packages(self, folder: str):
         return io.list_packages(self.root_folder, folder)
@@ -83,31 +88,15 @@ class Mate:
 
         return parsed_params
 
-    def __load_pl_trainer_package(
-        self, params: Bunch, model_name: str, experiment: str, map_key_values: dict = {}
-    ):
-
-        pl_package_params = Bunch({})
-        pl_package_params.params = params.clone()
-
-        module_class = package.PLTrainerPackage
-        trainer_package = module_class(**pl_package_params)
-
-        map_key_values.update({"save_path": self.save_path, "save_dir": self.save_path})
-
-        return trainer_package.install_objects(
-            self.root_folder, f"{self.root_folder}.models.{model_name}", map_key_values
-        )
-
     def __load_exec_function(self, exec_file: str):
         return __import__(
             f"{self.root_folder}.exec.{exec_file}",
             fromlist=["exec"],
         ).run
 
-    def __set_save_path(self, model_name: str, params: str):
+    def __set_save_path(self, model_name: str, params_name: str):
         self.save_path = io.set_save_path(
-            self.root_save_folder, self.root_folder, model_name, params
+            self.root_save_folder, self.root_folder, model_name, params_name
         )
 
     def __read_hyperparameters(self, model_name: str, hparams_name: str = "default"):
@@ -128,23 +117,37 @@ class Mate:
 
         return hp
 
-    def __get_trainer(self, model_name: str, parameters: str):
-        params = self.__read_hyperparameters(model_name, parameters)
-        self.__set_save_path(model_name, parameters)
+    def __is_pl(self, conf: Bunch):
+        return "pytorch_lightning_module" in conf
+
+    def __load_experiment_conf(self, model_name: str, params_name: str):
+        # ipdb.set_trace()
+        params = self.__read_hyperparameters(model_name, params_name)
+        self.__set_save_path(model_name, params_name)
         params.save_path = self.save_path
+        params.root_folder = self.root_folder
+        return params
 
-        print(params)
+    def __get_trainer(self, model_name: str, params: str):
+        if self.trainer is None:
 
-        objects = self.__load_pl_trainer_package(params, model_name, parameters)
+            conf = self.__load_experiment_conf(model_name, params)
+            if self.__is_pl(conf):
 
-        if self.config.contains("print_model"):
-            if self.config.print_model:
-                print(objects["pytorch_lightning_module"])
-        return (
-            objects["trainer"],
-            objects["pytorch_lightning_module"],
-            objects["data"],
-        )
+                map_key_value = {
+                    "save_path": self.save_path,
+                    "save_dir": self.save_path,
+                }
+                root_module = f"{self.root_folder}"
+                base_module = f"{self.root_folder}.models.{model_name}"
+
+                self.trainer = mate_trainer.LightningTrainer(
+                    conf, root_module, base_module, map_key_value
+                )
+            else:
+                self.trainer = mate_trainer.get_trainer_from_package(model_name, params)
+
+        return self.trainer
 
     def create(self, path: str):
         pass
@@ -169,42 +172,14 @@ class Mate:
 
     def __fit(self, model_name: str, params: str):
 
-        trainer, model, data_module = self.__get_trainer(model_name, params)
+        # conf = self.__load_experiment_conf(model_name, params)
+        trainer = self.__get_trainer(model_name, params)
 
         if self.is_restart:
             checkpoint_path = os.path.join(self.save_path, "checkpoints", "last.ckpt")
-            trainer.fit(model, datamodule=data_module, ckpt_path=checkpoint_path)
+            trainer.fit(ckpt_path=checkpoint_path)
         else:
-            trainer.fit(model, datamodule=data_module)
-        # trainer.fit(model, datamodule=data_module)
-
-    def __load_hyperparameter(self, model_name: str, params: str):
-
-        params = self.__read_hyperparameters(model_name, params)
-        self.__set_save_path(model_name, params)
-
-    # model_name can be experiment name
-    def __load_experiment(self, model_name: str, experiment: str = None):
-
-        experiments = io.list_experiments(self.root_folder)
-        ipdb.set_trace()
-        path, names, models = experiments
-
-        assert (
-            model_name in names or model_name in models
-        ), f"Model {model_name} not found"
-
-        # if experiment != None and experiment != "default":
-        #     conf_path = os.path.join(self.root_folder, "models", experiment)
-
-        for path, name, model in experiments:
-            if model_name == name or model_name == model:
-                self.__load_hyperparameter(model, experiment)
-                break
-
-        ipdb.set_trace()
-
-        params = self.__load_hyperparameter(model_name, experiment)
+            trainer.fit()
 
     def train(self, model_name: str, parameters: str = "default"):
         assert (
@@ -218,7 +193,7 @@ class Mate:
         _ = self.__read_hyperparameters(model_name, parameters)
         self.__set_save_path(model_name, parameters)
 
-        checkpoint_path = os.path.join(self.save_path, "checkpoint")
+        checkpoint_path = os.path.join(self.save_path, "checkpoints")
         if not os.path.exists(checkpoint_path):
             os.mkdir(checkpoint_path)
         checkpoints = [
@@ -244,11 +219,11 @@ class Mate:
         params = "parameters" if params == "" or params == "None" else params
         print(f"Testing model {model_name} with hyperparameters: {params}.json")
 
-        trainer, model, data_module = self.__get_trainer(model_name, params)
+        trainer = self.__get_trainer(model_name, params)
 
         checkpoint_path = os.path.join(self.save_path, "checkpoint", "best.ckpt")
 
-        trainer.test(model, datamodule=data_module, ckpt_path=checkpoint_path)
+        trainer.test(ckpt_path=checkpoint_path)
 
     def restart(self, model_name: str, params: str):
         assert model_name in self.models, f'Model "{model_name}" does not exist.'
@@ -295,7 +270,7 @@ class Mate:
         new_params = {}
         for model in conf.models:
             new_params[model["class_name"]] = model["params"]
-        ipdb.set_trace()
+        # ipdb.set_trace()
         old_params_files = [
             os.path.join(self.root_folder, "models", model_name, "hyperparameters", p)
             for p in os.listdir(

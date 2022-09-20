@@ -1,3 +1,5 @@
+from yerbamate.bunch import Bunch
+from yerbamate import parser
 from .package import Package
 
 
@@ -26,16 +28,23 @@ class Trainer(Package):
         self.data_module = data_module
         super().__init__(**params)
 
-    def is_component(self, backbone:str, given_class: Type):
+    def is_pl():
+        return False
+
+    def is_component(self, backbone: str, given_class: Type):
         return hasattr(given_class, "state_dict") and callable(given_class.state_dict)
 
     def fit(self) -> None:
         if self.backbone == "lightning":
             self._lightning_trainer.fit(
-                self._lightning_module, self.data_module.train_loader(), self.data_module.val_loader()
+                self._lightning_module,
+                self.data_module.train_loader(),
+                self.data_module.val_loader(),
             )
-        elif:
-            self._keras_model.fit(self.data_module.train_loader(), self.data_module.val_loader())
+        elif self.backbone == "keras":
+            self._keras_model.fit(
+                self.data_module.train_loader(), self.data_module.val_loader()
+            )
 
     def test(self) -> None:
         if self.backbone == "lightning":
@@ -51,7 +60,7 @@ class Trainer(Package):
     def load(self, obj: Any, path: str) -> None:
         pass
 
-    
+
 """    
     def test(
         self,
@@ -138,8 +147,62 @@ class KerasTrainer(Trainer):
         pass
 
 
+class LightningTrainer(Package):
+    def __init__(
+        self, params: Bunch, root_module, base_module, map_key_values, *kwargs
+    ):
+        super().__init__(params, *kwargs)
+
+        self.install(root_module, base_module, map_key_values)
+
+    def install(self, root_module: str, base_module: str, map_key_values: dict):
+
+        assert (
+            "pytorch_lightning_module" and "trainer" and "data" in self.params
+        ), "params must contain pytorch_lightning_module, trainer and data"
+
+        # install objects from params
+        # ipdb.set_trace()
+        objects = parser.load_python_object(
+            self.params, self.params.clone(), root_module, base_module, map_key_values
+        )
+
+        self.objects = objects
+        self.trainer = objects["trainer"]
+        self.model = objects["pytorch_lightning_module"]
+        self.datamodule = objects["data"]
+
+        # rename
+
+    def is_pl(self):
+        return True
+
+    def fit(self, *args, **kwargs):
+        self.trainer.fit(self.model, datamodule=self.datamodule, *args, **kwargs)
+
+    def test(self, *args, **kwargs):
+        self.trainer.test(self.model, datamodule=self.datamodule, *args, **kwargs)
+        pass
+
+    def save(self, path: str):
+        pass
+
+    def load(self, path: str):
+        pass
+
+
 def get_trainer_from_package(backbone: str, dirname: str) -> Trainer:
     if backbone == "keras":
         return KerasTrainer(dirname)
     elif backbone == "ligntning":
         return LightningTrainer(dirname)
+
+
+def get_trainer_from_config(config: Bunch, *args, **kawrg) -> Trainer:
+    if "pytorch_lightning_module" in config:
+        return LightningTrainer(config, *args, **kawrg)
+    elif "keras_model" in config:
+        return KerasTrainer(config, *args, **kawrg)
+    else:
+        raise ValueError("No trainer specified in config")
+    pass

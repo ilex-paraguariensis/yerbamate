@@ -15,7 +15,9 @@ def load_json(path):
 def set_save_path(
     root_save_folder: str, root_folder: str, model_name: str, params: str
 ):
-    save_path = os.path.join(root_save_folder, "models", model_name, "results", params)
+    save_path = os.path.join(
+        root_save_folder, root_folder, "models", model_name, "results", params
+    )
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -29,9 +31,7 @@ def save_train_experiments(save_path, hparams: Bunch, conf: Bunch):
         json.dump(params, f, indent=4)
 
 
-def update_experiments(
-    root_folder: str, model_name: str, params: str, hparams: Bunch
-):
+def update_experiments(root_folder: str, model_name: str, params: str, hparams: Bunch):
     with open(
         os.path.join(
             root_folder,

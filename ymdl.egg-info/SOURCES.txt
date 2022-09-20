@@ -13,6 +13,7 @@ mate/optimizer.py
 mate/trainer.py
 yerbamate/__init__.py
 yerbamate/__main__.py
+yerbamate/agnostic_trainer.py
 yerbamate/bunch.py
 yerbamate/constants.py
 yerbamate/io.py

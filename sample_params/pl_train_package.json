@@ -88,6 +88,17 @@
         "trainer": {
             "module": "pytorch_lightning",
             "class": "Trainer",
+            "fit_params": {
+                "model": {
+                    "object": true,
+                    "object_key": "pytorch_lightning_module"
+                },
+                "data_module": {
+                    "object": true,
+                    "object_key": "data"
+                },
+                "ckpt_path": "{cpkt_path}"
+            },
             "params": {
                 "gpus": 1,
                 "max_epochs": 100,
@@ -129,6 +140,7 @@
         "data": {
             "module": "data_loaders.cifar10.data_loader",
             "class": "CifarLightningDataModule",
+            "object_key": "data",
             "params": {
                 "location": "./data/cifar10",
                 "batch_size": 128,
