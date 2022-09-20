@@ -166,7 +166,6 @@ class Mate:
 
     def __fit(self, model_name: str, params: str):
 
-        # conf = self.__load_experiment_conf(model_name, params)
         trainer = self.__get_trainer(model_name, params)
 
         if self.is_restart:
@@ -176,12 +175,9 @@ class Mate:
             trainer.fit()
 
     def train(self, model_name: str, parameters: str = "default"):
-        assert (
-            model_name in self.models or model_name
+        assert io.experiment_exists(
+            self.root_folder, model_name, parameters
         ), f'Model "{model_name}" does not exist.'
-        
-        # print(f"Training model {model_name} with hyperparameters: {parameters}.json")
-        # self.__load_experiment(model_name, parameters)
 
         # we need to load hyperparameters before training to set save_path
         _ = self.__read_hyperparameters(model_name, parameters)
@@ -219,10 +215,10 @@ class Mate:
 
         trainer.test(ckpt_path=checkpoint_path)
 
-    def restart(self, model_name: str, params: str):
-        assert model_name in self.models, f'Model "{model_name}" does not exist.'
-        params = "parameters" if params == "" or params == "None" else params
-        print(f"Restarting model {model_name} with parameters: {params}.json")
+    def restart(self, model_name: str, params: str = "default"):
+        assert io.experiment_exists(
+            self.root_folder, model_name, params
+        ), f'Model "{model_name}" does not exist.'
 
         self.is_restart = True
         self.__fit(model_name, params)

@@ -294,6 +294,17 @@ def list_experiments(root_foolder: str, model_name=None, log=True):
     return experiments
 
 
+def list_experiment_names(root_folder: str, model_name: str):
+    experiments = list_experiments(root_folder, None, False)
+    return [x[1] for x in experiments]
+
+
+def experiment_exists(root_folder: str, model_name: str, experiment_name: str):
+
+    exp_path = __get_experiment_path(root_folder, model_name, experiment_name)
+    return os.path.exists(exp_path)
+
+
 def load_mate_config(path):
     with open(path) as f:
         config = Bunch(json.load(f))
