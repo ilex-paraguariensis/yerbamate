@@ -64,7 +64,8 @@ def parse_module_object(
     if "function" in object.keys():
         function = getattr(module_class, object["function"])
         py_object = function(**params)
-    else:
+    elif "class" in object.keys():
+        # ipdb.set_trace()
         py_object = module_class(**params)
 
     # save object in dict for later use
@@ -94,7 +95,10 @@ def load_module(object: Bunch, base_module: str, root_module: str):
         except ModuleNotFoundError:
 
             # lastly try global imports
-            module = __import__(object["module"], fromlist=fromlist)
+            try:
+                module = __import__(object["module"], fromlist=fromlist)
+            except ModuleNotFoundError:
+                return object
 
     if "class" in object:
         module = getattr(module, object["class"])
@@ -120,30 +124,33 @@ def __parse_dict_object(
 
         # check if the object is a dict with a function
         for key, value in object.items():
-            if type(value) == dict and (
-                "module" and ("class" or "function") in value.keys()
-            ):
-                object[key] = parse_module_object(
-                    root, value, base_module, root_module, map_key_values
-                )
+            object[key] = __parse_dict_object(
+                root, value, base_module, root_module, map_key_values
+            )
+            # if type(value) == dict and (
+            #     "module" and ("class" or "function") in value.keys()
+            # ):
+            #     object[key] = parse_module_object(
+            #         root, value, base_module, root_module, map_key_values
+            #     )
 
-            elif type(value) == dict:
-                for _key, _value in value.items():
-                    if type(_value) == dict and (
-                        "module" and ("class" or "function") in _value.keys()
-                    ):
-                        object[key][_key] = parse_module_object(
-                            root, _value, base_module, root_module, map_key_values
-                        )
+            # elif type(value) == dict:
+            #     for _key, _value in value.items():
+            #         if type(_value) == dict and (
+            #             "module" and ("class" or "function") in _value.keys()
+            #         ):
+            #             object[key][_key] = parse_module_object(
+            #                 root, _value, base_module, root_module, map_key_values
+            #             )
 
-            if type(value) == list:
-                for index, item in enumerate(value):
-                    if type(item) == dict and (
-                        "module" and ("class" or "function") in item.keys()
-                    ):
-                        object[key][index] = parse_module_object(
-                            root, item, base_module, root_module, map_key_values
-                        )
+            # if type(value) == list:
+            #     for index, item in enumerate(value):
+            #         if type(item) == dict and (
+            #             "module" and ("class" or "function") in item.keys()
+            #         ):
+            #             object[key][index] = parse_module_object(
+            #                 root, item, base_module, root_module, map_key_values
+            #             )
 
     if type(object) == list:
         result = [
@@ -225,6 +232,9 @@ def generate_params_no_depth(
 ):
 
     if "self" in object and object["self"] == True:
+        return object, None
+
+    if "module" not in object:
         return object, None
 
     module = load_module(object, base_module, root_module)
@@ -345,6 +355,15 @@ def load_python_object(
         if type(value) == dict and (
             "module" and ("class" or "function") in value.keys()
         ):
+            result[key] = load_python_object(
+                value, root, base_module, root_module, map_key_values
+            )
+        elif type(value) == list:
+            result[key] = [
+                load_python_object(item, root, base_module, root_module, map_key_values)
+                for item in value
+            ]
+        elif type(value) == dict:
             result[key] = load_python_object(
                 value, root, base_module, root_module, map_key_values
             )

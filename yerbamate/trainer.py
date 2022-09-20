@@ -7,27 +7,36 @@ from typing import Optional, Union, Sequence, Type, Any
 import os
 
 import torch as t
-from torch.utils.data import DataLoader
-from pytorch_lightning import (
-    Trainer as LightningTrainer,
-    LightningModule,
-    LightningDataModule,
-)
+
 from .package import Package
 import ipdb
 
-class Trainer(Package):
 
+class Trainer(Package):
     def __init__(self, params, *kwargs):
         super().__init__(params, *kwargs)
 
     @staticmethod
     def create(params: Bunch, root_module, base_module, map_key_values, *kwargs):
+
+        if "trainer" in params and "method_args" in params.trainer:
+            from .generic_trainer import GenericTrainer
+
+            return GenericTrainer(
+                params, root_module, base_module, map_key_values, *kwargs
+            )
+
         if "pytorch_lightning_module" in params:
-            from .lightning_trainer import LightningTrainer # importing it here avoids memory overload
+            from .lightning_trainer import (
+                LightningTrainer,
+            )  # importing it here avoids memory overload
+
             return LightningTrainer(params, root_module, base_module, map_key_values)
         else:
-            from .keras_trainer import KerasTrainer # importing it here avoids memory overload
+            from .keras_trainer import (
+                KerasTrainer,
+            )  # importing it here avoids memory overload
+
             return KerasTrainer(params, root_module, base_module, map_key_values)
 
     def is_pl(self):
@@ -47,7 +56,6 @@ class Trainer(Package):
 
     def load(self, obj: Any, path: str) -> None:
         pass
-
 
 
 """    
@@ -86,7 +94,6 @@ keras package structure
 │   ├── fit.py
 │   ├── test.py
 """
-
 
 
 def get_trainer_from_package(backbone: str, dirname: str) -> Trainer:

@@ -20,6 +20,7 @@
         "pytorch_lightning_module": {
             "module": "base_classification",
             "class": "LightningClassificationModule",
+            "object_key": "pl_model",
             "params": {
                 "classifier": {
                     "module": "modules.resnet.resnet",
@@ -85,20 +86,38 @@
                 }
             }
         },
+        "data": {
+            "module": "data_loaders.cifar10.data_loader",
+            "class": "CifarLightningDataModule",
+            "object_key": "data",
+            "params": {
+                "location": "./data/cifar10",
+                "batch_size": 128,
+                "image_size": [
+                    256,
+                    256
+                ],
+                "crop_size": 4
+            }
+        },
         "trainer": {
             "module": "pytorch_lightning",
             "class": "Trainer",
-            "fit_params": {
-                "model": {
-                    "object": true,
-                    "object_key": "pytorch_lightning_module"
-                },
-                "data_module": {
-                    "object": true,
-                    "object_key": "data"
-                },
-                "ckpt_path": "{cpkt_path}"
-            },
+            "function_calls": [
+                {
+                    "fit": {
+                        "model": {
+                            "object": true,
+                            "object_key": "pl_model"
+                        },
+                        "data_module": {
+                            "object": true,
+                            "object_key": "data"
+                        },
+                        "ckpt_path": "{save_dir}/checkpoints/last.ckpt"
+                    }
+                }
+            ],
             "params": {
                 "gpus": 1,
                 "max_epochs": 100,
@@ -135,20 +154,6 @@
                         "save_dir": "./logs"
                     }
                 }
-            }
-        },
-        "data": {
-            "module": "data_loaders.cifar10.data_loader",
-            "class": "CifarLightningDataModule",
-            "object_key": "data",
-            "params": {
-                "location": "./data/cifar10",
-                "batch_size": 128,
-                "image_size": [
-                    256,
-                    256
-                ],
-                "crop_size": 4
             }
         }
     }

@@ -1,18 +1,25 @@
+from .parse import Parser
 from .package import Package
 from yerbamate import parser
 from .bunch import Bunch
 from .trainer import Trainer
+import ipdb
 
-    
+
 class LightningTrainer(Trainer):
     def __init__(
         self, params: Bunch, root_module, base_module, map_key_values, *kwargs
     ):
         super().__init__(params, *kwargs)
 
-        self.install(root_module, base_module, map_key_values)
+        self.parser = Parser(
+            root_module=root_module,
+            base_module=base_module,
+            map_key_values=map_key_values,
+        )
+        self.install()
 
-    def install(self, root_module: str, base_module: str, map_key_values: dict):
+    def install(self):
 
         assert (
             "pytorch_lightning_module" and "trainer" and "data" in self.params
@@ -20,9 +27,10 @@ class LightningTrainer(Trainer):
 
         # install objects from params
         # ipdb.set_trace()
-        objects = parser.load_python_object(
-            self.params, self.params.clone(), root_module, base_module, map_key_values
-        )
+        root = self.params.clone()
+        objects = self.parser.load_python_object(root)
+
+        # ipdb.set_trace()
 
         self.objects = objects
         self.trainer = objects["trainer"]
@@ -45,6 +53,3 @@ class LightningTrainer(Trainer):
 
     def load(self, path: str):
         pass
-
-
-

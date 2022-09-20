@@ -16,6 +16,7 @@ yerbamate/__main__.py
 yerbamate/agnostic_trainer.py
 yerbamate/bunch.py
 yerbamate/constants.py
+yerbamate/generic_trainer.py
 yerbamate/io.py
 yerbamate/keras_trainer.py
 yerbamate/lightning_trainer.py
@@ -25,6 +26,7 @@ yerbamate/mate_cli.py
 yerbamate/migrator.py
 yerbamate/package.py
 yerbamate/package_installer.py
+yerbamate/parse.py
 yerbamate/parser.py
 yerbamate/pl-mate.py
 yerbamate/plot.py
