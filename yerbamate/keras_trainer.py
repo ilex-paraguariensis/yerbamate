@@ -1,27 +1,28 @@
 from .package import Package
 from .trainer import Trainer
+from . import parser
+from .bunch import Bunch
 import tensorflow as tf
-
+import ipdb
+import os
 
 class KerasTrainer(Package):
-    def __init__(self, dirname: str, run_config: dict):
-        compile_config = self._generate(os.path.join(dirname, "config.py"))
-        fit_config = self._generate(os.path.join(dirname, "fit.py"))
-        test_config = self._generate(os.path.join(dirname, "test.py"))
-        self.args = {
-            "compile": compile_config,
-            "fit": fit_config,
-            "test": test_config,
-        }
-        # TODO: assert that the given run_config has the same keys as the args, recursively
-        self._parse(run_config)()
-        self.fit = self._parse(run_config)
-        self.test = self._parse(run_config)
-        self.model = self._parse(run_config)
+    def __init__(self, params: Bunch, root_module, base_module, map_key_values, *kwargs):
 
-    @staticmethod
-    def is_component(given_class: Type):
-        return hasattr(given_class, "state_dict") and callable(given_class.state_dict)
+        super().__init__(params, *kwargs)
+        assert (
+            "keras_training_module" and "data" in self.params
+        ), "params must contain keras_training_module, trainer and data"
+
+        # install objects from params
+        objects = parser.load_python_object(
+            self.params, self.params.clone(), root_module, base_module, map_key_values
+        )
+        self.objects = objects
+        # self.trainer = objects["trainer"]
+        self.training_module = objects["keras_training_module"]
+        self.training_module.compile()
+        self.datamodule = objects["data"]
 
     model: tf.keras.Model
 
@@ -39,8 +40,8 @@ class KerasTrainer(Package):
         ), "Only one component can be specified in the run config"
 
     
-    def fit(self, train_loader, val_loader):
-        pass
+    def fit(self):
+        self.training_module.fit(self.datamodule.train_dataloader(), self.datamodule.val_dataloader())
 
     def test(self, train_loader, val_loader):
         pass
