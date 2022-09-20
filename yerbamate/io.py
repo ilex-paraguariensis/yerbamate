@@ -4,8 +4,10 @@ import shutil
 import sys
 import ipdb
 
-from yerbamate.bunch import Bunch
-from yerbamate.utils import once
+from typing import Optional
+from .bunch import Bunch
+from .utils import once
+from .git_url_parser import GitUrlParser
 
 
 def load_json(path):
@@ -360,38 +362,10 @@ def snapshot(root_folder: str, model_name: str):
     print(f"Created snapshot {snapshot_name}")
 
 
-def add(source:str, destination:str):
-    mate_dir = ".mate"
-    if not os.path.exists(mate_dir):
-        os.makedirs(mate_dir, exist_ok=True)
-    os.system(f"git clone {repo} {mate_dir}")
-
-    conf = os.path.join(mate_dir, "mate.json")
-    conf = Bunch(json.load(open(conf)))
-
-    dest_dir = os.path.join(self.root_folder, "models", model_name, "modules")
-    os.makedirs(dest_dir, exist_ok=True)
-
-    shutil.copytree(os.path.join(mate_dir, conf.export), dest_dir)
-    shutil.copytree(
-        os.path.join(mate_dir, "mate.json"),
-        os.path.join(dest_dir, conf.export),
+def install(root_dir: str, source: str, destination: Optional[str] = None):
+    parsed_url = GitUrlParser(source)
+    destination = ".".join((root_dir, "ciao"))
+    parsed_url.clone(destination)
+    print(
+        f'Successfully installed "{parsed_url.name}" from "{parsed_url.base_url}" into {destination}'
     )
-    shutil.rmtree(mate_dir)
-
-    new_params = {}
-    for model in conf.models:
-        new_params[model["class_name"]] = model["params"]
-    old_params_files = [
-        os.path.join(self.root_folder, "models", model_name, "hyperparameters", p)
-        for p in os.listdir(
-            os.path.join(self.root_folder, "models", model_name, "hyperparameters")
-        )
-    ]
-    for old_params_file in old_params_files:
-        p = Bunch(json.load(open(old_params_file)))
-        p.update(new_params)
-        with open(old_params_file, "w") as f:
-            json.dump(p, f, indent=4)
-    print(f"Sucessfully added dependency to model {model_name}")
-
