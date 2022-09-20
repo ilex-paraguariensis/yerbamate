@@ -1,9 +1,7 @@
 from yerbamate.bunch import Bunch
-from yerbamate import parser
 from .package import Package
 
 
-from abc import ABC, abstractmethod
 from pickle import LONG_BINGET
 from typing import Optional, Union, Sequence, Type, Any
 import os
@@ -15,50 +13,41 @@ from pytorch_lightning import (
     LightningModule,
     LightningDataModule,
 )
-import tensorflow as tf
 from .package import Package
-
+import ipdb
 
 class Trainer(Package):
-    _lightning_module: LightningModule
-    _lightning_trainer: LightningTrainer
-    _keras_model: tf.keras.Model
 
-    def __init__(self, data_module, **params):
-        self.data_module = data_module
-        super().__init__(**params)
+    def __init__(self, params, *kwargs):
+        super().__init__(params, *kwargs)
 
-    def is_pl():
+    @staticmethod
+    def create(params: Bunch, root_module, base_module, map_key_values, *kwargs):
+        if "pytorch_lightning_module" in params:
+            from .lightning_trainer import LightningTrainer # importing it here avoids memory overload
+            return LightningTrainer(params, root_module, base_module, map_key_values)
+        else:
+            from .keras_trainer import KerasTrainer # importing it here avoids memory overload
+            return KerasTrainer(params, root_module, base_module, map_key_values)
+
+    def is_pl(self):
         return False
 
     def is_component(self, backbone: str, given_class: Type):
         return hasattr(given_class, "state_dict") and callable(given_class.state_dict)
 
     def fit(self) -> None:
-        if self.backbone == "lightning":
-            self._lightning_trainer.fit(
-                self._lightning_module,
-                self.data_module.train_loader(),
-                self.data_module.val_loader(),
-            )
-        elif self.backbone == "keras":
-            self._keras_model.fit(
-                self.data_module.train_loader(), self.data_module.val_loader()
-            )
+        pass
 
     def test(self) -> None:
-        if self.backbone == "lightning":
-            self._lightning_trainer.test(
-                self._lightning_module, self.data_module.test_loader()
-            )
-        elif self.backbone == "keras":
-            self._keras_model.test(self.data_module.test_loader())
+        pass
 
     def save(self, obj: Any, path: str) -> None:
         pass
 
     def load(self, obj: Any, path: str) -> None:
         pass
+
 
 
 """    
@@ -98,97 +87,6 @@ keras package structure
 │   ├── test.py
 """
 
-
-class KerasTrainer(Trainer):
-    @staticmethod
-    def is_component(given_class: Type):
-        return hasattr(given_class, "state_dict") and callable(given_class.state_dict)
-
-    model: tf.keras.Model
-
-    def _generate(self, filename: str) -> dict:
-        pass
-
-    def _parse(self, args: dict) -> tuple[tf.keras.Model, callable]:
-
-        components = tuple(
-            (key, val) for (key, val) in args.items() if val.get("is_component")
-        )
-
-        assert (
-            len(components) == 1
-        ), "Only one component can be specified in the run config"
-
-    def __init__(self, dirname: str, run_config: dict):
-        compile_config = self._generate(os.path.join(dirname, "config.py"))
-        fit_config = self._generate(os.path.join(dirname, "fit.py"))
-        test_config = self._generate(os.path.join(dirname, "test.py"))
-        self.args = {
-            "compile": compile_config,
-            "fit": fit_config,
-            "test": test_config,
-        }
-        # TODO: assert that the given run_config has the same keys as the args, recursively
-        self._parse(run_config)()
-        self.fit = self._parse(run_config)
-        self.test = self._parse(run_config)
-        self.model = self._parse(run_config)
-
-    def fit(self, train_loader, val_loader):
-        pass
-
-    def test(self, train_loader, val_loader):
-        pass
-
-    def save(self, path: str):
-        pass
-
-    def load(self, path: str):
-        pass
-
-
-class LightningTrainer(Package):
-    def __init__(
-        self, params: Bunch, root_module, base_module, map_key_values, *kwargs
-    ):
-        super().__init__(params, *kwargs)
-
-        self.install(root_module, base_module, map_key_values)
-
-    def install(self, root_module: str, base_module: str, map_key_values: dict):
-
-        assert (
-            "pytorch_lightning_module" and "trainer" and "data" in self.params
-        ), "params must contain pytorch_lightning_module, trainer and data"
-
-        # install objects from params
-        # ipdb.set_trace()
-        objects = parser.load_python_object(
-            self.params, self.params.clone(), root_module, base_module, map_key_values
-        )
-
-        self.objects = objects
-        self.trainer = objects["trainer"]
-        self.model = objects["pytorch_lightning_module"]
-        self.datamodule = objects["data"]
-
-        # rename
-
-    def is_pl(self):
-        return True
-
-    def fit(self, *args, **kwargs):
-        self.trainer.fit(self.model, datamodule=self.datamodule, *args, **kwargs)
-
-    def test(self, *args, **kwargs):
-        self.trainer.test(self.model, datamodule=self.datamodule, *args, **kwargs)
-        pass
-
-    def save(self, path: str):
-        pass
-
-    def load(self, path: str):
-        pass
 
 
 def get_trainer_from_package(backbone: str, dirname: str) -> Trainer:
