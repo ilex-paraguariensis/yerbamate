@@ -17,6 +17,8 @@ yerbamate/agnostic_trainer.py
 yerbamate/bunch.py
 yerbamate/constants.py
 yerbamate/io.py
+yerbamate/keras_trainer.py
+yerbamate/lightning_trainer.py
 yerbamate/logger.py
 yerbamate/mate.py
 yerbamate/mate_cli.py

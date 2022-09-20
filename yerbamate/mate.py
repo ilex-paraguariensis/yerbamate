@@ -10,7 +10,7 @@ from yerbamate.bunch import Bunch
 from yerbamate.migrator import Migration
 
 # from yerbamate.trainer import Trainer
-#from yerbamate import trainer as mate_trainer
+# from yerbamate import trainer as mate_trainer
 from .trainer import Trainer
 
 
@@ -40,13 +40,13 @@ class Mate:
         self.is_restart = False
         self.run_params = None
         self.custom_save_path = None
-        self.trainer: mate_trainer.Trainer = None
+        self.trainer: Trainer = None
 
     def __list_packages(self, folder: str):
         return io.list_packages(self.root_folder, folder)
 
     def experiments(self, model_name: str = None):
-        io.experiments(self.root_folder, model_name)
+        io.list_experiments(self.root_folder, model_name, True)
 
     def __update_mate_version(self):
         utils.migrate_mate_version(self.config, self.root_folder)
@@ -118,9 +118,6 @@ class Mate:
 
         return hp
 
-    def __is_pl(self, conf: Bunch):
-        return "pytorch_lightning_module" in conf
-
     def __load_experiment_conf(self, model_name: str, params_name: str):
         params = self.__read_hyperparameters(model_name, params_name)
         self.__set_save_path(model_name, params_name)
@@ -132,19 +129,18 @@ class Mate:
         if self.trainer is None:
 
             conf = self.__load_experiment_conf(model_name, params)
-            #if self.__is_pl(conf):
+
+            print(conf)
 
             map_key_value = {
                 "save_path": self.save_path,
                 "save_dir": self.save_path,
             }
             root_module = f"{self.root_folder}"
-            base_module = f"{self.root_folder}.models.{model_name}"
-            self.trainer = Trainer.create(
-                conf, root_module, base_module, map_key_value
+            base_module = io.get_experiment_base_module(
+                self.root_folder, model_name, params
             )
-            #else:
-            #    self.trainer = mate_trainer.get_trainer_from_package(model_name, params)
+            self.trainer = Trainer.create(conf, root_module, base_module, map_key_value)
 
         return self.trainer
 
@@ -183,8 +179,8 @@ class Mate:
         assert (
             model_name in self.models or model_name
         ), f'Model "{model_name}" does not exist.'
-        print(f"Training model {model_name} with hyperparameters: {parameters}.json")
-
+        
+        # print(f"Training model {model_name} with hyperparameters: {parameters}.json")
         # self.__load_experiment(model_name, parameters)
 
         # we need to load hyperparameters before training to set save_path

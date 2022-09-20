@@ -5,6 +5,7 @@ import sys
 import ipdb
 
 from yerbamate.bunch import Bunch
+from yerbamate.utils import once
 
 
 def load_json(path):
@@ -15,9 +16,20 @@ def load_json(path):
 def set_save_path(
     root_save_folder: str, root_folder: str, model_name: str, params: str
 ):
-    save_path = os.path.join(
-        root_save_folder, root_folder, "models", model_name, "results", params
-    )
+
+    # exp_path = __get_experiment_path(root_folder, model_name, params)
+    exp_module = get_experiment_base_module(root_folder, model_name, params)
+
+    if exp_module == root_folder:
+        # model name is actually the experiment name
+        save_path = os.path.join(
+            root_save_folder, root_folder, "experiments", model_name
+        )
+
+    else:
+        save_path = os.path.join(
+            root_save_folder, root_folder, "models", model_name, "experiments", params
+        )
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -32,6 +44,7 @@ def save_train_experiments(save_path, hparams: Bunch, conf: Bunch):
 
 
 def update_experiments(root_folder: str, model_name: str, params: str, hparams: Bunch):
+    path = __get_experiment_path(root_folder, model_name, params)
     with open(
         os.path.join(
             root_folder,
@@ -55,14 +68,58 @@ def override_params(config: Bunch, params: Bunch):
     return params
 
 
-# def list_experiments(root_folder: str, model_name: str):
-#     return (
-#         list_packages(root_folder, "experiments")
-#         if model_name == None
-#         else list_packages(
-#             os.path.join(root_folder, "models", model_name), "experiments"
-#         )
-#     )
+def __get_experiment_path(root_folder: str, model_name: str, experiment: str):
+
+    # ipdb.set_trace()
+
+    if experiment == "default":
+        # firt check if second level default exists
+        path = os.path.join(
+            root_folder, "models", model_name, "experiments", "default.json"
+        )
+        if os.path.exists(path):
+            return path
+
+        # if not, check if first level default exists
+        path = os.path.join(root_folder, "experiments", f"{model_name}.json")
+        if os.path.exists(path):
+            return path
+
+    path = os.path.join(
+        root_folder, "models", model_name, "experiments", f"{model_name}.json"
+    )
+
+    if os.path.exists(path):
+        return path
+    return None
+
+
+def get_experiment_base_module(root_folder: str, model_name: str, experiment: str):
+
+    if experiment == "default":
+        # firt check if second level default exists
+        if os.path.exists(
+            os.path.join(
+                root_folder, "models", model_name, "experiments", "default.json"
+            )
+        ):
+            module = [root_folder, "models", model_name].join(".")
+
+        else:
+            path = os.path.join(root_folder, "experiments", f"{model_name}.json")
+            if os.path.exists(path):
+                module = root_folder
+
+    # if not, check if first level default exists
+    elif os.path.exists(os.path.join(root_folder, model_name, f"{model_name}.json")):
+        module = [root_folder, "models", model_name].join(".")
+
+    else:
+        module = [root_folder, "models", model_name].join(".")
+    return module
+
+
+print_once = once(print)
 
 
 def read_experiments(
@@ -72,20 +129,14 @@ def read_experiments(
     hparams_name: str = "default",
     run_params: dict = None,
 ):
-    # experiments = list_experiments(root_folder)
-    # ipdb.set_trace()
 
-    # if hparams_name == "default" and os.path.exists(os.path.join()):
+    hparams_path = __get_experiment_path(root_folder, model_name, hparams_name)
+    assert hparams_path != None, f"Could not find the experiment {model_name}"
 
-    with open(
-        os.path.join(
-            root_folder,
-            "models",
-            model_name,
-            "experiments",
-            f"{hparams_name}.json",
-        )
-    ) as f:
+    exp = get_experiment_description(root_folder, model_name, hparams_name)
+    print_once(f"{exp[2]}: {exp[0]}/{exp[1]}.json")
+
+    with open(hparams_path) as f:
         hparams = json.load(f)
         env_location = os.path.join(
             root_folder,
@@ -129,6 +180,7 @@ def read_experiments(
 
 def override_run_params(hparams: Bunch, run_params: dict):
 
+    # parsed from mate {command} --param1=value1 --param2=value2
     # run params is a key value pair of parameters to override
     # keys are formatted as "model.parameters.lr"
     # values are the new values
@@ -191,13 +243,30 @@ def list_packages(root_folder: str, folder: str):
     )
 
 
-def list_experiments(root_foolder: str, log=True):
+def get_experiment_description(root_folder: str, model_name: str, experiment: str):
+    # ipdb.set_trace()
+    experiments = list_experiments(root_folder, model_name, False)
+
+    for exp in experiments:
+        if exp[1] == experiment and exp[2] == model_name:
+            return exp
+        if exp[1] == model_name and exp[2] == "experiments":
+            return exp
+    return None
+
+
+def list_experiments(root_foolder: str, model_name=None, log=True):
 
     models = list_packages(root_foolder, "models")
 
     dirs = [
         (os.path.join(root_foolder, "experiments"), "experiments"),
     ]
+
+    if model_name != None and model_name in models:
+        models = [model_name]
+        dirs = []
+
     for model in models:
         dirs.append((os.path.join(root_foolder, "models", model, "experiments"), model))
 
@@ -209,8 +278,6 @@ def list_experiments(root_foolder: str, log=True):
             for file in files:
                 if not "__" in file and ".json" in file:
                     experiments.append([dir, file.replace(".json", ""), model])
-
-    # ipdb.set_trace()
 
     if log:
         for (
@@ -224,7 +291,7 @@ def list_experiments(root_foolder: str, log=True):
     names = [x[1] for x in experiments]
     models = [x[2] for x in experiments]
 
-    return paths, names, models
+    return experiments
 
 
 def load_mate_config(path):
