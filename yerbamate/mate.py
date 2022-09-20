@@ -100,10 +100,16 @@ class Mate:
             self.root_save_folder, self.root_folder, model_name, params_name
         )
 
-    def __read_hyperparameters(self, model_name: str, hparams_name: str = "default"):
+    def __read_hyperparameters(
+        self, model_name: str, hparams_name: str = "default"
+    ):
 
         hp = io.read_experiments(
-            self.config, self.root_folder, model_name, hparams_name, self.run_params
+            self.config,
+            self.root_folder,
+            model_name,
+            hparams_name,
+            self.run_params,
         )
 
         # this function will exit the program if there are missing parameters
@@ -140,7 +146,9 @@ class Mate:
             base_module = io.get_experiment_base_module(
                 self.root_folder, model_name, params
             )
-            self.trainer = Trainer.create(conf, root_module, base_module, map_key_value)
+            self.trainer = Trainer.create(
+                conf, root_module, base_module, map_key_value
+            )
 
         return self.trainer
 
@@ -169,7 +177,9 @@ class Mate:
         trainer = self.__get_trainer(model_name, params)
 
         if self.is_restart:
-            checkpoint_path = os.path.join(self.save_path, "checkpoints", "last.ckpt")
+            checkpoint_path = os.path.join(
+                self.save_path, "checkpoints", "last.ckpt"
+            )
             trainer.fit(ckpt_path=checkpoint_path)
         else:
             trainer.fit()
@@ -187,7 +197,8 @@ class Mate:
         if not os.path.exists(checkpoint_path):
             os.mkdir(checkpoint_path)
         checkpoints = [
-            os.path.join(checkpoint_path, p) for p in os.listdir(checkpoint_path)
+            os.path.join(checkpoint_path, p)
+            for p in os.listdir(checkpoint_path)
         ]
         action = "go"
         if len(checkpoints) > 0:
@@ -205,13 +216,19 @@ class Mate:
         self.__fit(model_name, parameters)
 
     def test(self, model_name: str, params: str):
-        assert model_name in self.models, f'Model "{model_name}" does not exist.'
+        assert (
+            model_name in self.models
+        ), f'Model "{model_name}" does not exist.'
         params = "parameters" if params == "" or params == "None" else params
-        print(f"Testing model {model_name} with hyperparameters: {params}.json")
+        print(
+            f"Testing model {model_name} with hyperparameters: {params}.json"
+        )
 
         trainer = self.__get_trainer(model_name, params)
 
-        checkpoint_path = os.path.join(self.save_path, "checkpoint", "best.ckpt")
+        checkpoint_path = os.path.join(
+            self.save_path, "checkpoint", "best.ckpt"
+        )
 
         trainer.test(ckpt_path=checkpoint_path)
 
@@ -235,70 +252,11 @@ class Mate:
     def sample(self, model_name: str, params: str):
         pass
 
-    def add(self, model_name: str, repo: str):
+    def install(self, source: str, destination: str):
         """
         Adds a dependency to a model.
         """
-        mate_dir = ".mate"
-        if not os.path.exists(mate_dir):
-            os.makedirs(mate_dir, exist_ok=True)
-        os.system(f"git clone {repo} {mate_dir}")
-
-        conf = os.path.join(mate_dir, "mate.json")
-        conf = Bunch(json.load(open(conf)))
-
-        dest_dir = os.path.join(self.root_folder, "models", model_name, "modules")
-        os.makedirs(dest_dir, exist_ok=True)
-
-        shutil.copytree(os.path.join(mate_dir, conf.export), dest_dir)
-        shutil.copytree(
-            os.path.join(mate_dir, "mate.json"),
-            os.path.join(dest_dir, conf.export),
-        )
-        shutil.rmtree(mate_dir)
-
-        new_params = {}
-        for model in conf.models:
-            new_params[model["class_name"]] = model["params"]
-        old_params_files = [
-            os.path.join(self.root_folder, "models", model_name, "hyperparameters", p)
-            for p in os.listdir(
-                os.path.join(self.root_folder, "models", model_name, "hyperparameters")
-            )
-        ]
-        for old_params_file in old_params_files:
-            p = Bunch(json.load(open(old_params_file)))
-            p.update(new_params)
-            with open(old_params_file, "w") as f:
-                json.dump(p, f, indent=4)
-        print(f"Sucessfully added dependency to model {model_name}")
-
-    def install(self, repo: str, source_model: str, destination_model: str):
-        """
-        installs a package
-        """
-        source_model_base_name = (
-            source_model.split(".")[-1] if "." in source_model else source_model
-        )
-        mate_dir = ".matedir"
-        if not os.path.exists(mate_dir):
-            os.mkdir(mate_dir)
-        os.system(f"git clone {repo} {mate_dir}")
-        os.system(
-            f"mv {os.path.join(mate_dir, '*')} {os.path.join(destination_model, source_model_base_name)}"
-        )
-        new_parameters = utils.get_model_parameters(
-            os.path.join(source_model, destination_model)
-        )
-        old_params_files = [
-            os.path.join("hyperparameters", p) for p in os.listdir("hyperparameters")
-        ]
-        for old_params_file in old_params_files:
-            params_name = old_params_file.split(".")[0]
-            old_params = self.__read_hyperparameters(destination_model, params_name)
-            old_params[source_model_base_name] = new_parameters
-            with open(old_params_file, "w") as f:
-                json.dump(old_params, f)
+        io.install(self.root_folder, source, destination)
 
     def exec(self, model: str, params: str, exec_file: str):
         params = "parameters" if params == "" or params == "None" else params

@@ -4,8 +4,10 @@ import shutil
 import sys
 import ipdb
 
-from yerbamate.bunch import Bunch
-from yerbamate.utils import once
+from typing import Optional
+from .bunch import Bunch
+from .utils import once
+from .git_url_parser import GitUrlParser
 
 
 def load_json(path):
@@ -358,3 +360,12 @@ def snapshot(root_folder: str, model_name: str):
         os.path.join(root_folder, "snapshots", snapshot_name),
     )
     print(f"Created snapshot {snapshot_name}")
+
+
+def install(root_dir: str, source: str, destination:str):
+    parsed_url = GitUrlParser(source)
+    destination = ".".join((root_dir, "ciao"))
+    parsed_url.clone(destination)
+    print(
+        f'Successfully installed "{parsed_url.name}" from "{parsed_url.base_url}" into {destination}'
+    )
