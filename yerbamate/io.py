@@ -362,7 +362,7 @@ def snapshot(root_folder: str, model_name: str):
     print(f"Created snapshot {snapshot_name}")
 
 
-def install(root_dir: str, source: str, destination: Optional[str] = None):
+def install(root_dir: str, source: str, destination:str):
     parsed_url = GitUrlParser(source)
     destination = ".".join((root_dir, "ciao"))
     parsed_url.clone(destination)
