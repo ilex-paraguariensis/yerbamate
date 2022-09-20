@@ -22,8 +22,8 @@ class GenericTrainer(Trainer):
     def install(self):
 
         assert (
-            "trainer" and "data" in self.params
-        ), "params must contain trainer and data"
+            "trainer"
+        ), "params must contain trainer"
 
         root = self.params.clone()
         objects = self.parser.load_python_object(root)
