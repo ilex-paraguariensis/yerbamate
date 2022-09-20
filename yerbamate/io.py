@@ -4,10 +4,8 @@ import shutil
 import sys
 import ipdb
 
-from typing import Optional
-from .bunch import Bunch
-from .utils import once
-from .git_url_parser import GitUrlParser
+from yerbamate.bunch import Bunch
+from yerbamate.utils import once
 
 
 def load_json(path):
@@ -88,12 +86,10 @@ def __get_experiment_path(root_folder: str, model_name: str, experiment: str):
             return path
 
     path = os.path.join(
-        root_folder, "models", model_name, "experiments", f"{model_name}.json"
+        root_folder, "models", model_name, "experiments", f"{experiment}.json"
     )
 
-    if os.path.exists(path):
-        return path
-    return None
+    return path
 
 
 def get_experiment_base_module(root_folder: str, model_name: str, experiment: str):
@@ -105,19 +101,18 @@ def get_experiment_base_module(root_folder: str, model_name: str, experiment: st
                 root_folder, "models", model_name, "experiments", "default.json"
             )
         ):
-            module = [root_folder, "models", model_name].join(".")
+            return ".".join([root_folder, "models", model_name])
+
 
         else:
             path = os.path.join(root_folder, "experiments", f"{model_name}.json")
             if os.path.exists(path):
-                module = root_folder
+                return root_folder
 
     # if not, check if first level default exists
-    elif os.path.exists(os.path.join(root_folder, model_name, f"{model_name}.json")):
-        module = [root_folder, "models", model_name].join(".")
+    # ipdb.set_trace()
+    module = ".".join([root_folder, "models", model_name])
 
-    else:
-        module = [root_folder, "models", model_name].join(".")
     return module
 
 
@@ -302,7 +297,7 @@ def list_experiment_names(root_folder: str, model_name: str):
 
 
 def experiment_exists(root_folder: str, model_name: str, experiment_name: str):
-
+    # ipdb.set_trace()
     exp_path = __get_experiment_path(root_folder, model_name, experiment_name)
     return os.path.exists(exp_path)
 
@@ -360,12 +355,3 @@ def snapshot(root_folder: str, model_name: str):
         os.path.join(root_folder, "snapshots", snapshot_name),
     )
     print(f"Created snapshot {snapshot_name}")
-
-
-def install(root_dir: str, source: str, destination:str):
-    parsed_url = GitUrlParser(source)
-    destination = ".".join((root_dir, "ciao"))
-    parsed_url.clone(destination)
-    print(
-        f'Successfully installed "{parsed_url.name}" from "{parsed_url.base_url}" into {destination}'
-    )
