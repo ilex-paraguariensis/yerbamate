@@ -22,18 +22,13 @@ class GenericTrainer(Trainer):
     def install(self):
 
         assert (
-            "pytorch_lightning_module" and "trainer" and "data" in self.params
-        ), "params must contain pytorch_lightning_module, trainer and data"
+            "trainer" and "data" in self.params
+        ), "params must contain trainer and data"
 
         root = self.params.clone()
         objects = self.parser.load_python_object(root)
 
         self.objects = objects
-
-        # rename
-
-    def is_pl(self):
-        return True
 
     def fit(self, *args, **kwargs):
 
