@@ -358,3 +358,40 @@ def snapshot(root_folder: str, model_name: str):
         os.path.join(root_folder, "snapshots", snapshot_name),
     )
     print(f"Created snapshot {snapshot_name}")
+
+
+def add(source:str, destination:str):
+    mate_dir = ".mate"
+    if not os.path.exists(mate_dir):
+        os.makedirs(mate_dir, exist_ok=True)
+    os.system(f"git clone {repo} {mate_dir}")
+
+    conf = os.path.join(mate_dir, "mate.json")
+    conf = Bunch(json.load(open(conf)))
+
+    dest_dir = os.path.join(self.root_folder, "models", model_name, "modules")
+    os.makedirs(dest_dir, exist_ok=True)
+
+    shutil.copytree(os.path.join(mate_dir, conf.export), dest_dir)
+    shutil.copytree(
+        os.path.join(mate_dir, "mate.json"),
+        os.path.join(dest_dir, conf.export),
+    )
+    shutil.rmtree(mate_dir)
+
+    new_params = {}
+    for model in conf.models:
+        new_params[model["class_name"]] = model["params"]
+    old_params_files = [
+        os.path.join(self.root_folder, "models", model_name, "hyperparameters", p)
+        for p in os.listdir(
+            os.path.join(self.root_folder, "models", model_name, "hyperparameters")
+        )
+    ]
+    for old_params_file in old_params_files:
+        p = Bunch(json.load(open(old_params_file)))
+        p.update(new_params)
+        with open(old_params_file, "w") as f:
+            json.dump(p, f, indent=4)
+    print(f"Sucessfully added dependency to model {model_name}")
+
