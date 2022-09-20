@@ -10,7 +10,8 @@ from yerbamate.bunch import Bunch
 from yerbamate.migrator import Migration
 
 # from yerbamate.trainer import Trainer
-from yerbamate import trainer as mate_trainer
+#from yerbamate import trainer as mate_trainer
+from .trainer import Trainer
 
 
 import ipdb
@@ -121,7 +122,6 @@ class Mate:
         return "pytorch_lightning_module" in conf
 
     def __load_experiment_conf(self, model_name: str, params_name: str):
-        # ipdb.set_trace()
         params = self.__read_hyperparameters(model_name, params_name)
         self.__set_save_path(model_name, params_name)
         params.save_path = self.save_path
@@ -132,20 +132,19 @@ class Mate:
         if self.trainer is None:
 
             conf = self.__load_experiment_conf(model_name, params)
-            if self.__is_pl(conf):
+            #if self.__is_pl(conf):
 
-                map_key_value = {
-                    "save_path": self.save_path,
-                    "save_dir": self.save_path,
-                }
-                root_module = f"{self.root_folder}"
-                base_module = f"{self.root_folder}.models.{model_name}"
-
-                self.trainer = mate_trainer.LightningTrainer(
-                    conf, root_module, base_module, map_key_value
-                )
-            else:
-                self.trainer = mate_trainer.get_trainer_from_package(model_name, params)
+            map_key_value = {
+                "save_path": self.save_path,
+                "save_dir": self.save_path,
+            }
+            root_module = f"{self.root_folder}"
+            base_module = f"{self.root_folder}.models.{model_name}"
+            self.trainer = Trainer.create(
+                conf, root_module, base_module, map_key_value
+            )
+            #else:
+            #    self.trainer = mate_trainer.get_trainer_from_package(model_name, params)
 
         return self.trainer
 
@@ -167,7 +166,6 @@ class Mate:
         io.clone(self.root_folder, source_model, target_model)
 
     def snapshot(self, model_name: str):
-
         io.snapshot(self.root_folder, model_name)
 
     def __fit(self, model_name: str, params: str):
@@ -270,7 +268,6 @@ class Mate:
         new_params = {}
         for model in conf.models:
             new_params[model["class_name"]] = model["params"]
-        # ipdb.set_trace()
         old_params_files = [
             os.path.join(self.root_folder, "models", model_name, "hyperparameters", p)
             for p in os.listdir(
