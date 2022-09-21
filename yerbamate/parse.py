@@ -1,6 +1,3 @@
-# A parser for mate formatted nested dict values of python modules, classes and functions
-
-
 from argparse import Namespace
 import io
 import re
@@ -11,78 +8,10 @@ import json
 from .syntax import SyntaxNode, node_types
 from .syntax import Object, MethodCall
 from typing import Optional, Union, Callable
-SimpleType = Union[str, int, float, bool, None]
-
-def parse_nodes_recursive(
-    args: Union[SyntaxNode, SimpleType],
-    references: dict[str, list[SyntaxNode]],  # dict of references, will be filled up during parsing
-    objects: dict[str, SyntaxNode],  # dict of nodes of type Object, will be filled up during parsing
-    on_references_assigned: list[Callable],
-    parent: Union[SyntaxNode, dict]
-    # list of callbacks to be called when all references are assigned
-):
-    if isinstance(args, dict):
-        node : Optional[SyntaxNode] = None
-        for node_type in node_types:
-            if node_type.is_one(args):
-                node = node_type(args)
-                objects[node.object_key] = node
-                if hasattr(node_type, "reference_key"):
-                    if node.reference_key == None:
-                        node.reference_key = parent.object_key
-                    if not node.reference_key in references:
-                        references[node.reference_key] = []
-                    references[node.reference_key].append(node)
-        if node is None:
-            raise SyntaxError(f"Invalid Node:\n{json.dumps(args, indent=4)}")
-        else:
-            for key, val in args.items():
-                if key =="params":
-                    for subkey, subval in val.items():
-                        try:
-                            node.__dict__[key][subkey] = parse_nodes_recursive(
-                                subval, references, objects, on_references_assigned, node
-                            )
-                        except:
-                            ipdb.set_trace()
-                elif isinstance(val, list):
-                    node.__dict__[key] = []
-                    for item in val:
-                        node.__dict__[key].append(
-                            parse_nodes_recursive(
-                                item, references, objects, on_references_assigned, node
-                            )
-                        )
-        return node
-    else:
-        return args
-
-
-def parse_nodes(args: Bunch):
-    references = {}
-    objects = {}
-    on_references_assigned = []
-    result = {}
-    for key, value in args.items():
-        result[key] = parse_nodes_recursive(
-            value, references, objects, on_references_assigned, result
-        )
-    # the entire tree is parsed, now we can assign references
-    dictionary = {key: val._json() for key, val in objects.items()}
-    for key, val in objects.items():
-        if key in references:
-            for reference in references[key]:
-                reference._reference = val
-    ipdb.set_trace()
-    print(json.dumps(dictionary, indent=4))
-    ipdb.set_trace()
-    return result
 
 
 class Parser:
-    def __init__(
-        self, root_module: str, base_module: str, map_key_values: dict
-    ):
+    def __init__(self, root_module: str, base_module: str, map_key_values: dict):
 
         self.root_module = root_module
         self.base_module = base_module
@@ -121,18 +50,12 @@ class Parser:
             return module_class
 
         for key, value in params.items():
-            if (
-                type(value) == dict
-                and "object_key" in value
-                and not "module" in value
-            ):
+            if type(value) == dict and "object_key" in value and not "module" in value:
                 # ipdb.set_trace()
                 # find the object from the root
                 if "function_call" in value:
                     function = value["function_call"]
-                    function = getattr(
-                        self.object_dict[value["object_key"]], function
-                    )
+                    function = getattr(self.object_dict[value["object_key"]], function)
                     py_object = function(value["object_key"])
                     # object = function(value[obj])
                 else:
@@ -163,9 +86,7 @@ class Parser:
 
         assert "module" in object
         assert "class" or "function" in object
-        fromlist = (
-            [object["class"]] if "class" in object else [object["function"]]
-        )
+        fromlist = [object["class"]] if "class" in object else [object["function"]]
 
         if root_module == None:
             root_module = self.root_module
@@ -173,9 +94,7 @@ class Parser:
             base_module = self.base_module
 
         try:
-            module = __import__(
-                base_module + "." + object["module"], fromlist=fromlist
-            )
+            module = __import__(base_module + "." + object["module"], fromlist=fromlist)
         except ModuleNotFoundError:
             # now try shared imports
             try:
@@ -310,9 +229,7 @@ class Parser:
 
         assert "module" in object
 
-        object, error = self.generate_params_no_depth(
-            object, generate_default_params
-        )
+        object, error = self.generate_params_no_depth(object, generate_default_params)
         errors = [error] if error else []
 
         if "params" in object:
@@ -380,9 +297,6 @@ class Parser:
         self,
         object: Bunch,
     ):
-        uba = parse_nodes(object)
-        ipdb.set_trace()
-        """
         if "module" in object:
             model_class, obj_params = self.parse_module_class_recursive(object)
             o = model_class(**obj_params)
@@ -408,7 +322,6 @@ class Parser:
         result = self.replace_key_values_no_depth(result)
 
         return result
-        """
 
     def load_method_args(self, object: Bunch, method: str):
 

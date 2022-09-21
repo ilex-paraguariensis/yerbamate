@@ -91,22 +91,25 @@ class Node:
             )
 
 
-class MethodCall(Node):
+class ObjectReference(Node):
+    reference_key: str = ""
+    _reference: Optional[Node] = None
+
+    def __init__(self, args):
+        super().__init__(args)
+
+
+class MethodCall(ObjectReference):
     function_call: str = ""
     reference_key: Optional[str] = None
     params: Bunch = Bunch({})
 
-    def __call__(self):
-        return getattr(self._py_object, self.function_call)(**self.params)
+    def __call__(self, *args, **kwargs):
+        return getattr(self._py_object, self.function_call)(
+            *args, **(self.params | kwargs)
+        )
 
     def __init__(self, args, parent: Optional[object] = None):
-        super().__init__(args)
-
-
-class ObjectReference(Node):
-    reference_key: str = ""
-
-    def __init__(self, args):
         super().__init__(args)
 
 
@@ -116,7 +119,32 @@ class Object(Node):
     params: Bunch = Bunch({})
     method_args: Optional[dict[str, MethodCall]] = None
 
-    def __load_module(self):
+    def _load(self):
+        if self._py_object is not None:
+            class_val = self._load_module()
+            loaded_params = {}
+            for key, val in self.params.items():
+                if isinstance(val, Object):
+                    val._load()
+                    loaded_params[key] = val._py_object
+                elif isinstance(val, MethodCall):
+                    loaded_params[key] = val()
+                elif isinstance(val, ObjectReference):
+                    val._reference._load()
+                    loaded_params[key] = val._reference._py_object
+
+            self._py_object = class_val(
+                **{
+                    key: (
+                        val
+                        if not hasattr(val, "reference_key")
+                        else val._reference
+                    )
+                    for key, val in self.params.items()
+                }
+            )
+
+    def _load_module(self) -> Type:
         fromlist = self.class_name
         base_module = self.module
         module = None
@@ -158,7 +186,13 @@ class Optimizers(Node):
         super().__init__(params)
 
 
-node_types = [Object, MethodCall, ObjectReference, LRScheduler, Optimizers]
+node_types: list[Type] = [
+    Object,
+    MethodCall,
+    ObjectReference,
+    LRScheduler,
+    Optimizers,
+]
 SyntaxNode = Union[
     Object, MethodCall, ObjectReference, LRScheduler, Optimizers
 ]
