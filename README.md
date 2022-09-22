@@ -12,10 +12,9 @@ This project is still in its early stages and is not ready for production. Some 
 Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any mate class to your projects. Mate simply parses the configuration. To make your project mate compatible, you need to make a Mate configuration file. Mate works with torch and keras out of the box. Now, you might want to know: what is this configuration?!
 
 ### Mate configuration (AKA Bombilla 🧉)
-Mate defines an experiment with a configuration file, aka Bombilla, Bombilla format is an ordered dictionary describing arguments and python objects in plain json. Bombilla supports any python module; that includes all the local project level modules, installed packages (eg., tensorflow, pytorch, x_transformers, torchvision, vit_pytorch). Mate generates objects in a Bombilla with DFS search, so if you want to use and pass an object, define it first! Nate in short generates objects from a Bombilla and calls functions, for example, train, test, or fit on your trainer.
+Mate defines an experiment with a configuration file, aka Bombilla, that is a ordered dictionary describing arguments and python objects in plain json. Bombilla supports any python module; including all the local project level modules and installed py packages (eg., tensorflow, pytorch, x_transformers, torchvision, vit_pytorch). Mate generates objects in a Bombilla with DFS search. 
 
-
-**Note that all the arguments are directly passed to the object constructor, so you can use any argument that is accepted by the object. For example, in the above example, we can select any logger and pass any parameters as long as they are accepted by the object constructor.**
+**Note that all the arguments are directly passed to the object constructor, so you can use any argument that is accepted by the fucntion call. For example, in the below example, we can select any logger and pass any parameters as long as they are accepted by the object constructor.**
 
 Here you can see some examples of objects in Bombilla format:
 * custom neural network that fine tunes a pretrained resnet:
