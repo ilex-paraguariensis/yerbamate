@@ -1,6 +1,8 @@
+from yerbamate.node import Node
+from yerbamate.node import NodeDict
 from .parse import Parser
 from .package import Package
-from yerbamate import parser
+from yerbamate import generic_parser, parser
 from .bunch import Bunch
 from .trainer import Trainer
 import ipdb
@@ -12,11 +14,14 @@ class LightningTrainer(Trainer):
     ):
         super().__init__(params, *kwargs)
 
-        self.parser = Parser(
-            root_module=root_module,
-            base_module=base_module,
-            map_key_values=map_key_values,
-        )
+        Node._root_module = root_module
+        Node._base_module = base_module
+        Node._key_value_map = map_key_values
+        # self.parser = Parser(
+        #     root_module=root_module,
+        #     base_module=base_module,
+        #     map_key_values=map_key_values,
+        # )
         self.install()
 
     def install(self):
@@ -28,9 +33,12 @@ class LightningTrainer(Trainer):
         # install objects from params
         # ipdb.set_trace()
         root = self.params.clone()
-        objects = self.parser.load_python_object(root)
+
+        node = NodeDict(root)
 
         # ipdb.set_trace()
+        node.__load__()
+        objects = node()
 
         self.objects = objects
         self.trainer = objects["trainer"]

@@ -7,6 +7,8 @@ from .bunch import Bunch
 import random
 import ipdb
 
+SimpleType = Union[str, int, float, bool, None]
+
 
 class Node:
     object_key: Optional[str] = None
@@ -14,7 +16,7 @@ class Node:
     _parent = None
 
     def __init__(self, args, parent=None, **kawrgs) -> None:
-
+        self._original_keys = args.keys()
         if args is None:
             args = self._json()
         for key, val in args.items():
@@ -22,10 +24,10 @@ class Node:
 
         _parent = parent
 
-        if self.object_key is None:
-            self.object_key = "_rnd_" + "".join(  # it will start with
-                random.choice("0123456789abcdef") for n in range(25)
-            )
+        # if self.object_key is None:
+        #     self.object_key = "_rnd_" + "".join(  # it will start with
+        #         random.choice("0123456789abcdef") for n in range(25)
+        #     )
 
     def _get_python_object(self) -> object:
         pass
@@ -42,9 +44,14 @@ class Node:
                 # get the key name
                 key_name = re.search(r"{.*}", value).group(0)[1:-1]
                 # replace the value
-                dynamic_object = value.replace(
-                    "{" + key_name + "}", Node._key_value_map[key_name]
-                )
+
+                replace = Node._key_value_map[key_name]
+                # if type(replace) in SimpleType:
+                #     dynamic_object = value.replace(
+                #         "{" + key_name + "}", Node._key_value_map[key_name]
+                #     )
+                # else:
+                dynamic_object = Node._key_value_map[key_name]
                 setattr(self, key, dynamic_object)
 
         # return object
@@ -114,7 +121,7 @@ class Node:
         cur_params = {
             key: val
             for key, val in cls.__dict__.items()
-            if not key.startswith("_") and not callable(val)
+            if not key.startswith("_") and not callable(val) and type(val) != object
         }
         for base_class in cls.__bases__:
             if base_class != object:
@@ -158,7 +165,11 @@ class Node:
         else:
             super_dict = super().__dict__
             return dict(
-                {key: val for key, val in super_dict.items() if not key.startswith("_")}
+                {
+                    key: val
+                    for key, val in super_dict.items()
+                    if not key.startswith("_") and key in self._original_keys
+                }
             )
 
     # def __dict__(self):
@@ -173,33 +184,66 @@ class NodeDict(Node):
 
     def __load__(self, parent: Optional[Node] = None):
 
+        # ipdb.set_trace()
+
         for key, val in self.__dict__.items():
-            val = load_node(val, parent=self)
-            if isinstance(val, Node):
-                val.__load__(self)
-                setattr(self, key, val())
-            elif isinstance(val, list):
-                for i, item in enumerate(val):
-                    item = load_node(item, parent=self)
-                    if isinstance(item, Node):
-                        item.__load__(self)
-                        val[i] = item()
+            if not key.startswith("_") and key in self._original_keys:
+                val = load_node(val, parent=self)
+                if isinstance(val, Node):
+                    val.__load__(self)
+                    setattr(self, key, val())
+                elif isinstance(val, list):
+                    for i, item in enumerate(val):
+                        item = load_node(item, parent=self)
+                        if isinstance(item, Node):
+                            item.__load__(self)
+                            val[i] = item()
 
         self.load_dynamic_objects()
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
-        return self.__dict__
+        # ipdb.set_trace()
+        return {
+            key: val
+            for key, val in self.__dict__.items()
+            if not key.startswith("_") and key in self._original_keys
+        }
 
 
 class ObjectReference(Node):
     reference_key: str = ""
     _reference: Optional[Node] = None
 
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, parent: Optional[Node] = None, **kawrgs) -> None:
+        super().__init__(args, parent=parent, **kawrgs)
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         return Node._key_value_map[self.reference_key]
+
+
+# class MethodCall(ObjectReference):
+#     function_call: str = ""
+#     reference_key: Optional[str] = None
+#     params: Bunch = Bunch({})
+
+#     def __call__(self, parent: Optional[object] = None, *args, **kwargs):
+
+#         # first create DictNode of params
+#         ipdb.set_trace()
+#         # if self.params.is_empty():
+#         #     params = {}
+#         dictNode = NodeDict(self.params)
+#         dictNode.__load__(self)
+#         params = dictNode()
+
+#         # then call the function
+#         object = Node._key_value_map[self.reference_key]
+#         function = getattr(object, self.function_call)
+#         self._py_object = function(*args, **dictNode())
+#         return self._py_object
+
+#     def __init__(self, args, parent: Optional[object] = None):
+#         super().__init__(args)
 
 
 class MethodCall(ObjectReference):
@@ -209,34 +253,21 @@ class MethodCall(ObjectReference):
 
     def __call__(self, parent: Optional[object] = None, *args, **kwargs):
 
-        # first create DictNode of params
-        dictNode = NodeDict(self.params)
-        dictNode.__load__(self)
-
-        # then call the function
-        object = Node._key_value_map[self.reference_key]
-        function = getattr(object, self.function_call)
-        return function(*args, **dictNode())
-
-    def __init__(self, args, parent: Optional[object] = None):
-        super().__init__(args)
-
-
-class MethodCall(ObjectReference):
-    function: str = ""
-    reference_key: Optional[str] = None
-    params: Bunch = Bunch({})
-
-    def __call__(self, parent: Optional[object] = None, *args, **kwargs):
+        if self._py_object != None:
+            return self._py_object
 
         # first create DictNode of params
         dictNode = NodeDict(self.params)
         dictNode.__load__(self)
+        params = dictNode()
+        # print("method call params", params)
+        # ipdb.set_trace()
 
         # then call the function
         object = Node._key_value_map[self.reference_key]
         function = getattr(object, self.function_call)
-        return function(*args, **dictNode())
+        self._py_object = function(**params)
+        return self._py_object
 
     def __init__(self, args, parent: Optional[object] = None):
         super().__init__(args)
@@ -263,7 +294,7 @@ class Object(Node):
 
         self.post_object_creation()
 
-        return self._py_object
+        # return self._py_object
 
     def __init__(self, args: Optional[Bunch] = None):
         super().__init__(args)
@@ -284,6 +315,8 @@ class Object(Node):
         param_node = NodeDict(self.params)
 
         param_node.__load__(self)
+        
+        # ipdb.set_trace()
 
         self._py_object = module(**param_node())
 
