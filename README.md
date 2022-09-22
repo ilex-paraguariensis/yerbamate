@@ -8,6 +8,85 @@ With Maté you can add neural network model dependencies such as ResNet, CNN, RN
 This project is still in its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
 
 
+## For Coders (Developers, Researchers, and Engineers)
+Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any mate class to your projects. Mate simply parses the configuration. To make your project mate compatible, you need to make a Mate configuration file. Now, you might want to know: what is this configuration?!
+
+### Mate configuration (AKA Bombilla 🧉)
+Mate defines an experiment with a configuration file, aka Bombilla, i.e., a JSON file containing arguments of nn, trainer, optimizer, data module from any python modules; that includes all the local project level modules and installed packages eg., tensorflow, pytorch, x_transformers, torchvision, vit_pytorch. Bombilla format is an ordered dictionary describing arguments and python objects in plain json. Mate generates objects in a Bombilla with DFS search, so if you want to use and pass an object, define it first! Nate in short generates objects from a Bombilla and calls functions, for example, train, test, or fit on your trainer.
+
+
+**Note that all the arguments are directly passed to the object constructor, so you can use any argument that is accepted by the object. For example, in the above example, we can select any logger and pass any parameters as long as they are accepted by the object constructor.**
+
+Here you can see some examples of objects in Bombilla format:
+* custom neural network that fine tunes a pretrained resnet:
+```
+            "classifier": {
+                "module": "modules.resnet.fine_tune",
+                "class": "ResNetTuneModel",
+                "object_key": "classifier",
+                "params": {
+                    "num_classes": 10,
+                    "resnet": {
+                        "module": "torchvision.models",
+                        "class": "resnet18",
+                        "params": {
+                            "pretrained": true
+                        }
+                    }
+                }
+            },
+
+
+```
+* **Pytorch lightning trainer**
+
+```
+    "trainer": {
+        "module": "pytorch_lightning",
+        "class": "Trainer",
+        "params": {
+            "gpus": 1,
+            "max_epochs": 100,
+            "precision": 16,
+            "gradient_clip_val": 0.5,
+            "enable_checkpointing": true,
+            "callbacks": [
+                {
+                    "module": "pytorch_lightning.callbacks",
+                    "class": "EarlyStopping",
+                    "params": {
+                        "monitor": "val_loss",
+                        "patience": 10,
+                        "mode": "min"
+                    }
+                },
+                {
+                    "module": "pytorch_lightning.callbacks",
+                    "class": "ModelCheckpoint",
+                    "params": {
+                        "dirpath": "{save_dir}/checkpoints",
+                        "monitor": "val_loss",
+                        "save_top_k": 1,
+                        "verbose": true,
+                        "save_last": true,
+                        "mode": "min"
+                    }
+                }
+            ],
+            "logger": {
+                "module": "pytorch_lightning.loggers",
+                "class": "WandbLogger",
+                "params": {
+                    "project": "cifar10",
+                    "name": "vit_vanilla",
+                    "save_dir": "./logs",
+                    "log_model": false
+                }
+            }
+        }
+    
+```
+
 
 ## Is Maté simple to use
 A Maté project is just like any other deep learning project with Tensorflow or Pytorch, but the difference is a standard project structure. As of now Maté is a command line tool, and soon Maté commands will be accessible from a web interface. Here are some sample commands that you might need in your experiments:
