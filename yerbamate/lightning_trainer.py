@@ -37,7 +37,7 @@ class LightningTrainer(Trainer):
         self.root_node = NodeDict(root)
 
         # ipdb.set_trace()
-        self.root_node = self.root_node.__load__()
+        self.root_node.__load__()
 
         objects = self.root_node()
 
@@ -52,6 +52,7 @@ class LightningTrainer(Trainer):
         return True
 
     def fit(self, *args, **kwargs):
+        # ipdb.set_trace()
         # ipdb.set_trace()
         self.root_node.trainer_node.call_method("fit", *args, **kwargs)
         # self.trainer.fit(self.model, datamodule=self.datamodule, *args, **kwargs)

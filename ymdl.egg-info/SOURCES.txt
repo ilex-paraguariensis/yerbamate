@@ -12,13 +12,14 @@ mate/monitor.py
 mate/optimizer.py
 mate/trainer.py
 yerbamate/__init__.py
-yerbamate/agnostic_trainer.py
 yerbamate/bunch.py
 yerbamate/constants.py
+yerbamate/function_trainer.py
 yerbamate/generic_parser.py
 yerbamate/generic_trainer.py
 yerbamate/git_url_parser.py
 yerbamate/io.py
+yerbamate/jax_trainer.py
 yerbamate/keras_trainer.py
 yerbamate/lightning_trainer.py
 yerbamate/logger.py

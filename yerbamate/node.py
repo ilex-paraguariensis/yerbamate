@@ -43,7 +43,8 @@ class Node:
         # return object
 
     def post_object_creation(self):
-        if "object_key" in self.__dict__:
+        # ipdb.set_trace()
+        if "object_key" in self._original_keys:
             Node._key_value_map[self.object_key] = self._py_object
 
     def load_module(self):
@@ -87,7 +88,9 @@ class Node:
                 return {
                     key: to_json(val)
                     for key, val in obj.__dict__.items()
-                    if not key.startswith("_") and not callable(val)
+                    if not key.startswith("_")
+                    and not callable(val)
+                    and type(val) in [str, int, float, bool, dict]
                 }
             elif isinstance(obj, list):
                 return [to_json(item) for item in obj]
@@ -153,7 +156,7 @@ class Node:
         if self._py_object != None:
             return self._py_object
         else:
-            super_dict = super().__dict__
+            super_dict = self.__dict__
             super_dict = dict(
                 {
                     key: val
@@ -235,12 +238,40 @@ class MethodCall(ObjectReference):
         dictNode.__load__(self)
         params = dictNode()
         # print("method call params", params)
-        # ipdb.set_trace()
 
         # then call the function
         object = Node._key_value_map[self.reference_key]
         function = getattr(object, self.function_call)
         self._py_object = function(**params)
+        self.post_object_creation()
+        return self._py_object
+
+    def __init__(self, args, parent: Optional[object] = None):
+        super().__init__(args)
+
+
+class YetAnotherMethodCall(MethodCall):
+    function: str = ""
+    object_key: str = ""
+    params: Bunch = Bunch({})
+
+    def __call__(self, parent: Optional[object] = None, *args, **kwargs):
+
+        if self._py_object != None:
+            return self._py_object
+
+        # first create DictNode of params
+        dictNode = NodeDict(self.params)
+        dictNode.__load__(self)
+        params = dictNode()
+        # print("method call params", params)
+        # ipdb.set_trace()
+
+        # then call the function
+        object = Node._key_value_map[self.reference_key]
+        function = getattr(object, self.function)
+        self._py_object = function(**params)
+        self.post_object_creation()
         return self._py_object
 
     def __init__(self, args, parent: Optional[object] = None):
@@ -275,10 +306,20 @@ class FunctionModuleCall(Node):
     def __call__(self, *args, **kwargs):
 
         params = self._param_node()
+
+        # ipdb.set_trace()
+
         module = self.load_module()
+
         function = getattr(module, self.function)
-        obj = function(**params)
-        self._py_object = obj
+
+        _arg, _kwarg = flatten_nameless_params(params)
+
+        if _arg:
+            obj = function(*_arg, *args, **_kwarg, **kwargs)
+        else:
+            obj = function(*args, **_kwarg, **kwargs)
+        self._py_object = function(**params)
         self.post_object_creation()
         return obj
 
@@ -322,7 +363,7 @@ class Object(Node):
 
         self.param_node = NodeDict(self.params)
 
-        self.param_node.__load__(self)
+        self.param_node.__load__()
 
         # ipdb.set_trace()
 
@@ -332,6 +373,8 @@ class Object(Node):
 
         if self._py_object != None:
             return self._py_object
+
+        # ipdb.set_trace()
 
         module = self.load_module()
 
@@ -379,6 +422,7 @@ SyntaxNode = Union[
 
 def load_node(args, parent=None):
     if isinstance(args, dict):
+        # ipdb.set_trace()
         node: Optional[SyntaxNode] = None
         for node_type in node_types:
             if node_type.is_one(args):
