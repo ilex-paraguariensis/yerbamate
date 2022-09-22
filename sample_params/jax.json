@@ -1,0 +1,21 @@
+{
+    "data": {
+        "module": "data_loader.datasets",
+        "function": "mnist",
+        "object_key": "data",
+        "params": {
+            "permute_train": true
+        }
+    },
+    "train_function": {
+        "module": "trainers.mnist_classifier",
+        "function": "train",
+        "params": {
+            "datasets": "{data}",
+            "step_size": 0.001,
+            "num_epochs": 10,
+            "batch_size": 128,
+            "momentum_mass": 0.9
+        }
+    }
+}

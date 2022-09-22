@@ -1,0 +1,48 @@
+{
+    "data": {
+        "module": "data_loaders.cifar10.data_loader",
+        "function": "get_train_data_loader",
+        "object_key": "data",
+        "params": {
+            "batch_size": 128
+        }
+    },
+    "trainer": {
+        "module": "modules.resnet.resnet",
+        "function": "get_model",
+        "params": {
+            "input_shape": [
+                180,
+                180,
+                3
+            ],
+            "num_classes": 2
+        },
+        "object_key": "model",
+        "method_args": [
+            {
+                "function": "compile",
+                "params": {
+                    "optimizer": {
+                        "module": "tensorflow.keras.optimizers",
+                        "class_name": "Adam",
+                        "params": {
+                            "learning_rate": 0.001
+                        }
+                    },
+                    "loss": "binary_crossentropy",
+                    "metrics": [
+                        "accuracy"
+                    ]
+                }
+            },
+            {
+                "function": "fit",
+                "params": {
+                    "": "{data}",
+                    "epochs": 10
+                }
+            }
+        ]
+    }
+}
