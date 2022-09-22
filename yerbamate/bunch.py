@@ -22,6 +22,9 @@ class Bunch(dict):
     def has(self, key):
         return self.contains(key)
 
+    def is_empty(self):
+        return len(self.keys()) == 0
+
     def clone(self):
         return Bunch(self.to_dict())
 

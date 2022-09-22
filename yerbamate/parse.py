@@ -79,6 +79,8 @@ class Parser:
         # function = getattr(module_class, function_name)
         return module_class(**params)
 
+    
+
     # Loads a module from a dict, importing hiearchy is local -> base -> global
     def load_module(
         self, object: Bunch, base_module: str = None, root_module: str = None

@@ -1,3 +1,4 @@
+from yerbamate.node import Node
 from .parse import Parser
 from .package import Package
 from yerbamate import parser
@@ -12,31 +13,35 @@ class GenericTrainer(Trainer):
     ):
         super().__init__(params, *kwargs)
 
-        self.parser = Parser(
-            root_module=root_module,
-            base_module=base_module,
-            map_key_values=map_key_values,
-        )
+        # install objects from params
+        Node._root_module = root_module
+        Node._base_module = base_module
+        Node._key_value_map = map_key_values
         self.install()
 
     def install(self):
 
-        assert (
-            "trainer"
-        ), "params must contain trainer"
+        assert "trainer", "params must contain trainer"
 
         root = self.params.clone()
-        objects = self.parser.load_python_object(root)
+        # ipdb.set_trace()
+
+        self.root_node = NodeDict(root)
+        self.root_node = self.root_node.__load__()
+
+        objects = self.root_node()
+
+        # ipdb.set_trace()
+        self.root_node.trainer_node.call_method("compile")
 
         self.objects = objects
 
     def fit(self, *args, **kwargs):
+        # ipdb.set_trace()
+        self.root_node.trainer_node.call_method("fit", *args, **kwargs)
 
-        self.parser.call_method(self.params.trainer, "fit", *args, **kwargs)
-
-    def test(self, *args, **kwargs):
-
-        self.parser.call_method(self.params.trainer, "test", *args, **kwargs)
+    def test(self, train_loader, val_loader):
+        pass
 
     def save(self, path: str):
         pass

@@ -19,12 +19,12 @@ class Trainer(Package):
     @staticmethod
     def create(params: Bunch, root_module, base_module, map_key_values, *kwargs):
 
-        if "trainer" in params and "method_args" in params.trainer:
-            from .generic_trainer import GenericTrainer
+        # if "trainer" in params and "method_args" in params.trainer:
+        #     from .generic_trainer import GenericTrainer
 
-            return GenericTrainer(
-                params, root_module, base_module, map_key_values, *kwargs
-            )
+        #     return GenericTrainer(
+        #         params, root_module, base_module, map_key_values, *kwargs
+        #     )
 
         if "pytorch_lightning_module" in params:
             from .lightning_trainer import (

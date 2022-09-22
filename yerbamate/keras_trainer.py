@@ -1,3 +1,5 @@
+from yerbamate.node import Node
+from yerbamate.node import NodeDict
 from .package import Package
 from .trainer import Trainer
 from . import parser
@@ -6,42 +8,40 @@ import tensorflow as tf
 import ipdb
 import os
 
+
 class KerasTrainer(Package):
-    def __init__(self, params: Bunch, root_module, base_module, map_key_values, *kwargs):
+    def __init__(
+        self, params: Bunch, root_module, base_module, map_key_values, *kwargs
+    ):
 
         super().__init__(params, *kwargs)
-        assert (
-            "keras_training_module" and "data" in self.params
-        ), "params must contain keras_training_module, trainer and data"
 
         # install objects from params
-        objects = parser.load_python_object(
-            self.params, self.params.clone(), root_module, base_module, map_key_values
-        )
+        Node._root_module = root_module
+        Node._base_module = base_module
+        Node._key_value_map = map_key_values
+        self.install()
+
+    def install(self):
+
+        assert "trainer", "params must contain trainer"
+
+        root = self.params.clone()
+        # ipdb.set_trace()
+
+        self.root_node = NodeDict(root)
+        self.root_node = self.root_node.__load__()
+
+        objects = self.root_node()
+
+        # ipdb.set_trace()
+        self.root_node.trainer_node.call_method("compile")
+
         self.objects = objects
-        # self.trainer = objects["trainer"]
-        self.training_module = objects["keras_training_module"]
-        self.training_module.compile()
-        self.datamodule = objects["data"]
 
-    model: tf.keras.Model
-
-    def _generate(self, filename: str) -> dict:
-        pass
-
-    def _parse(self, args: dict) -> tuple[tf.keras.Model, callable]:
-
-        components = tuple(
-            (key, val) for (key, val) in args.items() if val.get("is_component")
-        )
-
-        assert (
-            len(components) == 1
-        ), "Only one component can be specified in the run config"
-
-    
-    def fit(self):
-        self.training_module.fit(self.datamodule.train_dataloader(), self.datamodule.val_dataloader())
+    def fit(self, *args, **kwargs):
+        # ipdb.set_trace()
+        self.root_node.trainer_node.call_method("fit", *args, **kwargs)
 
     def test(self, train_loader, val_loader):
         pass
@@ -51,5 +51,3 @@ class KerasTrainer(Package):
 
     def load(self, path: str):
         pass
-
-

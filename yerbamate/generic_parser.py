@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+
 import io
 import re
 from .bunch import Bunch
 import ipdb
 import json
-from .syntax import SyntaxNode, node_types
-from .syntax import Object, MethodCall
+from .node import SyntaxNode, node_types
+from .node import Object, MethodCall
 from typing import Optional, Union, Callable
 
 SimpleType = Union[str, int, float, bool, None]
@@ -72,6 +74,8 @@ def parse_nodes(args: Bunch):
     objects = {}
     on_references_assigned = []
     result = {}
+    # ipdb.set_trace()
+
     for key, value in args.items():
         result[key] = parse_nodes_recursive(
             value, references, objects, on_references_assigned, result
@@ -82,13 +86,17 @@ def parse_nodes(args: Bunch):
         if key in references:
             for reference in references[key]:
                 reference._reference = val
-    ipdb.set_trace()
-    print(json.dumps(dictionary, indent=4))
-    ipdb.set_trace()
+    # ipdb.set_trace()
+    # print(json.dumps(dictionary, indent=4))
+    # ipdb.set_trace()
     return result
 
 
 def test():
-    with open("test.json") as f:
+    with open("sample_params/test.json") as f:
         args = Bunch(json.load(f))
     parse_nodes(args)
+
+
+if __name__ == "__main__":
+    test()

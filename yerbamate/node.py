@@ -53,6 +53,9 @@ class Node:
         fromlist = [self.class_name] if hasattr(self, "class_name") else []
         fromlist = [getattr(self, "class")] if hasattr(self, "class") else fromlist
 
+        if hasattr(self, "function") and not hasattr(self, "class_name"):
+            fromlist = [self.function]
+
         module_list = [
             Node._base_module + "." + self.module,
             Node._root_module + "." + self.module,
@@ -217,31 +220,6 @@ class ObjectReference(Node):
         return Node._key_value_map[self.reference_key]
 
 
-# class MethodCall(ObjectReference):
-#     function_call: str = ""
-#     reference_key: Optional[str] = None
-#     params: Bunch = Bunch({})
-
-#     def __call__(self, parent: Optional[object] = None, *args, **kwargs):
-
-#         # first create DictNode of params
-#         ipdb.set_trace()
-#         # if self.params.is_empty():
-#         #     params = {}
-#         dictNode = NodeDict(self.params)
-#         dictNode.__load__(self)
-#         params = dictNode()
-
-#         # then call the function
-#         object = Node._key_value_map[self.reference_key]
-#         function = getattr(object, self.function_call)
-#         self._py_object = function(*args, **dictNode())
-#         return self._py_object
-
-#     def __init__(self, args, parent: Optional[object] = None):
-#         super().__init__(args)
-
-
 class MethodCall(ObjectReference):
     function_call: str = ""
     reference_key: Optional[str] = None
@@ -283,6 +261,54 @@ class AnonMethodCall(Node):
         return self._node()
 
 
+class FunctionModuleCall(Node):
+    function: str = ""
+    module: str = ""
+    params: Bunch = Bunch({})
+    method_args: Optional[list[AnonMethodCall]] = None
+
+    def __load__(self, parent=None) -> object:
+
+        self._param_node = NodeDict(self.params)
+        return self
+
+    def __call__(self, *args, **kwargs):
+
+        params = self._param_node()
+        module = self.load_module()
+        function = getattr(module, self.function)
+        obj = function(**params)
+        self._py_object = obj
+        self.post_object_creation()
+        return obj
+
+    def call_method(self, method_name: str, *args, **kwargs):
+        method_arg_names = [arg["function"] for arg in self.method_args]
+        assert method_name in method_arg_names
+
+        idx = method_arg_names.index(method_name)
+        method_args = self.method_args[idx]["params"]
+
+        method_args = load_node(method_args, parent=self)
+        method_args.__load__(self)
+        method_args = method_args()
+        f, p = flatten_nameless_params(method_args)
+
+        method = getattr(self._py_object, method_name)
+        return method(*args, *f, **p, **kwargs)
+
+
+def flatten_nameless_params(params: dict) -> dict:
+
+    flat = params.pop("", None)
+    flats = []
+    while flat != None:
+        flats.append(flat)
+        flat = params.pop("", None)
+
+    return flats, params
+
+
 class Object(Node):
     module: str = ""
     class_name: str = ""
@@ -322,7 +348,7 @@ class Object(Node):
         assert method_name in method_arg_names
 
         idx = method_arg_names.index(method_name)
-        method_args = self.method_args[idx]
+        method_args = self.method_args[idx]["params"]
 
         method_args = load_node(method_args, parent=self)
         method_args.__load__(self)
@@ -341,11 +367,14 @@ class AnnonymousObject(Node):
 node_types: list[Type] = [
     Object,
     MethodCall,
+    FunctionModuleCall,
     ObjectReference,
     AnonMethodCall,
     NodeDict,
 ]
-SyntaxNode = Union[Object, MethodCall, ObjectReference, AnonMethodCall, NodeDict]
+SyntaxNode = Union[
+    Object, FunctionModuleCall, MethodCall, ObjectReference, AnonMethodCall, NodeDict
+]
 
 
 def load_node(args, parent=None):

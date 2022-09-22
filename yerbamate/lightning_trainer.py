@@ -34,16 +34,17 @@ class LightningTrainer(Trainer):
         # ipdb.set_trace()
         root = self.params.clone()
 
-        node = NodeDict(root)
+        self.root_node = NodeDict(root)
 
         # ipdb.set_trace()
-        node.__load__()
-        objects = node()
+        self.root_node = self.root_node.__load__()
+
+        objects = self.root_node()
 
         self.objects = objects
-        self.trainer = objects["trainer"]
-        self.model = objects["pytorch_lightning_module"]
-        self.datamodule = objects["data"]
+        # self.trainer = objects["trainer"]
+        # self.model = objects["pytorch_lightning_module"]
+        # self.datamodule = objects["data"]
 
         # rename
 
@@ -51,10 +52,13 @@ class LightningTrainer(Trainer):
         return True
 
     def fit(self, *args, **kwargs):
-        self.trainer.fit(self.model, datamodule=self.datamodule, *args, **kwargs)
+        # ipdb.set_trace()
+        self.root_node.trainer_node.call_method("fit", *args, **kwargs)
+        # self.trainer.fit(self.model, datamodule=self.datamodule, *args, **kwargs)
 
     def test(self, *args, **kwargs):
-        self.trainer.test(self.model, datamodule=self.datamodule, *args, **kwargs)
+        # self.trainer.test(self.model, datamodule=self.datamodule, *args, **kwargs)
+        self.root_node.trainer_node.call_method("test", *args, **kwargs)
 
     def save(self, path: str):
         pass
