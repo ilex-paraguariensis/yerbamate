@@ -131,15 +131,9 @@ The `Excetuables` can be used to run a trained model.
 
 At the moment it only works on Linux and MacOS. Windows is on its way.
 
-Install the stable version via pip:
-
-```
-pip install yerbamate
-```
-
 Install the lastest dev version from git:
 ```
-git clone -b lightning https://github.com/ilex-paraguariensis/yerbamate 
+git clone https://github.com/ilex-paraguariensis/yerbamate -b v2
 cd yerbamate
 python install.py
 ```
