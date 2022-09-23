@@ -19,7 +19,6 @@ yerbamate/generic_parser.py
 yerbamate/generic_trainer.py
 yerbamate/git_url_parser.py
 yerbamate/io.py
-yerbamate/jax_trainer.py
 yerbamate/keras_trainer.py
 yerbamate/lightning_trainer.py
 yerbamate/logger.py
@@ -31,7 +30,6 @@ yerbamate/package.py
 yerbamate/package_installer.py
 yerbamate/parse.py
 yerbamate/parser.py
-yerbamate/pl-mate.py
 yerbamate/plot.py
 yerbamate/project_parser.py
 yerbamate/syntax.py
