@@ -41,6 +41,7 @@ class LightningTrainer(Trainer):
 
         objects = self.root_node()
 
+
         self.objects = objects
         # self.trainer = objects["trainer"]
         # self.model = objects["pytorch_lightning_module"]

@@ -40,6 +40,15 @@ class Node:
                 dynamic_object = Node._key_value_map[key_name]
                 setattr(self, key, dynamic_object)
 
+            if type(value) == list:
+                for i, item in enumerate(value):
+                    if type(item) == str and re.search(r"{.*}", item):
+                        # get the key name
+                        key_name = re.search(r"{.*}", item).group(0)[1:-1]
+
+                        dynamic_object = Node._key_value_map[key_name]
+                        value[i] = dynamic_object
+
         # return object
 
     def post_object_creation(self):
@@ -156,10 +165,11 @@ class Node:
         if self._py_object != None:
             return self._py_object
         else:
+
             super_dict = self.__dict__
             super_dict = dict(
                 {
-                    key: val
+                    key: val() if isinstance(val, Node) else val
                     for key, val in super_dict.items()
                     if not key.startswith("_") and key in self._original_keys
                 }
@@ -186,7 +196,7 @@ class NodeDict(Node):
                 val = load_node(val, parent=self)
                 if isinstance(val, Node):
                     val.__load__(self)
-                    setattr(self, key, val())
+                    setattr(self, key, val)
                     node_key_dict[key] = val
                 elif isinstance(val, list):
                     for i, item in enumerate(val):
@@ -198,18 +208,22 @@ class NodeDict(Node):
         for key, val in node_key_dict.items():
             setattr(self, f"{key}_node", val)
 
-        self.load_dynamic_objects()
+        # self.load_dynamic_objects()
 
         return self
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
-        self.load_dynamic_objects()
         # ipdb.set_trace()
-        return {
-            key: val
+        # for key, val in self.__dict__.items():
+        #     if isinstance(val, Node):
+        #         setattr(self, key, val())
+        self.load_dynamic_objects()
+        result = {
+            key: val if not isinstance(val, Node) else val()
             for key, val in self.__dict__.items()
             if not key.startswith("_") and key in self._original_keys
         }
+        return result
 
 
 class ObjectReference(Node):
@@ -301,13 +315,12 @@ class FunctionModuleCall(Node):
     def __load__(self, parent=None) -> object:
 
         self._param_node = NodeDict(self.params)
+        self._param_node.__load__(self)
         return self
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self):
 
         params = self._param_node()
-
-        # ipdb.set_trace()
 
         module = self.load_module()
 
@@ -316,12 +329,11 @@ class FunctionModuleCall(Node):
         _arg, _kwarg = flatten_nameless_params(params)
 
         if _arg:
-            obj = function(*_arg, *args, **_kwarg, **kwargs)
+            self._py_object = function(*_arg, **_kwarg)
         else:
-            obj = function(*args, **_kwarg, **kwargs)
-        self._py_object = function(**params)
+            self._py_object = function(**params)
         self.post_object_creation()
-        return obj
+        return self._py_object
 
     def call_method(self, method_name: str, *args, **kwargs):
         method_arg_names = [arg["function"] for arg in self.method_args]
@@ -331,6 +343,7 @@ class FunctionModuleCall(Node):
         method_args = self.method_args[idx]["params"]
 
         method_args = load_node(method_args, parent=self)
+        # ipdb.set_trace()
         method_args.__load__(self)
         method_args = method_args()
         f, p = flatten_nameless_params(method_args)
@@ -392,6 +405,8 @@ class Object(Node):
 
         idx = method_arg_names.index(method_name)
         method_args = self.method_args[idx]["params"]
+
+        # ipdb.set_trace()
 
         method_args = load_node(method_args, parent=self)
         method_args.__load__(self)
