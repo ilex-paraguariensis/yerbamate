@@ -99,6 +99,35 @@ Inside the `Data` folder, you would have your dataloaders, augmentation and prep
 
 The `Excetuables` can be used to run a trained model. 
 
+## For Coders (Developers, Researchers, and Engineers)
+Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any mate class to your projects. Mate simply parses the configuration. To make your project mate compatible, you need to make a Mate configuration file. Mate works with torch and keras out of the box. Now, you might want to know: what is this configuration?!
+
+### Mate configuration (AKA Bombilla 🧉)
+Mate defines an experiment with a configuration file, aka Bombilla, that is a ordered dictionary describing arguments and python objects in plain json. Bombilla supports any python module; including all the local project level modules and installed py packages (eg., tensorflow, pytorch, x_transformers, torchvision, vit_pytorch). Mate generates objects in a Bombilla with DFS search. 
+
+**Note that all the arguments are directly passed to the object constructor, so you can use any argument that is accepted by the fucntion call. For example, in the below example, we can select any logger and pass any parameters as long as they are accepted by the object constructor.**
+
+Here you can see some examples of objects in Bombilla format:
+* custom neural network that fine tunes a pretrained resnet:
+```
+            "classifier": {
+                "module": "modules.resnet.fine_tune",
+                "class": "ResNetTuneModel",
+                "object_key": "classifier",
+                "params": {
+                    "num_classes": 10,
+                    "resnet": {
+                        "module": "torchvision.models",
+                        "class": "resnet18",
+                        "params": {
+                            "pretrained": true
+                        }
+                    }
+                }
+            },
+
+
+```
 
 
 ## FAQ
