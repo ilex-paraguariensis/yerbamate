@@ -203,7 +203,7 @@ class NodeDict(Node):
                         item = load_node(item, parent=self)
                         if isinstance(item, Node):
                             item.__load__(self)
-                            val[i] = item()
+                            val[i] = item
 
         for key, val in node_key_dict.items():
             setattr(self, f"{key}_node", val)
@@ -213,13 +213,19 @@ class NodeDict(Node):
         return self
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
-        # ipdb.set_trace()
-        # for key, val in self.__dict__.items():
-        #     if isinstance(val, Node):
-        #         setattr(self, key, val())
+
         self.load_dynamic_objects()
+
+        def val_to_call(val):
+            if isinstance(val, Node):
+                return val()
+            elif isinstance(val, list):
+                return [val_to_call(item) for item in val]
+            else:
+                return val
+
         result = {
-            key: val if not isinstance(val, Node) else val()
+            key: val_to_call(val)
             for key, val in self.__dict__.items()
             if not key.startswith("_") and key in self._original_keys
         }
