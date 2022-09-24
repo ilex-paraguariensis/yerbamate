@@ -32,7 +32,7 @@ yerbamate/parse.py
 yerbamate/parser.py
 yerbamate/plot.py
 yerbamate/project_parser.py
-yerbamate/syntax.py
+yerbamate/test_import.py
 yerbamate/trainer.py
 yerbamate/tune_hyperparameters.py
 yerbamate/utils.py
