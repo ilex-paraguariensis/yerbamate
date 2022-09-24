@@ -1,8 +1,7 @@
-from yerbamate.node import Node
-from yerbamate.node import NodeDict
+from .node import Node, NodeDict
 from .parse import Parser
 from .package import Package
-from yerbamate import generic_parser, parser
+from . import generic_parser, parser
 from .bunch import Bunch
 from .trainer import Trainer
 import ipdb

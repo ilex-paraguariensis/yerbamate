@@ -1,25 +1,13 @@
-from curses.panel import new_panel
 import os
-from argparse import ArgumentParser, Namespace
 
-from sre_constants import ASSERT
-import yerbamate
+from .bunch import Bunch
+from .migrator import Migration
 
-
-from yerbamate.bunch import Bunch
-from yerbamate.migrator import Migration
-
-# from yerbamate.trainer import Trainer
-# from yerbamate import trainer as mate_trainer
-from .trainer import Trainer
-
-
-import ipdb
 import json
 import sys
 
-import shutil
-
+from .trainer import Trainer
+import ipdb
 
 from yerbamate import utils, parser, io, package
 

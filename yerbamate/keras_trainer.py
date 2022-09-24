@@ -1,12 +1,10 @@
-from yerbamate.node import Node
-from yerbamate.node import NodeDict
+from .node import Node, NodeDict
 from .package import Package
 from .trainer import Trainer
 from . import parser
 from .bunch import Bunch
 import tensorflow as tf
 import ipdb
-import os
 
 
 class KerasTrainer(Package):
