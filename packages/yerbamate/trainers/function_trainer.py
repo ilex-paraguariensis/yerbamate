@@ -1,8 +1,5 @@
-from yerbamate.node import Node, NodeDict, FunctionModuleCall
-from .parse import Parser
-from .package import Package
-from yerbamate import parser
-from .bunch import Bunch
+from yerbamate.parser.node import Node, NodeDict
+from yerbamate.utils.bunch import Bunch
 from .trainer import Trainer
 import ipdb
 
@@ -27,32 +24,11 @@ class FunctionTrainer(Trainer):
         # ipdb.set_trace()
 
         self.root_node = NodeDict(root)
-        # self.root_node = self.root_node.__load__()
-
-        # objects = self.root_node()
-
-        # ipdb.set_trace()
-        # self.root_node.trainer_node.call_method("compile")
-
-        # self.objects = objects
 
     def fit(self, *args, **kwargs):
-        # ipdb.set_trace()
-
-        # self.root_node()
-        # ipdb.set_trace()
-
         self.root_node.__load__()
 
-
-        # calling all the functions, in order
         self.root_node()
-
-        # self.root_node.train_function_node()
-
-        # ipdb.set_trace()
-
-        # self.root_node.trainer_node.call_method("fit", *args, **kwargs)
 
     def test(self, train_loader, val_loader):
         pass

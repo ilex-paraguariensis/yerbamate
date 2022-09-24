@@ -1,7 +1,6 @@
 import os
 
 from .utils.bunch import Bunch
-from .utils.migrator import Migration
 
 import json
 import sys
@@ -13,6 +12,7 @@ from . import io
 from .parser import parser
 
 from typing import Optional
+
 
 class Mate:
     @staticmethod
@@ -90,9 +90,7 @@ class Mate:
             self.root_save_folder, self.root_folder, model_name, params_name
         )
 
-    def __read_hyperparameters(
-        self, model_name: str, hparams_name: str = "default"
-    ):
+    def __read_hyperparameters(self, model_name: str, hparams_name: str = "default"):
 
         hp = io.read_experiments(
             self.config,
@@ -136,9 +134,7 @@ class Mate:
             base_module = io.get_experiment_base_module(
                 self.root_folder, model_name, params
             )
-            self.trainer = Trainer.create(
-                conf, root_module, base_module, map_key_value
-            )
+            self.trainer = Trainer.create(conf, root_module, base_module, map_key_value)
 
         return self.trainer
 
@@ -167,9 +163,7 @@ class Mate:
         trainer = self.__get_trainer(model_name, params)
 
         if self.is_restart:
-            checkpoint_path = os.path.join(
-                self.save_path, "checkpoints", "last.ckpt"
-            )
+            checkpoint_path = os.path.join(self.save_path, "checkpoints", "last.ckpt")
             trainer.fit(ckpt_path=checkpoint_path)
         else:
             trainer.fit()
@@ -187,8 +181,7 @@ class Mate:
         if not os.path.exists(checkpoint_path):
             os.mkdir(checkpoint_path)
         checkpoints = [
-            os.path.join(checkpoint_path, p)
-            for p in os.listdir(checkpoint_path)
+            os.path.join(checkpoint_path, p) for p in os.listdir(checkpoint_path)
         ]
         action = "go"
         if len(checkpoints) > 0:
@@ -206,19 +199,13 @@ class Mate:
         self.__fit(model_name, parameters)
 
     def test(self, model_name: str, params: str):
-        assert (
-            model_name in self.models
-        ), f'Model "{model_name}" does not exist.'
+        assert model_name in self.models, f'Model "{model_name}" does not exist.'
         params = "parameters" if params == "" or params == "None" else params
-        print(
-            f"Testing model {model_name} with hyperparameters: {params}.json"
-        )
+        print(f"Testing model {model_name} with hyperparameters: {params}.json")
 
         trainer = self.__get_trainer(model_name, params)
 
-        checkpoint_path = os.path.join(
-            self.save_path, "checkpoint", "best.ckpt"
-        )
+        checkpoint_path = os.path.join(self.save_path, "checkpoint", "best.ckpt")
 
         trainer.test(ckpt_path=checkpoint_path)
 

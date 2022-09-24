@@ -1,8 +1,7 @@
-from .node import Node, NodeDict
-from .package import Package
+from yerbamate.parser.node import Node, NodeDict
+from yerbamate.package import Package
 from .trainer import Trainer
-from . import parser
-from .bunch import Bunch
+from yerbamate.utils.bunch import Bunch
 import tensorflow as tf
 import ipdb
 

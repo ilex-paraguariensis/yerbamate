@@ -30,7 +30,6 @@ packages/yerbamate/parser/parse.py
 packages/yerbamate/parser/parser.py
 packages/yerbamate/trainers/__init__.py
 packages/yerbamate/trainers/function_trainer.py
-packages/yerbamate/trainers/generic_trainer.py
 packages/yerbamate/trainers/keras_trainer.py
 packages/yerbamate/trainers/lightning_trainer.py
 packages/yerbamate/trainers/trainer.py
