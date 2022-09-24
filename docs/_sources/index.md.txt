@@ -7,6 +7,10 @@ With Maté you can add neural network model dependencies such as ResNet, CNN, RN
 ### A word of notice
 This project is still in its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
 
+## Examples
+
+Please check out the [examples repo](https://github.com/ilex-paraguariensis/examples/).
+
 
 ## For Coders (Developers, Researchers, and Engineers)
 Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any mate class to your projects. Mate simply parses the configuration. To make your project mate compatible, you need to make a Mate configuration file. Mate works with torch and keras out of the box. Now, you might want to know: what is this configuration?!
