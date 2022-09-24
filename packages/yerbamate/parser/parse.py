@@ -1,12 +1,10 @@
 from argparse import Namespace
 import io
 import re
-from yerbamate import utils
-from yerbamate.bunch import Bunch
-import ipdb
-import json
-from .syntax import SyntaxNode, node_types
-from .syntax import Object, MethodCall
+from ..utils import utils
+from ..utils.bunch import Bunch
+# from .syntax import SyntaxNode, node_types
+# from .syntax import Object, MethodCall
 from typing import Optional, Union, Callable
 
 

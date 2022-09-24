@@ -4,8 +4,8 @@ import shutil
 import sys
 import ipdb
 
-from yerbamate.bunch import Bunch
-from yerbamate.utils import once
+from .utils.bunch import Bunch
+from .utils.utils import once
 
 
 def load_json(path):

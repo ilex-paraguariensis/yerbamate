@@ -1,8 +1,7 @@
-from .node import Node, NodeDict
-from .parse import Parser
-from .package import Package
-from . import generic_parser, parser
-from .bunch import Bunch
+from ..parser.node import Node, NodeDict
+from ..parser.parse import Parser
+from ..package import Package
+from ..utils.bunch import Bunch
 from .trainer import Trainer
 import ipdb
 

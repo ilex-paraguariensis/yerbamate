@@ -4,7 +4,7 @@ import json
 
 import regex as re
 
-from .bunch import Bunch
+from ..utils.bunch import Bunch
 import random
 import ipdb
 

@@ -5,9 +5,8 @@ from argparse import Namespace
 import io
 import re
 from typing import Callable
-from yerbamate import utils
-from yerbamate import bunch
-from yerbamate.bunch import Bunch
+from ..utils import utils
+from ..utils.bunch import Bunch
 import ipdb
 
 

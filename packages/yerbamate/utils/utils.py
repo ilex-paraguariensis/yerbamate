@@ -67,8 +67,8 @@ def get_function_parameters(
 
 def migrate_mate_version(config: Bunch, root_project: str):
 
-    from . import __version__
-    import yerbamate.migrator as migrator
+    from yerbamate import __version__
+    from . import migrator
 
     if config.mate_version == __version__:  # pragma: no cover
         return config

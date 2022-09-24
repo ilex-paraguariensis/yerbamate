@@ -1,16 +1,18 @@
 import os
 
-from .bunch import Bunch
-from .migrator import Migration
+from .utils.bunch import Bunch
+from .utils.migrator import Migration
 
 import json
 import sys
 
-from .trainer import Trainer
+from .trainers.trainer import Trainer
 import ipdb
+from .utils import utils
+from . import io
+from .parser import parser
 
-from yerbamate import utils, parser, io, package
-
+from typing import Optional
 
 class Mate:
     @staticmethod
@@ -28,12 +30,12 @@ class Mate:
         self.is_restart = False
         self.run_params = None
         self.custom_save_path = None
-        self.trainer: Trainer = None
+        self.trainer: Optional[Trainer] = None
 
     def __list_packages(self, folder: str):
         return io.list_packages(self.root_folder, folder)
 
-    def experiments(self, model_name: str = None):
+    def experiments(self, model_name: Optional[str] = None):
         io.list_experiments(self.root_folder, model_name, True)
 
     def __update_mate_version(self):

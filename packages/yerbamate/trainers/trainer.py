@@ -1,5 +1,5 @@
-from yerbamate.bunch import Bunch
-from .package import Package
+from ..utils.bunch import Bunch
+from ..package import Package
 
 
 from pickle import LONG_BINGET
@@ -8,7 +8,6 @@ import os
 
 import torch as t
 
-from .package import Package
 import ipdb
 
 
