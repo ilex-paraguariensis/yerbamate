@@ -31,9 +31,9 @@ class LightningTrainer(Trainer):
         # install objects from params
         # ipdb.set_trace()
         root = self.params.clone()
-
+        
         self.root_node = NodeDict(root)
-
+        ipdb.set_trace()
         # ipdb.set_trace()
         self.root_node.__load__()
 
