@@ -11,7 +11,7 @@ import urllib
 from typing import Union, Callable, Optional, Type
 from .utils.bunch import Bunch
 
-from yerbamate import parser
+from .bombilla import parser
 
 import inspect
 import ipdb

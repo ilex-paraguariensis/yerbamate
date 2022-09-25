@@ -9,7 +9,7 @@ from .trainers.trainer import Trainer
 import ipdb
 from .utils import utils
 from . import io
-from .parser import parser
+from .bombilla import parser
 
 from typing import Optional
 

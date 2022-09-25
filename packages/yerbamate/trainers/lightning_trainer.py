@@ -1,5 +1,5 @@
-from ..parser.node import Node, NodeDict
-from ..parser.parse import Parser
+from ..bombilla.node import Node, NodeDict
+from ..bombilla.parse import Parser
 from ..package import Package
 from ..utils.bunch import Bunch
 from .trainer import Trainer
