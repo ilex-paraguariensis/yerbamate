@@ -14,27 +14,28 @@ class KerasTrainer(Package):
         super().__init__(params, *kwargs)
 
         # install objects from params
-        Node._root_module = root_module
-        Node._base_module = base_module
-        Node._key_value_map = map_key_values
-        self.install()
+        #Node._root_module = root_module
+        #Node._base_module = base_module
+        #Node._key_value_map = map_key_values
+        #self.install()
+        self.root_node = NodeDict.create(root_module, base_module, map_key_values, params)
 
     def install(self):
 
         assert "trainer", "params must contain trainer"
 
-        root = self.params.clone()
-        # ipdb.set_trace()
+        #root = self.params.clone()
+        ## ipdb.set_trace()
 
-        self.root_node = NodeDict(root)
-        self.root_node = self.root_node.__load__()
+        #self.root_node = NodeDict(root)
+        self.root_node.__load__()
 
         objects = self.root_node()
 
         # ipdb.set_trace()
         self.root_node.trainer_node.call_method("compile")
 
-        self.objects = objects
+        # self.objects = objects
 
     def fit(self, *args, **kwargs):
         # ipdb.set_trace()
