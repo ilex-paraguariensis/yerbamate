@@ -1,4 +1,4 @@
-from bambilla import Bambilla
+from bombilla import Bombilla
 from yerbamate.package import Package
 from .trainer import Trainer
 from yerbamate.utils.bunch import Bunch

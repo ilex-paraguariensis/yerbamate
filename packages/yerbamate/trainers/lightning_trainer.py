@@ -20,7 +20,6 @@ class LightningTrainer(Trainer):
         self.install()
 
     def install(self):
-
         assert (
             "pytorch_lightning_module" and "trainer" and "data" in self.params
         ), "params must contain pytorch_lightning_module, trainer and data"
