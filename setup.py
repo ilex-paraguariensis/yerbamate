@@ -23,7 +23,8 @@ setup(
     python_requires=">=3.9",
     version="0.2.5",
     packages=find_packages("packages"),
-    package_dir={'': 'packages/'},
+    include_package_data=True,
+    package_dir={"": "packages/"},
     license="Apache License 2.0",
     license_files=("LICENSE.md",),
     classifiers=[
