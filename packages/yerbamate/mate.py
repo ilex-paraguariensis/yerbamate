@@ -9,7 +9,7 @@ from .trainers.trainer import Trainer
 import ipdb
 from .utils import utils
 from . import io
-from .bombilla import parser
+from bombilla import parser
 
 from typing import Optional
 from .project_parser.project_parser import ProjectParser
@@ -26,7 +26,7 @@ class Mate:
         self.root_folder = ""
         self.save_path = ""
         self.current_folder = os.path.dirname(__file__)
-        # self.config: Optional[MateConfig] = None
+        self.config: Optional[MateConfig] = None
         self.__findroot()
         self.__update_mate_version()
         self.models = self.__list_packages("models")
@@ -34,7 +34,7 @@ class Mate:
         self.run_params = None
         self.custom_save_path = None
         self.trainer: Optional[Trainer] = None
-        # parser = ProjectParser(self.config.backbone)
+        # parser = ProjectParser(self.config)
         # parser.check_project_structure()
 
     def __list_packages(self, folder: str):
