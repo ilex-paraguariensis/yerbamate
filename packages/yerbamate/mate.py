@@ -32,9 +32,12 @@ class Mate:
         self.run_params = None
         self.custom_save_path = None
         self.trainer: Optional[Trainer] = None
-        self.config: Optional[Bunch] = None
-        parser = ProjectParser(self.config.backbone)
-        parser.check_project_structure()
+
+        # throw an error
+
+        # self.config: Optional[Bunch] = None
+        # parser = ProjectParser(self.config.backbone)
+        # parser.check_project_structure()
 
     def __list_packages(self, folder: str):
         return io.list_packages(self.root_folder, folder)
@@ -98,6 +101,7 @@ class Mate:
     def __read_hyperparameters(
         self, model_name: str, hparams_name: str = "default"
     ):
+
 
         hp = io.read_experiments(
             self.config,

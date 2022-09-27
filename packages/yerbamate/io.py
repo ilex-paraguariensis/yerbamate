@@ -60,7 +60,8 @@ def update_experiments(root_folder: str, model_name: str, params: str, hparams: 
 
 def override_params(config: Bunch, params: Bunch):
 
-    if "override_params" in config and config.override_params["enabled"] == True:
+    # ipdb.set_trace()
+    if "override_params" in config and config["override_params"]["enabled"] == True:
         for key, value in config.override_params.items():
             if key == "enabled":
                 key = "override_params"
@@ -102,7 +103,6 @@ def get_experiment_base_module(root_folder: str, model_name: str, experiment: st
             )
         ):
             return ".".join([root_folder, "models", model_name])
-
 
         else:
             path = os.path.join(root_folder, "experiments", f"{model_name}.json")

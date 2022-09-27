@@ -1,4 +1,4 @@
-from yerbamate.parser.node import Node, NodeDict
+from bambilla import Bambilla
 from yerbamate.package import Package
 from .trainer import Trainer
 from yerbamate.utils.bunch import Bunch
@@ -13,32 +13,26 @@ class KerasTrainer(Package):
 
         super().__init__(params, *kwargs)
 
-        # install objects from params
-        Node._root_module = root_module
-        Node._base_module = base_module
-        Node._key_value_map = map_key_values
+        self.bambilla = Bambilla(
+            params,
+            root_module=root_module,
+            base_module=base_module,
+            object_key_map=map_key_values,
+        )
         self.install()
 
     def install(self):
 
         assert "trainer", "params must contain trainer"
 
-        root = self.params.clone()
-        # ipdb.set_trace()
+        self.bambilla.load()
+        self.bambilla.execute()
 
-        self.root_node = NodeDict(root)
-        self.root_node = self.root_node.__load__()
-
-        objects = self.root_node()
-
-        # ipdb.set_trace()
-        self.root_node.trainer_node.call_method("compile")
-
-        self.objects = objects
+        self.bambilla.execute_method("compile", "trainer")
 
     def fit(self, *args, **kwargs):
-        # ipdb.set_trace()
-        self.root_node.trainer_node.call_method("fit", *args, **kwargs)
+
+        self.bambilla.execute_method("fit", "trainer", *args, **kwargs)
 
     def test(self, train_loader, val_loader):
         pass
