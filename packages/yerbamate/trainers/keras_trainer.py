@@ -13,7 +13,7 @@ class KerasTrainer(Package):
 
         super().__init__(params, *kwargs)
 
-        self.bambilla = Bambilla(
+        self.bambilla = Bombilla(
             params,
             root_module=root_module,
             base_module=base_module,

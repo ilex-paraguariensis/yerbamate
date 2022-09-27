@@ -1,4 +1,4 @@
-from bambilla import Bambilla
+from bombilla import Bombilla
 
 from ..utils.bunch import Bunch
 from .trainer import Trainer
@@ -11,7 +11,7 @@ class LightningTrainer(Trainer):
     ):
         super().__init__(params, *kwargs)
 
-        self.bombilla = Bambilla(
+        self.bombilla = Bombilla(
             params,
             root_module=root_module,
             base_module=base_module,

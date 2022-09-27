@@ -4,6 +4,8 @@ import shutil
 import sys
 import ipdb
 
+from .mate_config import MateConfig
+
 from .utils.bunch import Bunch
 from .utils.utils import once
 
@@ -229,7 +231,7 @@ def find_root():
 
     # self.root_save_folder = self.root_folder
     sys.path.insert(0, os.getcwd())
-    return root_folder, Bunch(config)
+    return root_folder, config
 
 
 def list_packages(root_folder: str, folder: str):
