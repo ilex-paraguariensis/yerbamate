@@ -3,27 +3,19 @@ import ipdb
 from enum import Enum
 from ..utils.bunch import Bunch
 import json
-
-
-class Framework(Enum):
-    keras = "keras"
-    lightning = "lightning"
-    jax = "jax"
+from ..backbone_type import BackboneType
 
 
 class ProjectParser:
-    def __init__(self, backbone: str):
-        assert (
-            backbone in Framework.__members__.keys()
-        ), f"Backbone {backbone} not supported. Please use one of {Framework.__members__.keys()}"
-        self.backbone = Framework(backbone)
+    def __init__(self, backbone: BackboneType):
+        self.backbone = backbone
         # loads the correct template (which is in json format) from the backbone_templates folder
-        with open(
-            os.path.join(
-                os.path.dirname(__file__),
-                f"backbone_templates/{self.backbone.value}.json",
-            )
-        ) as f:
+        path = os.path.join(
+            os.path.dirname(__file__),
+            "backbone_templates",
+            f"{self.backbone.value}.json",
+        )
+        with open(path) as f:
             self.template = Bunch(json.load(f))
 
         assert (
@@ -49,7 +41,7 @@ class ProjectParser:
                 ProjectParser._check_template_syntax(element)
 
     def check_project_structure(self):
-        return
+        return True
         assert (
             "__init__.py" in os.listdir()
         ), "Project must have __init__.py file"
