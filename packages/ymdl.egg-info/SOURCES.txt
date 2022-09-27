@@ -32,14 +32,6 @@ packages/yerbamate/package.py
 packages/yerbamate/package_installer.py
 packages/yerbamate/_legacy/plot.py
 packages/yerbamate/_legacy/tune_hyperparameters.py
-packages/yerbamate/bombilla/.git
-packages/yerbamate/bombilla/.gitignore
-packages/yerbamate/bombilla/LICENSE
-packages/yerbamate/bombilla/__init__.py
-packages/yerbamate/bombilla/generic_parser.py
-packages/yerbamate/bombilla/node.py
-packages/yerbamate/bombilla/parse.py
-packages/yerbamate/bombilla/parser.py
 packages/yerbamate/project_parser/__init__.py
 packages/yerbamate/project_parser/_project_parser.py
 packages/yerbamate/project_parser/project_parser.py
