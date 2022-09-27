@@ -303,11 +303,11 @@ def experiment_exists(root_folder: str, model_name: str, experiment_name: str):
 
 def load_mate_config(path):
     with open(path) as f:
-        config = Bunch(json.load(f))
-        assert (
-            "results_folder" in config
-        ), 'Please add "results_folder":<path> in mate.json'
-        assert "project" in config, 'Please add "project":<project name> in mate.json'
+        config = MateConfig(json.load(f))
+        #assert (
+        #    "results_folder" in config
+        #), 'Please add "results_folder":<path> in mate.json'
+        #assert "project" in config, 'Please add "project":<project name> in mate.json'
     return config
 
 
