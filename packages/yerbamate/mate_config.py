@@ -27,13 +27,22 @@ class Config:
     def __repr__(self):
         return self.__str__()
 
+    
+    def json(self):
+        return {key: (val if not isinstance(val, Enum) else str(val)) for key, val in self.__dict__.items()}
+
+    def copy(self):
+        return self.json().copy()
+
+    
+
 
 class MateConfig(Config):
     def __init__(self, config):
         self.project = ""
         self.mate_version = ""
         self.results_folder = ""
-        self.backbone: BackboneType = BackboneType.lightning
+        # self.backbone: BackboneType = BackboneType.lightning
         self.override_params: dict[str, Any] = {}
         super().__init__(config)
 
