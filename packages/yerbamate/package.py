@@ -11,8 +11,6 @@ import urllib
 from typing import Union, Callable, Optional, Type
 from .utils.bunch import Bunch
 
-from .bombilla import parser
-
 import inspect
 import ipdb
 
@@ -119,19 +117,3 @@ class PLTrainerPackage(Package):
             description=description,
             version=version,
         )
-
-    def install_objects(self, root_module: str, base_module: str, map_key_values: dict):
-
-        assert (
-            "pytorch_lightning_module" and "trainer" and "data" in self.params
-        ), "params must contain pytorch_lightning_module, trainer and data"
-
-        # install objects from params
-        # ipdb.set_trace()
-        objects = parser.load_python_object(
-            self.params, self.params.clone(), root_module, base_module, map_key_values
-        )
-
-        self.objects = objects
-
-        return objects
