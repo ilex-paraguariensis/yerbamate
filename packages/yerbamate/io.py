@@ -60,10 +60,10 @@ def update_experiments(root_folder: str, model_name: str, params: str, hparams: 
         json.dump(hparams, f, indent=4)
 
 
-def override_params(config: Bunch, params: Bunch):
+def override_params(config: MateConfig, params: Bunch):
 
     # ipdb.set_trace()
-    if "override_params" in config and config["override_params"]["enabled"] == True:
+    if config.override_params is not None and "enabled" in config.override_params and config.override_params["enabled"]:
         for key, value in config.override_params.items():
             if key == "enabled":
                 key = "override_params"
@@ -72,9 +72,6 @@ def override_params(config: Bunch, params: Bunch):
 
 
 def __get_experiment_path(root_folder: str, model_name: str, experiment: str):
-
-    # ipdb.set_trace()
-
     if experiment == "default":
         # firt check if second level default exists
         path = os.path.join(
