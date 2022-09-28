@@ -18,7 +18,6 @@ def load_json(path):
 def set_save_path(
     root_save_folder: str, root_folder: str, model_name: str, params: str
 ):
-
     # exp_path = __get_experiment_path(root_folder, model_name, params)
     exp_module = get_experiment_base_module(root_folder, model_name, params)
 
@@ -34,7 +33,7 @@ def set_save_path(
         )
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-
+    
     return save_path
 
 
@@ -71,7 +70,8 @@ def override_params(config: MateConfig, params: Bunch):
     return params
 
 
-def __get_experiment_path(root_folder: str, model_name: str, experiment: str):
+def __get_experiment_path(root_folder: str, model_name: str, experiment_name: str):
+    """
     if experiment == "default":
         # firt check if second level default exists
         path = os.path.join(
@@ -88,7 +88,8 @@ def __get_experiment_path(root_folder: str, model_name: str, experiment: str):
     path = os.path.join(
         root_folder, "models", model_name, "experiments", f"{experiment}.json"
     )
-
+    """
+    path = os.path.join(root_folder, "experiments", f"{experiment_name}.json")
     return path
 
 
@@ -117,27 +118,11 @@ def get_experiment_base_module(root_folder: str, model_name: str, experiment: st
 
 print_once = once(print)
 
-
-def read_experiments(
-    conf: Bunch,
-    root_folder: str,
-    model_name: str,
-    hparams_name: str = "default",
-    run_params: dict = None,
-):
-
-    hparams_path = __get_experiment_path(root_folder, model_name, hparams_name)
-    assert hparams_path != None, f"Could not find the experiment {model_name}"
-
-    exp = get_experiment_description(root_folder, model_name, hparams_name)
-    print_once(f"{exp[2]}: {exp[0]}/{exp[1]}.json")
-
-    with open(hparams_path) as f:
-        hparams = json.load(f)
-        env_location = os.path.join(
-            root_folder,
-            "env.json",
-        )
+def apply_env(root_folder:str, hparams:Bunch):
+    env_location = os.path.join(
+        root_folder,
+        "env.json",
+    )
     if not os.path.exists(env_location):
         print(f"Could not find env.json in {env_location}. Created one.")
         with open(env_location, "w") as f:
@@ -164,6 +149,23 @@ def read_experiments(
         print("Updated env.json")
         # print(json.dumps(env, indent=4))
 
+def read_experiments(
+    conf: MateConfig,
+    root_folder: str,
+    model_name: str,
+    hparams_name: str = "default",
+    run_params: dict = None,
+):
+
+    hparams_path = __get_experiment_path(root_folder, model_name, hparams_name)
+    assert hparams_path != None, f"Could not find the experiment {model_name}"
+
+    #exp = get_experiment_description(root_folder, model_name, hparams_name)
+    #print_once(f"{exp[2]}: {exp[0]}/{exp[1]}.json")
+
+    with open(hparams_path) as f:
+        hparams = json.load(f)
+    
     hparams = Bunch(hparams)
     hparams = override_params(conf, hparams)
     hparams = override_run_params(hparams, run_params)
@@ -242,7 +244,6 @@ def list_packages(root_folder: str, folder: str):
 def get_experiment_description(root_folder: str, model_name: str, experiment: str):
     # ipdb.set_trace()
     experiments = list_experiments(root_folder, model_name, False)
-
     for exp in experiments:
         if exp[1] == experiment and exp[2] == model_name:
             return exp
@@ -252,7 +253,7 @@ def get_experiment_description(root_folder: str, model_name: str, experiment: st
 
 
 def list_experiments(root_foolder: str, model_name=None, log=True):
-
+    """
     models = list_packages(root_foolder, "models")
 
     dirs = [
@@ -288,7 +289,8 @@ def list_experiments(root_foolder: str, model_name=None, log=True):
     models = [x[2] for x in experiments]
 
     return experiments
-
+    """
+    return os.listdir(os.path.join(root_foolder, "experiments"))
 
 def list_experiment_names(root_folder: str, model_name: str):
     experiments = list_experiments(root_folder, None, False)
@@ -299,6 +301,13 @@ def experiment_exists(root_folder: str, model_name: str, experiment_name: str):
     # ipdb.set_trace()
     exp_path = __get_experiment_path(root_folder, model_name, experiment_name)
     return os.path.exists(exp_path)
+
+
+def assert_experiment_exists(root_folder: str, model_name: str, experiment_name: str):
+    # ipdb.set_trace()
+    exp_path = __get_experiment_path(root_folder, model_name, experiment_name)
+    
+    assert os.path.exists(exp_path), f"Experiment {exp_path} does not exist"
 
 
 def load_mate_config(path):

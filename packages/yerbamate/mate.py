@@ -34,8 +34,7 @@ class Mate:
         self.run_params = None
         self.custom_save_path = None
         self.trainer: Optional[Trainer] = None
-        # parser = ProjectParser(self.config)
-        # parser.check_project_structure()
+        ProjectParser.check_project_structure(self.root_folder)
 
     def __list_packages(self, folder: str):
         return io.list_packages(self.root_folder, folder)
@@ -174,14 +173,15 @@ class Mate:
         else:
             trainer.fit()
 
-    def train(self, model_name: str, parameters: str = "default"):
-        assert io.experiment_exists(
-            self.root_folder, model_name, parameters
-        ), f'Model "{model_name}" does not exist.'
+    def train(self, model_name: str, experiment_name: str = "default"):
+        #assert io.experiment_exists(
+        #    self.root_folder, model_name, parameters
+        #), f'Experiment "{model_name}" does not exist.'
+        io.assert_experiment_exists(self.root_folder, model_name, experiment_name)
 
         # we need to load hyperparameters before training to set save_path
-        _ = self.__read_hyperparameters(model_name, parameters)
-        self.__set_save_path(model_name, parameters)
+        _ = self.__read_hyperparameters(model_name, experiment_name)
+        self.__set_save_path(model_name, experiment_name)
 
         checkpoint_path = os.path.join(self.save_path, "checkpoints")
         if not os.path.exists(checkpoint_path):
@@ -202,7 +202,7 @@ class Mate:
                 print("Ok, exiting.")
                 return
 
-        self.__fit(model_name, parameters)
+        self.__fit(model_name, experiment_name)
 
     def test(self, model_name: str, params: str):
         assert model_name in self.models, f'Model "{model_name}" does not exist.'
@@ -216,9 +216,10 @@ class Mate:
         trainer.test(ckpt_path=checkpoint_path)
 
     def restart(self, model_name: str, params: str = "default"):
-        assert io.experiment_exists(
-            self.root_folder, model_name, params
-        ), f'Model "{model_name}" does not exist.'
+        #assert io.experiment_exists(
+        #    self.root_folder, model_name, params
+        #), f'Model "{model_name}" does not exist.'
+        io.assert_experiment_exists(self.root_folder, model_name, params)
 
         self.is_restart = True
         self.__fit(model_name, params)
