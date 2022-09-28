@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 import sys
+from typing import Optional
 import ipdb
 
 from .mate_config import MateConfig
@@ -33,11 +34,11 @@ def set_save_path(
         )
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    
+
     return save_path
 
 
-def save_train_experiments(save_path, hparams: Bunch, conf: Bunch):
+def save_train_experiments(save_path, hparams: Bunch, conf: MateConfig):
     params = hparams.copy()
     params["mate"] = conf.copy()
     with open(os.path.join(save_path, "train.json"), "w") as f:
@@ -62,7 +63,11 @@ def update_experiments(root_folder: str, model_name: str, params: str, hparams: 
 def override_params(config: MateConfig, params: Bunch):
 
     # ipdb.set_trace()
-    if config.override_params is not None and "enabled" in config.override_params and config.override_params["enabled"]:
+    if (
+        config.override_params is not None
+        and "enabled" in config.override_params
+        and config.override_params["enabled"]
+    ):
         for key, value in config.override_params.items():
             if key == "enabled":
                 key = "override_params"
@@ -118,7 +123,8 @@ def get_experiment_base_module(root_folder: str, model_name: str, experiment: st
 
 print_once = once(print)
 
-def apply_env(root_folder:str, hparams:Bunch):
+
+def apply_env(root_folder: str, hparams: Bunch):
     env_location = os.path.join(
         root_folder,
         "env.json",
@@ -149,6 +155,7 @@ def apply_env(root_folder:str, hparams:Bunch):
         print("Updated env.json")
         # print(json.dumps(env, indent=4))
 
+
 def read_experiments(
     conf: MateConfig,
     root_folder: str,
@@ -160,12 +167,12 @@ def read_experiments(
     hparams_path = __get_experiment_path(root_folder, model_name, hparams_name)
     assert hparams_path != None, f"Could not find the experiment {model_name}"
 
-    #exp = get_experiment_description(root_folder, model_name, hparams_name)
-    #print_once(f"{exp[2]}: {exp[0]}/{exp[1]}.json")
+    # exp = get_experiment_description(root_folder, model_name, hparams_name)
+    # print_once(f"{exp[2]}: {exp[0]}/{exp[1]}.json")
 
     with open(hparams_path) as f:
         hparams = json.load(f)
-    
+
     hparams = Bunch(hparams)
     hparams = override_params(conf, hparams)
     hparams = override_run_params(hparams, run_params)
@@ -212,6 +219,8 @@ def find_root():
     current_path = os.getcwd()
     found = False
     i = 0
+    root_folder = ""
+    config : Optional[MateConfig] = None
     while not found and i < 6:
 
         if os.path.exists(os.path.join(current_path, "mate.json")):
@@ -225,8 +234,9 @@ def find_root():
             current_path = os.getcwd()
             i += 1
             if current_path == "/" or i == 6:
-                print("ERROR: Could not find mate.json")
-                sys.exit(1)
+                raise Exception(
+                    "Could not find mate.json. Please make sure you are in the root folder of the project."
+                )
 
     # self.root_save_folder = self.root_folder
     sys.path.insert(0, os.getcwd())
@@ -292,6 +302,7 @@ def list_experiments(root_foolder: str, model_name=None, log=True):
     """
     return os.listdir(os.path.join(root_foolder, "experiments"))
 
+
 def list_experiment_names(root_folder: str, model_name: str):
     experiments = list_experiments(root_folder, None, False)
     return [x[1] for x in experiments]
@@ -306,17 +317,17 @@ def experiment_exists(root_folder: str, model_name: str, experiment_name: str):
 def assert_experiment_exists(root_folder: str, model_name: str, experiment_name: str):
     # ipdb.set_trace()
     exp_path = __get_experiment_path(root_folder, model_name, experiment_name)
-    
+
     assert os.path.exists(exp_path), f"Experiment {exp_path} does not exist"
 
 
 def load_mate_config(path):
     with open(path) as f:
         config = MateConfig(json.load(f))
-        #assert (
+        # assert (
         #    "results_folder" in config
-        #), 'Please add "results_folder":<path> in mate.json'
-        #assert "project" in config, 'Please add "project":<project name> in mate.json'
+        # ), 'Please add "results_folder":<path> in mate.json'
+        # assert "project" in config, 'Please add "project":<project name> in mate.json'
     return config
 
 
