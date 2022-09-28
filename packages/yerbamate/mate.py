@@ -174,9 +174,9 @@ class Mate:
             trainer.fit()
 
     def train(self, model_name: str, experiment_name: str = "default"):
-        #assert io.experiment_exists(
+        # assert io.experiment_exists(
         #    self.root_folder, model_name, parameters
-        #), f'Experiment "{model_name}" does not exist.'
+        # ), f'Experiment "{model_name}" does not exist.'
         io.assert_experiment_exists(self.root_folder, model_name, experiment_name)
 
         # we need to load hyperparameters before training to set save_path
@@ -216,9 +216,9 @@ class Mate:
         trainer.test(ckpt_path=checkpoint_path)
 
     def restart(self, model_name: str, params: str = "default"):
-        #assert io.experiment_exists(
+        # assert io.experiment_exists(
         #    self.root_folder, model_name, params
-        #), f'Model "{model_name}" does not exist.'
+        # ), f'Model "{model_name}" does not exist.'
         io.assert_experiment_exists(self.root_folder, model_name, params)
 
         self.is_restart = True
