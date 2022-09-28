@@ -35,6 +35,15 @@ class Trainer(Package):
 
             return KerasTrainer(params, root_module, base_module, map_key_values)
 
+    def generate_full_dict(self) -> tuple:
+
+        assert hasattr(self, "bombilla"), "bombilla not found"
+        full, err = self.bombilla.generate_full_dict()
+
+        # remove empty or none values from error list
+        err = [e for e in err if e is not None and len(e) > 0]
+        return full, err
+
     def is_pl(self):
         return False
 

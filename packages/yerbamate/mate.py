@@ -60,17 +60,11 @@ class Mate:
         experiment: str,
         generate_defaults: bool = False,
     ):
-        # FIXME this doesnt seem to work
         """
         Validates that all the required parameters are present in the params file
         """
 
-        root_module = f"{self.root_folder}"
-        base_module = f"{self.root_folder}.models.{model_name}"
-
-        parsed_params, errors = parser.generate_params(
-            root, base_module, root_module, generate_defaults
-        )
+        parsed_params, errors = self.trainer.generate_full_dict()
 
         if len(errors) > 0:
             print(f"Errors in {model_name}/{experiment}")
@@ -105,17 +99,36 @@ class Mate:
             self.run_params,
         )
 
-        # this function will exit the program if there are missing parameters
-        self.__validate_missing_params(hp, model_name, hparams_name)
+        # # this function will exit the program if there are missing parameters
+        # self.__validate_missing_params(hp, model_name, hparams_name)
 
-        # all params are now validated, we can update the whole generated file
-        all_params = self.__validate_missing_params(
-            hp, model_name, hparams_name, generate_defaults=True
-        )
+        # # all params are now validated, we can update the whole generated file
+        # all_params = self.__validate_missing_params(
+        #     hp, model_name, hparams_name, generate_defaults=True
+        # )
 
-        io.save_train_experiments(self.save_path, all_params, self.config)
+        # io.save_train_experiments(self.save_path, all_params, self.config)
 
         return hp
+
+    def __parse_and_validate_params(self, model_name: str, params: str):
+        assert (
+            self.trainer is not None
+        ), "Trainer must be initialized before parsing params (Bombilla is managed by Trainer)"
+
+        full, err = self.trainer.generate_full_dict()
+
+        if len(err) > 0:
+            print(f"Errors in {model_name}/{params}")
+            for error in err:
+                print(error)
+
+            # io.update_hyperparameters(self.root_folder, model_name, params, full)
+            sys.exit(1)
+
+        io.save_train_experiments(self.save_path, full, self.config)
+
+        return full
 
     def __load_experiment_conf(self, model_name: str, params_name: str):
         params = self.__read_hyperparameters(model_name, params_name)
@@ -166,6 +179,8 @@ class Mate:
     def __fit(self, model_name: str, params: str):
 
         trainer = self.__get_trainer(model_name, params)
+
+        self.__parse_and_validate_params(model_name, params)
 
         if self.is_restart:
             checkpoint_path = os.path.join(self.save_path, "checkpoints", "last.ckpt")

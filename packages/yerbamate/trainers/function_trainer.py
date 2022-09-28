@@ -11,7 +11,7 @@ class FunctionTrainer(Trainer):
         super().__init__(params, *kwargs)
 
         # install objects from params
-        self.bambilla = Bombilla(
+        self.bombilla = Bombilla(
             params,
             root_module=root_module,
             base_module=base_module,
@@ -22,7 +22,7 @@ class FunctionTrainer(Trainer):
     def install(self):
 
         assert "train_function", "params must contain train_function"
-        self.bambilla.load()
+        self.bombilla.load()
 
         # root = self.params.clone()
         # # ipdb.set_trace()
@@ -31,7 +31,7 @@ class FunctionTrainer(Trainer):
 
     def fit(self, *args, **kwargs):
 
-        self.bambilla.execute()
+        self.bombilla.execute()
 
     def test(self, train_loader, val_loader):
         pass

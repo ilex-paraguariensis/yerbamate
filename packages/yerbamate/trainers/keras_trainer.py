@@ -6,14 +6,14 @@ import tensorflow as tf
 import ipdb
 
 
-class KerasTrainer(Package):
+class KerasTrainer(Trainer):
     def __init__(
         self, params: Bunch, root_module, base_module, map_key_values, *kwargs
     ):
 
         super().__init__(params, *kwargs)
 
-        self.bambilla = Bombilla(
+        self.bombilla = Bombilla(
             params,
             root_module=root_module,
             base_module=base_module,
@@ -25,14 +25,14 @@ class KerasTrainer(Package):
 
         assert "trainer", "params must contain trainer"
 
-        self.bambilla.load()
-        self.bambilla.execute()
+        self.bombilla.load()
+        self.bombilla.execute()
 
-        self.bambilla.execute_method("compile", "trainer")
+        self.bombilla.execute_method("compile", "trainer")
 
     def fit(self, *args, **kwargs):
 
-        self.bambilla.execute_method("fit", "trainer", *args, **kwargs)
+        self.bombilla.execute_method("fit", "trainer", *args, **kwargs)
 
     def test(self, train_loader, val_loader):
         pass
