@@ -1,6 +1,5 @@
 import os
 import ipdb
-from enum import Enum
 from ..utils.bunch import Bunch
 import json
 from ..backbone_type import BackboneType
@@ -10,18 +9,55 @@ class ProjectParser:
     def __init__(self, backbone: BackboneType):
         self.backbone = backbone
         # loads the correct template (which is in json format) from the backbone_templates folder
+     
+    @staticmethod
+    def check_project_structure(root_folder:str):
+        os.chdir(root_folder)
+        template_name = "lightning"
         path = os.path.join(
             os.path.dirname(__file__),
             "backbone_templates",
-            f"{self.backbone.value}.json",
+            f"{template_name}.json",
         )
         with open(path) as f:
-            self.template = Bunch(json.load(f))
+            template = Bunch(json.load(f))
+
+        ProjectParser._check_template_syntax(template)
 
         assert (
-            "experiments" in self.template
+            "experiments" in template
         ), "Template must have experiments key"
-
+        assert (
+            "__init__.py" in os.listdir()
+        ), "Project must have __init__.py file"
+        dirs = os.listdir()
+        for key in template.keys():
+            if key not in dirs:
+                raise ValueError(
+                    f"Project missing folder: {key}"
+                )
+        # checks that all items in listdir() are folders
+        for key, val in template.items():
+            if isinstance(val, list):
+                assert os.path.isdir(key), f"{key} should be a directory"
+                dir_type = type(val[0])  # they all have te same type
+                if dir_type == dict:
+                    # check that the subdir is a module
+                    assert os.path.exists(
+                        os.path.join(key, "__init__.py")
+                    ), f"Folder {key} is not a module"
+                    folder_template = template[key]
+                    for sub_key in os.listdir(key):
+                        subdir_path = os.path.join(key, sub_key)
+                        # check if the templates says it shuld be a module
+                        if "module" in folder_template:
+                            # first check that its a module
+                            assert (
+                                os.path.isdir(subdir_path)
+                                or sub_key == "__init__.py"
+                            ), f"{sub_key} is not a folder"
+        os.chdir("..")
+       
     @staticmethod
     def _check_template_syntax(template: Bunch):
         if isinstance(template, list):
@@ -39,36 +75,7 @@ class ProjectParser:
             ), "Template must have at least one element."
             for element in template.values():
                 ProjectParser._check_template_syntax(element)
-
-    def check_project_structure(self):
-        return True
-        assert (
-            "__init__.py" in os.listdir()
-        ), "Project must have __init__.py file"
-        assert sorted(self.template.keys()) == sorted(
-            os.listdir()
-        ), "Project structure does not match the template for backbone {self.backbone.value}.\nShould be {self.template.keys()}"
-        # checks that all items in listdir() are folders
-        for key, val in self.template:
-            if isinstance(val, list):
-                assert os.path.isdir(key), f"{key} should be a directory"
-                dir_type = type(val[0])  # they all have te same type
-                if dir_type == dict:
-                    # check that the subdir is a module
-                    assert os.path.exists(
-                        os.path.join(key, "__init__.py")
-                    ), f"Folder {key} is not a module"
-                    folder_template = self.template[key]
-                    for sub_key in os.listdir(key):
-                        subdir_path = os.path.join(key, sub_key)
-                        # check if the templates says it shuld be a module
-                        if "module" in folder_template:
-                            # first check that its a module
-                            assert (
-                                os.path.isdir(subdir_path)
-                                or sub_key == "__init__.py"
-                            ), f"{sub_key} is not a folder"
-
+        
     def check_bombillas(self):
         for experiment in os.listdir("experiments"):
             pass

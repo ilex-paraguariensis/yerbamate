@@ -1,6 +1,6 @@
 {
-  "trainer": [{ "module": "pytorch_lightning", "class_name": "Trainer" }],
-  "data_loader": [
+  "trainers": [{ "module": "pytorch_lightning", "class_name": "Trainer" }],
+  "data_loaders": [
     { "module": "pytorch_lightning", "class_name": "LightningDataModule" }
   ],
   "models": [{ "module": "torch.nn", "class_name": "Module" }],
