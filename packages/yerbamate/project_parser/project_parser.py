@@ -9,9 +9,9 @@ class ProjectParser:
     def __init__(self, backbone: BackboneType):
         self.backbone = backbone
         # loads the correct template (which is in json format) from the backbone_templates folder
-     
+
     @staticmethod
-    def check_project_structure(root_folder:str):
+    def check_project_structure(root_folder: str):
         os.chdir(root_folder)
         template_name = "lightning"
         path = os.path.join(
@@ -24,18 +24,12 @@ class ProjectParser:
 
         ProjectParser._check_template_syntax(template)
 
-        assert (
-            "experiments" in template
-        ), "Template must have experiments key"
-        assert (
-            "__init__.py" in os.listdir()
-        ), "Project must have __init__.py file"
+        assert "experiments" in template, "Template must have experiments key"
+        assert "__init__.py" in os.listdir(), "Project must have __init__.py file"
         dirs = os.listdir()
         for key in template.keys():
             if key not in dirs:
-                raise ValueError(
-                    f"Project missing folder: {key}"
-                )
+                raise ValueError(f"Project missing folder: {key}")
         # checks that all items in listdir() are folders
         for key, val in template.items():
             if isinstance(val, list):
@@ -53,29 +47,22 @@ class ProjectParser:
                         if "module" in folder_template:
                             # first check that its a module
                             assert (
-                                os.path.isdir(subdir_path)
-                                or sub_key == "__init__.py"
+                                os.path.isdir(subdir_path) or sub_key == "__init__.py"
                             ), f"{sub_key} is not a folder"
         os.chdir("..")
-       
+
     @staticmethod
     def _check_template_syntax(template: Bunch):
         if isinstance(template, list):
-            assert (
-                len(template) >= 1
-            ), "Template must have at least one element."
+            assert len(template) >= 1, "Template must have at least one element."
             current_type = type(template[0])
             for element in template[1:]:
-                assert (
-                    type(element) == current_type
-                ), "Template must be homogeneous."
+                assert type(element) == current_type, "Template must be homogeneous."
         elif isinstance(template, dict):
-            assert (
-                len(template) >= 1
-            ), "Template must have at least one element."
+            assert len(template) >= 1, "Template must have at least one element."
             for element in template.values():
                 ProjectParser._check_template_syntax(element)
-        
+
     def check_bombillas(self):
         for experiment in os.listdir("experiments"):
             pass
