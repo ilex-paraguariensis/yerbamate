@@ -1,18 +1,37 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 
-Maté is a deep learning framework compatible with Pytorch and Tensorflow. It is a package and project manager for deep learning. 
-With Maté you can add neural network model dependencies such as ResNet, CNN, RNN, Transformer, and ViT variants to your projects with a simple command line. As a project manager, Maté evaluates, trains, and keeps track of your numerous experiments. Mate adds the source code of the dependencies to your project, making it fully customizable and reprodocible.
+Maté is a deep learning framework compatible with pytorch(lightning), tensorflow(keras), jax(flax). It is a package and experiment manager for deep learning.  You can use it to train, evaluate, and deploy your models. It is designed to be flexible and easy to use.  
 
+## Installation
 
-### A word of notice
-This project is still in its early stages and is not ready for production. Some features are not yet implemented, and some are not yet stable.
+```bash
+pip install yerbamate
+```
+
+## Integration
+
+To integrate Maté with your project, you might only need to move a few files to your project directory. Your project is now integrated with Maté, and with a experiment configuration file, you can use mate commands to train and evaluate your models. ()
+
+```bash
+Mate enforcers modularity and seperation of models, trainers and data processing. An empty project looks like this:
+
+```bash
+├── data
+│   
+├── experiments
+│
+├── models
+│
+├── trainers(optional)
+```
+
 
 ## Examples
 
 Please check out the [examples repo](https://github.com/ilex-paraguariensis/examples/).
 
 
-## For Coders (Developers, Researchers, and Engineers)
+## For Coders
 Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any mate class to your projects. Mate simply parses the configuration. To make your project mate compatible, you need to make a Mate configuration file. Mate works with torch and keras out of the box. Now, you might want to know: what is this configuration?!
 
 ### Mate configuration (AKA Bombilla 🧉)
