@@ -10,7 +10,7 @@ pip install yerbamate
 
 ## Integration
 
-To integrate Maté with your project, you might only need to move a few files to your project directory. Your project is now integrated with Maté, and with a experiment configuration file, you can use mate commands to train and evaluate your models. ()
+To integrate Maté with your project, you might only need to move a few files to your project directory. Mate enforcers modularity and seperation of models, trainers and data processing. With a experiment configuration file, you can use mate commands to train and evaluate your models. 
 
 ```bash
 Mate enforcers modularity and seperation of models, trainers and data processing. An empty project looks like this:

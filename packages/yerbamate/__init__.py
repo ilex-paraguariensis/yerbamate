@@ -1,4 +1,4 @@
 from importlib.metadata import version
 
-version = version("ymdl")
+version = version("yerbamate")
 __version__ = version

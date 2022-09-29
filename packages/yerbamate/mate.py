@@ -28,7 +28,7 @@ class Mate:
         self.current_folder = os.path.dirname(__file__)
         self.config: Optional[MateConfig] = None
         self.__findroot()
-        self.__update_mate_version()
+        # self.__update_mate_version()
         self.models = self.__list_packages("models")
         self.is_restart = False
         self.run_params = None

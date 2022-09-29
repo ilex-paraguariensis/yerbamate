@@ -21,7 +21,7 @@ setup(
     author_email="yerba.mate.dl@proton.me",
     url="https://github.com/ilex-paraguariensis/yerbamate",
     python_requires=">=3.9",
-    version="0.8.10",
+    version="0.8.12",
     packages=find_packages("packages", exclude=["tests"]),
     include_package_data=True,
     package_dir={"": "packages/"},
