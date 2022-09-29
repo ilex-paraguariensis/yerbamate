@@ -13,6 +13,33 @@ pip install yerbamate
 
 Please check out the [examples repo](https://github.com/ilex-paraguariensis/examples/) for examples of pytorch lightning, keras and jax.
 
+## Quick Start ⚡
+
+**Train a model**
+
+```bash
+mate train my_experiment
+```
+
+**Evaluate a model**
+
+```bash
+mate test my_experiment
+```
+
+**Run a model**
+
+```bash
+mate run feature_extraction my_experiment
+```
+
+**Clone a model**
+
+```bash
+mate clone resnet my_resnet
+```
+
+More features coming soon!
 
 
 ## What is the Maté standard?
@@ -47,27 +74,7 @@ An example of a the foolder structure of a mate project is shown below:
 ```
 
 
-## Quick Start ⚡
 
-**Train a model**
-
-```bash
-mate train my_experiment
-```
-
-**Evaluate a model**
-
-```bash
-mate test my_experiment
-```
-
-**Run a model**
-
-```bash
-mate run feature_extraction my_experiment
-```
-
-More features coming soon!
 
 
 ## For Coders
