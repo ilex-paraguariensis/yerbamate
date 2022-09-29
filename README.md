@@ -47,6 +47,27 @@ An example of a the foolder structure of a mate project is shown below:
 ```
 
 
+## Quick Start ⚡
+
+**Train a model**
+
+```bash
+mate train my_experiment
+```
+
+**Evaluate a model**
+
+```bash
+mate test my_experiment
+```
+
+**Run a model**
+
+```bash
+mate run feature_extraction my_experiment
+```
+
+More features coming soon!
 
 
 ## For Coders
