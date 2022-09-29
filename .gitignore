@@ -1,2 +1,4 @@
 __pycache__/
 .vim/
+dist/
+packages/ymdl.egg-info/
