@@ -11,8 +11,35 @@ pip install yerbamate
 
 ## Examples
 
-Please check out the [examples repo](https://github.com/ilex-paraguariensis/examples/) for examples of pytorch lightning, keras and jax.
+Please check out the (examples repo)[https://github.com/ilex-paraguariensis/examples/] for examples of pytorch lightning, keras and jax.
 
+## Quick Start ⚡
+
+**Train a model**
+
+```bash
+mate train my_experiment
+```
+
+**Evaluate a model**
+
+```bash
+mate test my_experiment
+```
+
+**Run a model**
+
+```bash
+mate run feature_extraction my_experiment
+```
+
+**Clone a model**
+
+```bash
+mate clone resnet my_resnet
+```
+
+More features coming soon!
 
 
 ## What is the Maté standard?
@@ -48,14 +75,13 @@ An example of a the foolder structure of a mate project is shown below:
 
 
 
-
 ## For Coders
 Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any mate class to your projects. Mate simply parses the configuration. To make your project mate compatible, you need to move a few files and make a Bombilla configuration file. 
 
-### Mate configuration (AKA Bombilla 🧉)
+### Mate configuration (AKA (Bombilla)[https://github.com/ilex-paraguariensis/bombilla]🧉)
 Mate defines an experiment with a configuration file, aka Bombilla, that is a ordered dictionary describing arguments and python objects in plain json. Bombilla supports any python module; including all the local project level modules and installed py packages (eg., tensorflow, pytorch, x_transformers, torchvision, vit_pytorch). Mate generates objects in a Bombilla with DFS search. 
 
-**Note that all the arguments are directly passed to the object constructor, so you can use any argument that is accepted by the fucntion call.**
+**Note that all the arguments are directly passed to the object constructor, so you can use any argument that is accepted by the function's singnature.**
 
 Here you can see some examples of objects in Bombilla format:
 * custom neural network that fine tunes a pretrained resnet:
