@@ -11,35 +11,8 @@ pip install yerbamate
 
 ## Examples
 
-Please check out the (examples repo)[https://github.com/ilex-paraguariensis/examples/] for examples of pytorch lightning, keras and jax.
+Please check out the [examples repo](https://github.com/ilex-paraguariensis/examples/) for examples of pytorch lightning, keras and jax.
 
-## Quick Start ⚡
-
-**Train a model**
-
-```bash
-mate train my_experiment
-```
-
-**Evaluate a model**
-
-```bash
-mate test my_experiment
-```
-
-**Run a model**
-
-```bash
-mate run feature_extraction my_experiment
-```
-
-**Clone a model**
-
-```bash
-mate clone resnet my_resnet
-```
-
-More features coming soon!
 
 
 ## What is the Maté standard?
@@ -78,84 +51,40 @@ An example of a the foolder structure of a mate project is shown below:
 ## For Coders
 Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any mate class to your projects. Mate simply parses the configuration. To make your project mate compatible, you need to move a few files and make a Bombilla configuration file. 
 
-### Mate configuration (AKA (Bombilla)[https://github.com/ilex-paraguariensis/bombilla]🧉)
+### Mate configuration (AKA [Bombilla](https://github.com/ilex-paraguariensis/bombilla)🧉)
 Mate defines an experiment with a configuration file, aka Bombilla, that is a ordered dictionary describing arguments and python objects in plain json. Bombilla supports any python module; including all the local project level modules and installed py packages (eg., tensorflow, pytorch, x_transformers, torchvision, vit_pytorch). Mate generates objects in a Bombilla with DFS search. 
 
-**Note that all the arguments are directly passed to the object constructor, so you can use any argument that is accepted by the function's singnature.**
-
-Here you can see some examples of objects in Bombilla format:
-* custom neural network that fine tunes a pretrained resnet:
-```
-            "classifier": {
-                "module": "modules.resnet.fine_tune",
-                "class": "ResNetTuneModel",
-                "object_key": "classifier",
-                "params": {
-                    "num_classes": 10,
-                    "resnet": {
-                        "module": "torchvision.models",
-                        "class": "resnet18",
-                        "params": {
-                            "pretrained": true
-                        }
-                    }
-                }
-            },
 
 
-```
-* **Pytorch lightning trainer**
 
-```
-    "trainer": {
-        "module": "pytorch_lightning",
-        "class": "Trainer",
-        "params": {
-            "gpus": 1,
-            "max_epochs": 100,
-            "precision": 16,
-            "gradient_clip_val": 0.5,
-            "enable_checkpointing": true,
-            "callbacks": [
-                {
-                    "module": "pytorch_lightning.callbacks",
-                    "class": "EarlyStopping",
-                    "params": {
-                        "monitor": "val_loss",
-                        "patience": 10,
-                        "mode": "min"
-                    }
-                },
-                {
-                    "module": "pytorch_lightning.callbacks",
-                    "class": "ModelCheckpoint",
-                    "params": {
-                        "dirpath": "{save_dir}/checkpoints",
-                        "monitor": "val_loss",
-                        "save_top_k": 1,
-                        "verbose": true,
-                        "save_last": true,
-                        "mode": "min"
-                    }
-                }
-            ],
-            "logger": {
-                "module": "pytorch_lightning.loggers",
-                "class": "WandbLogger",
-                "params": {
-                    "project": "cifar10",
-                    "name": "vit_vanilla",
-                    "save_dir": "./logs",
-                    "log_model": false
-                }
-            }
-        }
-    
+
+## Quick Start ⚡
+
+**Train a model**
+
+```bash
+mate train my_experiment
 ```
 
+**Evaluate a model**
 
-**More tutorials and examples will be added soon!!**
+```bash
+mate test my_experiment
+```
 
+**Run a model**
+
+```bash
+mate run feature_extraction my_experiment
+```
+
+**Clone a model**
+
+```bash
+mate clone resnet my_resnet
+```
+
+**More tutorials, features and examples will be added soon!!**
 
 
 ## FAQ
