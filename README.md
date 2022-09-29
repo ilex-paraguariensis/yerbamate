@@ -16,7 +16,7 @@ Please check out the [examples repo](https://github.com/ilex-paraguariensis/exam
 
 
 ### What is the Maté standard?
-Mate enforces modularity and seperation of three basic components of a deep learning project: models, trainers, and data loaders. Each model, data loader and trainer should be a module inside its respective folder. This allows for out-of-the-box sharing of models, data loaders, and trainers. 
+Mate enforces modularity and seperation of three basic components of a deep learning project: models, trainers(optional), and data loaders. Each model, data loader and trainer should be a module inside its respective folder. This allows for out-of-the-box sharing of models, data loaders, and trainers. 
 
 An example of a the foolder structure of a mate project is shown below:
 
