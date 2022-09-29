@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: ymdl
+Version: 0.2.5
+Summary: A cowsay clone for python in one file.
+Home-page: https://github.com/ilex-paraguariensis/yerbamate
+Author: Giulio Zani, Ali Rahimi
+Author-email: yerba.mate.dl@proton.me
+License: Apache License 2.0
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.9

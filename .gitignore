@@ -2,3 +2,5 @@ __pycache__/
 .vim/
 dist/
 ymir.egg-info/
+dist/
+packages/ymdl.egg-info/

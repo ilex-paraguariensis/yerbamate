@@ -1,0 +1,8 @@
+ipdb==0.13.9
+mate==0.2.0
+numpy==1.23.3
+pytorch_lightning==1.7.5
+PyYAML==6.0
+torch==1.12.1+cu116
+torchmetrics==0.9.3
+ymdl==0.2.5

@@ -15,16 +15,19 @@ setup(
 )
 """
 setup(
-    name="ymdl",
+    name="yerbamate",
     description="A cowsay clone for python in one file.",
     author="Giulio Zani, Ali Rahimi",
     author_email="yerba.mate.dl@proton.me",
     url="https://github.com/ilex-paraguariensis/yerbamate",
     python_requires=">=3.9",
-    version="0.2.5",
-    packages=["yerbamate","mate"],
+    version="0.8.12",
+    packages=find_packages("packages", exclude=["tests"]),
+    include_package_data=True,
+    package_dir={"": "packages/"},
     license="Apache License 2.0",
     license_files=("LICENSE.md",),
+    install_requires=["bomba"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
