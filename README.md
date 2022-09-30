@@ -22,9 +22,11 @@ Please check out the [examples repo](https://github.com/ilex-paraguariensis/exam
 
 ### What is the Maté standard?
 Maté enforces **modularity** and seperation of three basic components of a deep learning project:
+
 - models,
 - trainers(optional),
-- data loaders. 
+- data loaders
+
 Each model, data loader and trainer should be a module inside its respective folder. This allows for out-of-the-box sharing of models, data loaders, and trainers between Maté projects. 
 
 An example of a the foolder structure of a maté project is shown below:
@@ -64,11 +66,9 @@ Dear coders, we try our best to not get in your way and in fact, you do not have
 Maté defines an experiment with a configuration file, aka [Bombilla](https://github.com/ilex-paraguariensis/bombilla), that is a ordered dictionary describing arguments and python objects in plain json. [Bombilla](https://github.com/ilex-paraguariensis/bombilla) supports any python module; including all the local project level modules and installed py packages (eg., tensorflow, pytorch, x_transformers, torchvision, vit_pytorch). 
 
 
-
-
 ## Quick Start ⚡
 
-**Train a model**
+**Run an experiment/train your model**
 
 ```bash
 maté train my_experiment
@@ -102,6 +102,7 @@ maté clone resnet my_resnet
 
 ## Contact 🤝 
 
-For questions please contact:
 
-yerba.maté.dl(at)proton.me
+- yerba.maté.dl(at)proton.me
+- [@mate_dl](https://twitter.com/mate_dl)
+
