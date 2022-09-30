@@ -1,9 +1,9 @@
 ## Maté 🧉
 
-Maté is a deep learning template project and framework compatible with [PyTorch](https://pytorch.org/) ([Lightning](https://www.pytorchlightning.ai/)), [TensorFlow](https://www.tensorflow.org/) ([Keras](https://keras.io/)), and [Jax](https://github.com/google/jax) ([Flax](https://github.com/google/flax)). It is a package and experiment manager for deep learning. 
+Maté is a deep learning template project and framework compatible with [PyTorch](https://pytorch.org/) ([Lightning](https://www.pytorchlightning.ai/)), [TensorFlow](https://www.tensorflow.org/) ([Keras](https://keras.io/)), and [Jax](https://github.com/google/jax) ([Flax](https://github.com/google/flax)). Maté is a package and experiment manager for deep learning. 
 
 
-As a package manager, you can add AI models, trainers/training loops, and data loaders to your projects as dependencies.
+As a package manager, you can add AI models, trainers/training loops, and data loaders to your projects as dependencies. (coming soon!)
 
 
 As a project manager, Maté evaluates, trains, and keeps track of your experiments. In addition, Maté adds the source code of the dependencies to your project, making it fully customizable and reproducible.
@@ -20,9 +20,16 @@ Please check out the [examples repo](https://github.com/ilex-paraguariensis/exam
 
 ## Core Principles
 
-- **Modularity**: Divide your project into sharable (python) modules.
-- **Reproducibility**: Through just one (JSON) file you can reproduce an entire experiment all all its hyperparameters
-- 🧉 is **intuitive** and **flexible**: no need to add boilerplate code, just take it away!
+- **Modularity**: Divide your project into re-usable/sharable (python) modules.
+- **Single Source of Truth**: Maté uses a single JSON configuration file to define an experiment with all the hyperparameters defined there.
+- **Don't Get in Developers Way**: Maté tries its best to not get in your way and in fact, you do not have to integrate or import any maté class to your projects. Maté do not enforce any coding style, and only has a loose modular project structure.
+
+## What does Maté offer?
+
+- **Reproducibility**: Out-of-the-box Maté projects are fully reproducible. You can share your project with anyone and they can run the same experiments as you did.
+- **Reusability and Shareability**: Maté offers reusability/shareability of any modules (e.g., trainers, models and data loaders) between Maté projets.
+- **Customizability**: Maté is fully compatible with any framework. For example in case you use pytorch-lightning, out of the box you can use W&B, Tensorboard, or any other pytorch-lightning logger.
+
 
 ### What is the Maté standard?
 
