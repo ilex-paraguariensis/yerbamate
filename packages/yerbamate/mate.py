@@ -14,7 +14,7 @@ from bombilla import parser
 from typing import Optional
 from .project_parser.project_parser import ProjectParser
 from .mate_config import MateConfig
-
+from .mateboard.mateboard import MateBoard
 
 class Mate:
     @staticmethod
@@ -28,7 +28,6 @@ class Mate:
         self.current_folder = os.path.dirname(__file__)
         self.config: Optional[MateConfig] = None
         self.__findroot()
-        # self.__update_mate_version()
         self.models = self.__list_packages("models")
         self.is_restart = False
         self.run_params = None
@@ -36,11 +35,122 @@ class Mate:
         self.trainer: Optional[Trainer] = None
         ProjectParser.check_project_structure(self.root_folder)
 
-    def __list_packages(self, folder: str):
-        return io.list_packages(self.root_folder, folder)
-
     def experiments(self, model_name: Optional[str] = None):
         io.list_experiments(self.root_folder, model_name, True)
+
+    def create(self, path: str):
+        pass
+
+    def remove(self, model_name: str):
+        io.remove(self.root_folder, model_name)
+
+    def list(self, folder: str):
+
+        if folder == "experiments":
+            io.list_experiments(self.root_folder)
+            return
+
+        io.list(self.root_folder, folder)
+
+    def clone(self, source_model: str, target_model: str):
+        io.clone(self.root_folder, source_model, target_model)
+
+    def snapshot(self, model_name: str):
+        io.snapshot(self.root_folder, model_name)
+
+    def train(self, model_name: str, experiment_name: str = "default"):
+        # assert io.experiment_exists(
+        #    self.root_folder, model_name, parameters
+        # ), f'Experiment "{model_name}" does not exist.'
+        io.assert_experiment_exists(self.root_folder, model_name, experiment_name)
+
+        # we need to load hyperparameters before training to set save_path
+        _ = self.__read_hyperparameters(model_name, experiment_name)
+        self.__set_save_path(model_name, experiment_name)
+
+        checkpoint_path = os.path.join(self.save_path, "checkpoints")
+        if not os.path.exists(checkpoint_path):
+            os.mkdir(checkpoint_path)
+        checkpoints = [
+            os.path.join(checkpoint_path, p) for p in os.listdir(checkpoint_path)
+        ]
+        action = "go"
+        if len(checkpoints) > 0:
+            while action not in ("y", "n", ""):
+                action = input(
+                    "Checkpiont file exists. Re-training will erase it. Continue? ([y]/n)\n"
+                )
+            if action in ("y", "", "Y"):
+                for checkpoint in checkpoints:
+                    os.remove(checkpoint)  # remove all checkpoint files
+            else:
+                print("Ok, exiting.")
+                return
+
+        self.__fit(model_name, experiment_name)
+
+    def test(self, model_name: str, params: str):
+        assert model_name in self.models, f'Model "{model_name}" does not exist.'
+        params = "parameters" if params == "" or params == "None" else params
+        print(f"Testing model {model_name} with hyperparameters: {params}.json")
+
+        trainer = self.__get_trainer(model_name, params)
+
+        checkpoint_path = os.path.join(self.save_path, "checkpoint", "best.ckpt")
+
+        trainer.test(ckpt_path=checkpoint_path)
+
+    def restart(self, model_name: str, params: str = "default"):
+        # assert io.experiment_exists(
+        #    self.root_folder, model_name, params
+        # ), f'Model "{model_name}" does not exist.'
+        io.assert_experiment_exists(self.root_folder, model_name, params)
+
+        self.is_restart = True
+        self.__fit(model_name, params)
+
+    def tune(self, model: str, params: tuple[str, ...]):
+        """
+        Fine tunes specified hyperparameters. (Not implemented yet)
+        """
+        pass
+
+    def generate(self, model_name: str, params: str):
+        pass
+
+    def sample(self, model_name: str, params: str):
+        pass
+
+    def install(self, source: str, destination: str):
+        """
+        Adds a dependency to a model.
+        """
+        io.install(self.root_folder, source, destination)
+
+    def exec(self, model: str, params: str, exec_file: str):
+        params = "parameters" if params == "" or params == "None" else params
+        print(f"Executing model {model} with result of: {params}")
+        _, model, _ = self.__get_trainer(model, params)
+
+        self.__load_exec_function(exec_file)(model)
+
+    def export(self):
+        models = self.config.models
+        for model in models:
+            params = self.__populate_model_params(model)
+            model["params"] = params
+        # save params to mate.json
+        with open("mate.json", "w") as f:
+            json.dump(self.config, f, indent=4)
+
+        print("Exported models to mate.json")
+
+    def board(self):
+        board = MateBoard()
+        board.start()
+
+    def __list_packages(self, folder: str):
+        return io.list_packages(self.root_folder, folder)
 
     def __update_mate_version(self):
         utils.migrate_mate_version(self.config, self.root_folder)
@@ -156,26 +266,6 @@ class Mate:
 
         return self.trainer
 
-    def create(self, path: str):
-        pass
-
-    def remove(self, model_name: str):
-        io.remove(self.root_folder, model_name)
-
-    def list(self, folder: str):
-
-        if folder == "experiments":
-            io.list_experiments(self.root_folder)
-            return
-
-        io.list(self.root_folder, folder)
-
-    def clone(self, source_model: str, target_model: str):
-        io.clone(self.root_folder, source_model, target_model)
-
-    def snapshot(self, model_name: str):
-        io.snapshot(self.root_folder, model_name)
-
     def __fit(self, model_name: str, params: str):
 
         trainer = self.__get_trainer(model_name, params)
@@ -187,93 +277,6 @@ class Mate:
             trainer.fit(ckpt_path=checkpoint_path)
         else:
             trainer.fit()
-
-    def train(self, model_name: str, experiment_name: str = "default"):
-        # assert io.experiment_exists(
-        #    self.root_folder, model_name, parameters
-        # ), f'Experiment "{model_name}" does not exist.'
-        io.assert_experiment_exists(self.root_folder, model_name, experiment_name)
-
-        # we need to load hyperparameters before training to set save_path
-        _ = self.__read_hyperparameters(model_name, experiment_name)
-        self.__set_save_path(model_name, experiment_name)
-
-        checkpoint_path = os.path.join(self.save_path, "checkpoints")
-        if not os.path.exists(checkpoint_path):
-            os.mkdir(checkpoint_path)
-        checkpoints = [
-            os.path.join(checkpoint_path, p) for p in os.listdir(checkpoint_path)
-        ]
-        action = "go"
-        if len(checkpoints) > 0:
-            while action not in ("y", "n", ""):
-                action = input(
-                    "Checkpiont file exists. Re-training will erase it. Continue? ([y]/n)\n"
-                )
-            if action in ("y", "", "Y"):
-                for checkpoint in checkpoints:
-                    os.remove(checkpoint)  # remove all checkpoint files
-            else:
-                print("Ok, exiting.")
-                return
-
-        self.__fit(model_name, experiment_name)
-
-    def test(self, model_name: str, params: str):
-        assert model_name in self.models, f'Model "{model_name}" does not exist.'
-        params = "parameters" if params == "" or params == "None" else params
-        print(f"Testing model {model_name} with hyperparameters: {params}.json")
-
-        trainer = self.__get_trainer(model_name, params)
-
-        checkpoint_path = os.path.join(self.save_path, "checkpoint", "best.ckpt")
-
-        trainer.test(ckpt_path=checkpoint_path)
-
-    def restart(self, model_name: str, params: str = "default"):
-        # assert io.experiment_exists(
-        #    self.root_folder, model_name, params
-        # ), f'Model "{model_name}" does not exist.'
-        io.assert_experiment_exists(self.root_folder, model_name, params)
-
-        self.is_restart = True
-        self.__fit(model_name, params)
-
-    def tune(self, model: str, params: tuple[str, ...]):
-        """
-        Fine tunes specified hyperparameters. (Not implemented yet)
-        """
-        pass
-
-    def generate(self, model_name: str, params: str):
-        pass
-
-    def sample(self, model_name: str, params: str):
-        pass
-
-    def install(self, source: str, destination: str):
-        """
-        Adds a dependency to a model.
-        """
-        io.install(self.root_folder, source, destination)
-
-    def exec(self, model: str, params: str, exec_file: str):
-        params = "parameters" if params == "" or params == "None" else params
-        print(f"Executing model {model} with result of: {params}")
-        _, model, _ = self.__get_trainer(model, params)
-
-        self.__load_exec_function(exec_file)(model)
-
-    def export(self):
-        models = self.config.models
-        for model in models:
-            params = self.__populate_model_params(model)
-            model["params"] = params
-        # save params to mate.json
-        with open("mate.json", "w") as f:
-            json.dump(self.config, f, indent=4)
-
-        print("Exported models to mate.json")
 
     def __export_model(self, model: str):
         export_root = os.path.join(self.root_folder, "export")

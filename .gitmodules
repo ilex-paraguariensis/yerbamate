@@ -1,0 +1,3 @@
+[submodule "packages/yerbamate/mateboard"]
+	path = packages/yerbamate/mateboard
+	url = https://github.com/ilex-paraguariensis/mateboard
