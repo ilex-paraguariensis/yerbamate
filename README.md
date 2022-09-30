@@ -1,7 +1,12 @@
 ## Maté 🧉
 
-Maté is a deep learning template project and framework compatible with pytorch(lightning), tensorflow(keras), and jax(flax). It is a package and experiment manager for deep learning. As a package manager you can add AI models, trainers and data loaders to your projects as dependencies(to be implemented). As a project manager, Maté evaluates, trains, and keeps track of your experiments. Maté adds the source code of the dependencies to your project, making it fully customizable and reproducible.
+Maté is a deep learning template project and framework compatible with [PyTorch](https://pytorch.org/) ([lightning](https://www.pytorchlightning.ai/)), [TensorFlow](https://www.tensorflow.org/) ([Keras](https://keras.io/)), and [Jax](https://github.com/google/jax) ([Flax](https://github.com/google/flax)). It is a package and experiment manager for deep learning. 
 
+
+As a package manager, you can add AI models, trainers/training loops, and data loaders to your projects as dependencies.
+
+
+As a project manager, Maté evaluates, trains, and keeps track of your experiments. In addition, Maté adds the source code of the dependencies to your project, making it fully customizable and reproducible.
 
 ## Installation 🔌
 
@@ -11,12 +16,16 @@ pip install yerbamate
 
 ## Examples
 
-Please check out the [examples repo](https://github.com/ilex-paraguariensis/examples/) for examples of pytorch lightning, keras and jax.
+Please check out the [examples repo](https://github.com/ilex-paraguariensis/examples/) for examples of PyTorch Lightning, Keras and Jax.
 
 
 
 ### What is the Maté standard?
-Maté enforces modularity and seperation of three basic components of a deep learning project: models, trainers(optional), and data loaders. Each model, data loader and trainer should be a module inside its respective folder. This allows for out-of-the-box sharing of models, data loaders, and trainers between Maté projects. 
+Maté enforces **modularity** and seperation of three basic components of a deep learning project:
+- models,
+- trainers(optional),
+- data loaders. 
+Each model, data loader and trainer should be a module inside its respective folder. This allows for out-of-the-box sharing of models, data loaders, and trainers between Maté projects. 
 
 An example of a the foolder structure of a maté project is shown below:
 
