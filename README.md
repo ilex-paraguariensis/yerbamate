@@ -18,7 +18,11 @@ pip install yerbamate
 
 Please check out the [examples repo](https://github.com/ilex-paraguariensis/examples/) for examples of PyTorch Lightning, Keras and Jax.
 
+## Core Principles
 
+- **Modularity**: Divide your project into sharable (python) modules.
+- **Reproducibility**: Through just one (JSON) file you can reproduce an entire experiment all all its hyperparameters
+- Maté🧉 is intuitive and flexible: no need to add boilerplate code, just take it away!
 
 ### What is the Maté standard?
 Maté enforces **modularity** and seperation of three basic components of a deep learning project:
