@@ -1,6 +1,6 @@
 ## Maté 🧉
 
-Maté is a deep learning template project and framework compatible with [PyTorch](https://pytorch.org/) ([lightning](https://www.pytorchlightning.ai/)), [TensorFlow](https://www.tensorflow.org/) ([Keras](https://keras.io/)), and [Jax](https://github.com/google/jax) ([Flax](https://github.com/google/flax)). It is a package and experiment manager for deep learning. 
+Maté is a deep learning template project and framework compatible with [PyTorch](https://pytorch.org/) ([Lightning](https://www.pytorchlightning.ai/)), [TensorFlow](https://www.tensorflow.org/) ([Keras](https://keras.io/)), and [Jax](https://github.com/google/jax) ([Flax](https://github.com/google/flax)). It is a package and experiment manager for deep learning. 
 
 
 As a package manager, you can add AI models, trainers/training loops, and data loaders to your projects as dependencies.
@@ -106,8 +106,14 @@ maté clone resnet my_resnet
 
 **A**: Yes! Maté works with colab as any Maté project is exportable to a juypter notebook.
 
-## Contact 🤝 
+---
 
+**Q: But I like wandb! Does this try to replac it?**
+
+**A**: No! 🧉 supports wandb. Just just choose it as a logger.
+
+
+## Contact 🤝 
 
 - yerba.maté.dl(at)proton.me
 - [@mate_dl](https://twitter.com/mate_dl)
