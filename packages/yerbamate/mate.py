@@ -16,6 +16,7 @@ from .project_parser.project_parser import ProjectParser
 from .mate_config import MateConfig
 from .mateboard.mateboard import MateBoard
 
+
 class Mate:
     @staticmethod
     def init(project_name: str):

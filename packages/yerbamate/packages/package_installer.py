@@ -4,7 +4,6 @@ import sys
 import shutil
 import urllib
 from typing import Union, Callable, Optional, Type
-from .bunch import Bunch
 
 
 import inspect

@@ -9,7 +9,7 @@ import sys
 import shutil
 import urllib
 from typing import Union, Callable, Optional, Type
-from .utils.bunch import Bunch
+from ..utils.bunch import Bunch
 
 import inspect
 import ipdb
