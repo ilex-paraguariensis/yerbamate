@@ -22,18 +22,20 @@ Please check out the [examples repo](https://github.com/ilex-paraguariensis/exam
 
 - **Modularity**: Divide your project into sharable (python) modules.
 - **Reproducibility**: Through just one (JSON) file you can reproduce an entire experiment all all its hyperparameters
-- Maté🧉 is intuitive and flexible: no need to add boilerplate code, just take it away!
+- 🧉 is **intuitive** and **flexible**: no need to add boilerplate code, just take it away!
 
 ### What is the Maté standard?
-Maté enforces **modularity** and seperation of three basic components of a deep learning project:
+
+Maté enforces modularity and separation of three essential components of a deep learning project:
 
 - models,
-- trainers(optional),
+- trainers (optional),
 - data loaders
 
-Each model, data loader and trainer should be a module inside its respective folder. This allows for out-of-the-box sharing of models, data loaders, and trainers between Maté projects. 
+Each model, data loader, and trainer must be a python module inside its folder.
+This guarantees out-of-the-box sharing of models, data loaders, and trainers between Maté projects.
 
-An example of a the foolder structure of a maté project is shown below:
+This is how folders in a 🧉 project are organized:
 
 ```
 ├── root_project_folder
