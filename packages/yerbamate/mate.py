@@ -1,5 +1,7 @@
 import os
 
+from .packages.metadata.generator import MetadataGenerator
+
 from .utils.bunch import Bunch
 
 import json
@@ -35,6 +37,10 @@ class Mate:
         self.custom_save_path = None
         self.trainer: Optional[Trainer] = None
         ProjectParser.check_project_structure(self.root_folder)
+        # self.metadata_generator = MetadataGenerator(self.root_folder)
+
+    # def metadata(self):
+    #     self.metadata_generator.generate()
 
     def experiments(self, model_name: Optional[str] = None):
         io.list_experiments(self.root_folder, model_name, True)
