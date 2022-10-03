@@ -37,10 +37,13 @@ class Mate:
         self.custom_save_path = None
         self.trainer: Optional[Trainer] = None
         ProjectParser.check_project_structure(self.root_folder)
-        # self.metadata_generator = MetadataGenerator(self.root_folder)
+        self.metadata_generator = MetadataGenerator(self.root_folder)
+        # metadata = self.metadata_generator.generate()
 
-    # def metadata(self):
-    #     self.metadata_generator.generate()
+        # ipdb.set_trace()
+
+    def metadata(self):
+        self.metadata_generator.generate()
 
     def experiments(self, model_name: Optional[str] = None):
         io.list_experiments(self.root_folder, model_name, True)

@@ -8,7 +8,7 @@ import ipdb
 from bombilla.utils import get_function_args
 
 
-class ModelMetadataGenerator:
+class ModuleMetadataGenerator:
     def __init__(
         self,
         root_module: str,
@@ -25,12 +25,13 @@ class ModelMetadataGenerator:
         self.module_path = os.path.join(
             self.root_module, self.type_module, self.local_module
         )
-        self.module = self.__get_local_module()
+        # self.module = self.__get_local_module()
         self.module_files = os.listdir(self.module_path)
 
     def generate(self):
-        ipdb.set_trace()
 
+        self.module = self.__get_local_module()
+        # ipdb.set_trace()
         classes = self.__find_classes(self.module)
 
         meta = [self.generate_class_metadata(klass) for klass in classes]
@@ -44,9 +45,26 @@ class ModelMetadataGenerator:
             "functions": fun_meta,
         }
 
+    def format_modules(self, args: dict) -> dict:
+
+        res = args.copy()
+        for key, value in args.items():
+            # ipdb.set_trace()
+            if type(value) == dict and "module" in value:
+
+                value["module"] = value["module"].replace(
+                    ".".join([self.root_module, self.type_module, ""]), ""
+                )
+                res[key] = value
+
+        return res
+
     def generate_class_metadata(self, klass):
 
-        args, errors = get_function_args(klass[1].__init__)
+        # ipdb.set_trace()
+        args, errors = get_function_args(klass[1].__init__, {})
+        # ipdb.set_trace()
+        args = self.format_modules(args)
         return {
             "class_name": klass[0],
             "module": self.local_module,
@@ -55,7 +73,8 @@ class ModelMetadataGenerator:
         }
 
     def generate_function_metadata(self, function):
-        args, errors = get_function_args(function[1])
+        args, errors = get_function_args(function[1], {})
+        args = self.format_modules(args)
         return {
             "function_name": function[0],
             "module": self.local_module,
