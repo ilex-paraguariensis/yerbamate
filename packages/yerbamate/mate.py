@@ -36,9 +36,9 @@ class Mate:
         self.run_params = None
         self.custom_save_path = None
         self.trainer: Optional[Trainer] = None
-        self.metadata_generator = MetadataGenerator(self.root_folder)
+        self.metadata_generator = MetadataGenerator(self.root_folder, self.config.metadata)
         self.data_source = PackageManager(self.root_folder)
-        # metadata = self.metadata_generator.generate()
+        metadata = self.metadata_generator.generate()
         # ipdb.set_trace()
 
     def metadata(self):
@@ -294,7 +294,7 @@ class Mate:
 
         trainer = self.__get_trainer(params)
 
-        self.__parse_and_validate_params(model_name, params)
+        self.__parse_and_validate_params(params)
 
         if self.is_restart:
             checkpoint_path = os.path.join(self.save_path, "checkpoints", "last.ckpt")

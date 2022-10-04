@@ -1,3 +1,6 @@
+from typing import Any
+
+from .metadata import BaseMetadata, Metadata
 from ..package import Package
 import os
 import ipdb
@@ -5,11 +8,11 @@ from .package_metadata import ModuleMetadataGenerator
 
 
 class MetadataGenerator:
-    def __init__(self, root_module: str, root_package: Package = None) -> None:
+    def __init__(self, root_module: str, metadata: Metadata) -> None:
         # TODO root_package should have at least the author, type, version, description
 
         self.root_module = root_module
-        self.root_package = root_package
+        self.root_meta = metadata
         self.sub_modules = self.list_submodules()
 
     # should generate a metadata package for the whole project
@@ -24,10 +27,13 @@ class MetadataGenerator:
             "data_loaders": data_meta,
         }
 
+        
+        
+
     def generate_module_metadata(self, module: str) -> dict:
         return {
             model_module: ModuleMetadataGenerator(
-                self.root_module, module, model_module
+                self.root_module, module, model_module, self.root_meta
             ).generate()
             for model_module in self.list_modules(module)
         }

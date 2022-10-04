@@ -2,6 +2,8 @@ import os
 
 import sys, inspect
 
+from .metadata import BaseMetadata, Metadata
+
 from ..package import Package
 import ipdb
 
@@ -14,13 +16,13 @@ class ModuleMetadataGenerator:
         root_module: str,
         type_module: str,
         local_module: str,
-        package_info: Package = None,
+        base_metadata: Metadata,
     ):
 
         self.root_module = root_module
         self.type_module = type_module
         self.local_module = local_module
-        self.package_info = package_info
+        self.base_metadata = base_metadata.copy()
 
         self.module_path = os.path.join(
             self.root_module, self.type_module, self.local_module
@@ -28,10 +30,18 @@ class ModuleMetadataGenerator:
         # self.module = self.__get_local_module()
         self.module_files = os.listdir(self.module_path)
 
+    def update_metadata(self):
+
+        # update URL to point to the right module
+        url_addition = "/".join([self.root_module, self.type_module, self.local_module])
+        new_url = self.base_metadata.url + url_addition
+        type = self.type_module
+        self.base_metadata.update(url=new_url, type=type)
+
     def generate(self):
 
         self.module = self.__get_local_module()
-        # ipdb.set_trace()
+
         classes = self.__find_classes(self.module)
 
         meta = [self.generate_class_metadata(klass) for klass in classes]
@@ -40,10 +50,25 @@ class ModuleMetadataGenerator:
 
         fun_meta = [self.generate_function_metadata(function) for function in functions]
 
-        return {
-            "classes": meta,
-            "functions": fun_meta,
+        self.update_metadata()
+        results = {
+            "exports": {
+                "classes": meta,
+                "functions": fun_meta,
+            }
         }
+        self.base_metadata.add(**results)
+
+        self.save_metadata()
+
+        return self.base_metadata
+
+    def save_metadata(self):
+
+        json_path = os.path.join(self.module_path, "metadata.json")
+
+        with open(json_path, "w") as f:
+            f.write(str(self.base_metadata))
 
     def format_modules(self, args: dict) -> dict:
 
@@ -65,21 +90,34 @@ class ModuleMetadataGenerator:
         args, errors = get_function_args(klass[1].__init__, {})
         # ipdb.set_trace()
         args = self.format_modules(args)
-        return {
-            "class_name": klass[0],
-            "module": self.local_module,
-            "params": args,
-            "errors": errors,
-        }
+        if errors:
+            return {
+                "class_name": klass[0],
+                "module": self.local_module,
+                "params": args,
+                "errors": errors,
+            }
+        else:
+            return {
+                "class_name": klass[0],
+                "module": self.local_module,
+                "params": args,
+            }
 
     def generate_function_metadata(self, function):
         args, errors = get_function_args(function[1], {})
         args = self.format_modules(args)
+        if errors:
+            return {
+                "function_name": function[0],
+                "module": self.local_module,
+                "params": args,
+                "errors": errors,
+            }
         return {
             "function_name": function[0],
             "module": self.local_module,
             "params": args,
-            "errors": errors,
         }
 
     def __get_local_module(self):
