@@ -2,23 +2,27 @@ from .sources.remote import RemoteDataSource
 from .sources.local import LocalDataSource
 
 from .package import Package
+from typing import Optional
 
 
 class PackageManager:
-    def __init__(self):
+    def __init__(self, root_dir: str = "."):
         self.remote = RemoteDataSource()
-        self.local = LocalDataSource()
+        self.local = LocalDataSource(root_dir)
 
-    def locally_available_models(self):
-        return self.local.get_models()
+    def get_local_models(self, query: Optional[str] = None):
+        return self.local.get_models(query)
 
-    def locally_available_trainers(self):
-        return self.local.get_trainers()
+    def get_local_trainers(self, query: Optional[str] = None):
+        return self.local.get_trainers(query)
 
-    def locally_available_packages(self):
-        return self.local.get_packages()
+    def get_local_data_loaders(self, query: Optional[str] = None):
+        return self.local.get_data_loaders(query)
 
-    def query_models(self, query: str = None):
+    def get_local_experiments(self, query: Optional[str] = None):
+        return self.local.get_experiments(query)
+    """
+    def query_models(self, query: Optional[str] = None):
         return self.remote.get_models(query)
 
     def query_trainers(self, query: str = None):
@@ -29,3 +33,4 @@ class PackageManager:
 
     def install_model(self, model: Package):
         self.local.add_model(model)
+    """
