@@ -4,7 +4,9 @@ from typing import Optional
 
 
 class LocalDataSource(DataSource):
-    def __init__(self, root_dir: str = "."):
+    def __init__(self,
+                 root_dir: str = "." # a different root (".mate") is used while installing a packaage installing a package, we can use the root dir of the package
+                 ):
         super().__init__()
         assert "mate.json" in os.listdir(
             root_dir
@@ -18,7 +20,7 @@ class LocalDataSource(DataSource):
         self.data_loaders = self.__filter_regular_folders(
             os.listdir(os.path.join(root_dir, "data_loaders"))
         )
-        self.experiments = os.listdir(os.path.join(root_dir, "experiments"))
+        self.experiments = [os.path.splitext(exp_name)[0] for exp_name in os.listdir(os.path.join(root_dir, "experiments"))]
         self.packages = []  # TODO: what's this?
 
     def __filter_regular_folders(self, names: list[str]):
