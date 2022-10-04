@@ -4,7 +4,7 @@ import shutil
 import sys
 from typing import Optional
 import ipdb
-
+from .utils.git_url_parser import GitUrlParser
 from .mate_config import MateConfig
 
 from .utils.bunch import Bunch
@@ -15,27 +15,33 @@ def load_json(path):
     with open(path) as f:
         return Bunch(json.load(f))
 
+def install(local_destination_folder: str, url: str):
+    assert "local_destination_folder" in ["trainers", "models", "datasets"]
+    parser = GitUrlParser(url)
+    parser.clone(local_destination_folder)
+
 
 def set_save_path(
-    root_save_folder: str, root_folder: str, model_name: str, params: str
+    root_save_folder: str, root_folder: str, params: str
 ):
     # exp_path = __get_experiment_path(root_folder, model_name, params)
-    exp_module = get_experiment_base_module(root_folder, model_name, params)
-
-    if exp_module == root_folder:
-        # model name is actually the experiment name
-        save_path = os.path.join(
-            root_save_folder, root_folder, "experiments", model_name
-        )
-
-    else:
-        save_path = os.path.join(
-            root_save_folder, root_folder, "models", model_name, "experiments", params
-        )
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
-
-    return save_path
+    # exp_module = get_experiment_base_module(root_folder, model_name, params)
+    #
+    # if exp_module == root_folder:
+    #     # model name is actually the experiment name
+    #     save_path = os.path.join(
+    #         root_save_folder, root_folder, "experiments", model_name
+    #     )
+    #
+    # else:
+    #     save_path = os.path.join(
+    #         root_save_folder, root_folder, "models", model_name, "experiments", params
+    #     )
+    # if not os.path.exists(save_path):
+    #     os.makedirs(save_path)
+    #
+    # return save_path
+    return os.path.join(root_save_folder, root_folder, "experiments", params)
 
 
 def save_train_experiments(save_path, hparams: Bunch, conf: MateConfig):
@@ -75,7 +81,7 @@ def override_params(config: MateConfig, params: Bunch):
     return params
 
 
-def __get_experiment_path(root_folder: str, model_name: str, experiment_name: str):
+def __get_experiment_path(root_folder: str, experiment_name: str):
     """
     if experiment == "default":
         # firt check if second level default exists
@@ -159,13 +165,12 @@ def apply_env(root_folder: str, hparams: Bunch):
 def read_experiments(
     conf: MateConfig,
     root_folder: str,
-    model_name: str,
     hparams_name: str = "default",
-    run_params: dict = None,
+    run_params: Optional[dict] = None,
 ):
 
-    hparams_path = __get_experiment_path(root_folder, model_name, hparams_name)
-    assert hparams_path != None, f"Could not find the experiment {model_name}"
+    hparams_path = __get_experiment_path(root_folder, hparams_name)
+    # assert hparams_path != None, f"Could not find the experiment {model_name}"
 
     # exp = get_experiment_description(root_folder, model_name, hparams_name)
     # print_once(f"{exp[2]}: {exp[0]}/{exp[1]}.json")
@@ -182,8 +187,13 @@ def read_experiments(
 
     return hparams
 
+def update_dict_in_depth(d: dict, keys: list, value):
+    if len(keys) == 1:
+        d[keys[0]] = value
+    else:
+        update_dict_in_depth(d[keys[0]], keys[1:], value)
 
-def override_run_params(hparams: Bunch, run_params: dict):
+def override_run_params(hparams: Bunch, run_params: Optional[dict]):
 
     # parsed from mate {command} --param1=value1 --param2=value2
     # run params is a key value pair of parameters to override
@@ -194,12 +204,7 @@ def override_run_params(hparams: Bunch, run_params: dict):
     if run_params == None:
         return hparams
 
-    def update_dict_in_depth(d: dict, keys: list, value):
-        if len(keys) == 1:
-            d[keys[0]] = value
-        else:
-            update_dict_in_depth(d[keys[0]], keys[1:], value)
-
+    
     for key, value in run_params.items():
         keys = key.split(".")
         if len(keys) == 1:
@@ -262,7 +267,7 @@ def get_experiment_description(root_folder: str, model_name: str, experiment: st
     return None
 
 
-def list_experiments(root_foolder: str, model_name=None, log=True):
+def list_experiments(root_foolder: str, log=True):
     """
     models = list_packages(root_foolder, "models")
 
