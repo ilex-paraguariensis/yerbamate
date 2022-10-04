@@ -14,7 +14,7 @@ from . import io
 from bombilla import parser
 
 from typing import Optional
-from .project_parser.project_parser import ProjectParser
+from .packages.package_manager import PackageManager
 from .mate_config import MateConfig
 from .mateboard.mateboard import MateBoard
 
@@ -36,17 +36,13 @@ class Mate:
         self.run_params = None
         self.custom_save_path = None
         self.trainer: Optional[Trainer] = None
-        ProjectParser.check_project_structure(self.root_folder)
         self.metadata_generator = MetadataGenerator(self.root_folder)
+        self.data_source = PackageManager(self.root_folder)
         # metadata = self.metadata_generator.generate()
-
         # ipdb.set_trace()
 
     def metadata(self):
         self.metadata_generator.generate()
-
-    def experiments(self, model_name: Optional[str] = None):
-        io.list_experiments(self.root_folder, model_name, True)
 
     def create(self, path: str):
         pass
@@ -54,13 +50,27 @@ class Mate:
     def remove(self, model_name: str):
         io.remove(self.root_folder, model_name)
 
-    def list(self, folder: str):
+    def list(self, module_name: str):
 
+        """
         if folder == "experiments":
             io.list_experiments(self.root_folder)
             return
 
         io.list(self.root_folder, folder)
+        """
+        module_names = {
+            "models": self.data_source.get_local_models,
+            "trainers": self.data_source.get_local_trainers,
+            "data_loaders": self.data_source.get_local_data_loaders,
+            "experiments": self.data_source.get_local_experiments
+        }
+        assert (
+            module_name in module_names
+        ), f"Invalid module name: {module_name}, must be one of {list(module_names.keys())}"
+        return module_names[module_name](query)
+
+        return print("\t"+"\n\t".join(self.data_source.get(folder)))
 
     def clone(self, source_model: str, target_model: str):
         io.clone(self.root_folder, source_model, target_model)
@@ -68,16 +78,20 @@ class Mate:
     def snapshot(self, model_name: str):
         io.snapshot(self.root_folder, model_name)
 
-    def train(self, model_name: str, experiment_name: str = "default"):
+    def train(self, experiment_name: str = "default"):
         # assert io.experiment_exists(
         #    self.root_folder, model_name, parameters
         # ), f'Experiment "{model_name}" does not exist.'
-        io.assert_experiment_exists(self.root_folder, model_name, experiment_name)
+        # io.assert_experiment_exists(self.root_folder, experiment_name)
+        assert (
+            len(self.data_source.get_local_experiments(experiment_name)) > 0
+        ), f'Experiment "{experiment_name}" does not exist.'
 
         # we need to load hyperparameters before training to set save_path
-        _ = self.__read_hyperparameters(model_name, experiment_name)
-        self.__set_save_path(model_name, experiment_name)
-
+        _ = self.__read_hyperparameters(experiment_name)
+        self.__set_save_path(experiment_name)
+        if not os.path.exists(self.save_path):
+            os.makedirs(self.save_path)
         checkpoint_path = os.path.join(self.save_path, "checkpoints")
         if not os.path.exists(checkpoint_path):
             os.mkdir(checkpoint_path)
@@ -97,7 +111,7 @@ class Mate:
                 print("Ok, exiting.")
                 return
 
-        self.__fit(model_name, experiment_name)
+        self.__fit(experiment_name)
 
     def test(self, model_name: str, params: str):
         assert model_name in self.models, f'Model "{model_name}" does not exist.'
@@ -204,17 +218,16 @@ class Mate:
             fromlist=["exec"],
         ).run
 
-    def __set_save_path(self, model_name: str, params_name: str):
+    def __set_save_path(self, params_name: str):
         self.save_path = io.set_save_path(
-            self.root_save_folder, self.root_folder, model_name, params_name
+            self.root_save_folder, self.root_folder, params_name
         )
 
-    def __read_hyperparameters(self, model_name: str, hparams_name: str = "default"):
+    def __read_hyperparameters(self, hparams_name: str = "default"):
 
         hp = io.read_experiments(
             self.config,
             self.root_folder,
-            model_name,
             hparams_name,
             self.run_params,
         )
@@ -231,7 +244,7 @@ class Mate:
 
         return hp
 
-    def __parse_and_validate_params(self, model_name: str, params: str):
+    def __parse_and_validate_params(self, params: str):
         assert (
             self.trainer is not None
         ), "Trainer must be initialized before parsing params (Bombilla is managed by Trainer)"
@@ -239,7 +252,7 @@ class Mate:
         full, err = self.trainer.generate_full_dict()
 
         if len(err) > 0:
-            print(f"Errors in {model_name}/{params}")
+            print(f"Errors in {params}")
             for error in err:
                 print(error)
 
@@ -250,17 +263,17 @@ class Mate:
 
         return full
 
-    def __load_experiment_conf(self, model_name: str, params_name: str):
-        params = self.__read_hyperparameters(model_name, params_name)
-        self.__set_save_path(model_name, params_name)
+    def __load_experiment_conf(self, params_name: str):
+        params = self.__read_hyperparameters(params_name)
+        self.__set_save_path(params_name)
         params.save_path = self.save_path
         params.root_folder = self.root_folder
         return params
 
-    def __get_trainer(self, model_name: str, params: str):
+    def __get_trainer(self, params: str):
         if self.trainer is None:
 
-            conf = self.__load_experiment_conf(model_name, params)
+            conf = self.__load_experiment_conf(params)
 
             print(conf)
 
@@ -269,16 +282,17 @@ class Mate:
                 "save_dir": self.save_path,
             }
             root_module = f"{self.root_folder}"
-            base_module = io.get_experiment_base_module(
-                self.root_folder, model_name, params
-            )
+            # base_module = io.get_experiment_base_module(
+            #     self.root_folder, model_name, params
+            # )
+            base_module = "models"
             self.trainer = Trainer.create(conf, root_module, base_module, map_key_value)
 
         return self.trainer
 
-    def __fit(self, model_name: str, params: str):
+    def __fit(self, params: str):
 
-        trainer = self.__get_trainer(model_name, params)
+        trainer = self.__get_trainer(params)
 
         self.__parse_and_validate_params(model_name, params)
 
