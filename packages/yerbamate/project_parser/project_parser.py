@@ -12,6 +12,10 @@ class ProjectParser:
 
     @staticmethod
     def check_project_structure(root_folder: str):
+        assert "mate.json" in os.listdir(
+            os.path.join(root_folder, "..")
+        ), "No mate.json found in root directory. Check this is a valid mate project."
+
         os.chdir(root_folder)
         template_name = "lightning"
         path = os.path.join(
