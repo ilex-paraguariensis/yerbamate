@@ -25,7 +25,7 @@ class PackageManager:
         return self.remote.get_trainers(query)
 
     def query_datasets(self, query: str = None):
-        return self.remote.get_datasets(query)
+        return self.remote.get_data_loaders(query)
 
     def install_model(self, model: Package):
         self.local.add_model(model)

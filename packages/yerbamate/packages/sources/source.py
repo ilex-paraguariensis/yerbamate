@@ -1,6 +1,3 @@
-
-
-
 class DataSource:
     def __init__(self):
         pass
@@ -11,7 +8,7 @@ class DataSource:
     def get_trainers(self, query: str = None):
         pass
 
-    def get_datasets(self, query: str = None):
+    def get_data_loaders(self, query: str = None):
         pass
 
     def get_experiments(self, query: str = None):

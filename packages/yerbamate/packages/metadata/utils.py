@@ -1,7 +1,7 @@
 from typing import Callable
 import inspect
 import ipdb
-    
+
 
 def get_function_args(
     function: Callable,

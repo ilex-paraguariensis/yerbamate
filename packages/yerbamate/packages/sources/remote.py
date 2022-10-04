@@ -1,11 +1,8 @@
-
-
 from .source import DataSource
 
 
 # TODO: this class should call API to get the data
 class RemoteDataSource(DataSource):
-
     def __init__(self):
         super().__init__()
         self.models = []
@@ -20,7 +17,7 @@ class RemoteDataSource(DataSource):
     def get_trainers(self, query: str = None):
         return self.trainers
 
-    def get_datasets(self, query: str = None):
+    def get_data_loaders(self, query: str = None):
         return self.datasets
 
     def get_experiments(self, query: str = None):
