@@ -7,7 +7,7 @@ from .metadata import BaseMetadata, Metadata
 from ..package import Package
 import ipdb
 
-from bombilla.utils import get_function_args
+from .utils import get_function_args
 
 
 class ModuleMetadataGenerator:
