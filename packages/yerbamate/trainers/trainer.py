@@ -8,9 +8,10 @@ from typing import Optional, Union, Sequence, Type, Any
 import ipdb
 
 
-class Trainer(Package):
-    def __init__(self, params, *kwargs):
-        super().__init__(params, *kwargs)
+class Trainer:
+    def __init__(self, params):
+        super().__init__()
+        self.params = params
 
     @staticmethod
     def create(params: Bunch, root_module, base_module, map_key_values, *kwargs):

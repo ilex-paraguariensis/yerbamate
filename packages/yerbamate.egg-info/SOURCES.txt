@@ -87,9 +87,11 @@ packages/yerbamate/mateboard/mateboard/static/mate_summary.json
 packages/yerbamate/packages/__init__.py
 packages/yerbamate/packages/package.py
 packages/yerbamate/packages/package_manager.py
+packages/yerbamate/packages/package_repository.py
 packages/yerbamate/packages/__pycache__/__init__.cpython-310.pyc
 packages/yerbamate/packages/__pycache__/package.cpython-310.pyc
 packages/yerbamate/packages/__pycache__/package_manager.cpython-310.pyc
+packages/yerbamate/packages/__pycache__/package_repository.cpython-310.pyc
 packages/yerbamate/packages/_legacy/package_installer.py
 packages/yerbamate/packages/metadata/__init__.py
 packages/yerbamate/packages/metadata/generator.py
