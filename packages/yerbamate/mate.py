@@ -38,6 +38,7 @@ class Mate:
         self.run_params = None
         self.custom_save_path = None
         self.trainer: Optional[Trainer] = None
+        assert self.config is not None
         self.package_manager = PackageManager(self.config)
 
     def create(self, path: str):
@@ -64,7 +65,7 @@ class Mate:
         # ), f'Experiment "{model_name}" does not exist.'
         # io.assert_experiment_exists(self.root_folder, experiment_name)
         assert (
-            len(self.data_source.get_local_experiments(experiment_name)) > 0
+            len(self.package_manager.list("experiments", experiment_name)) > 0
         ), f'Experiment "{experiment_name}" does not exist.'
 
         # we need to load hyperparameters before training to set save_path

@@ -42,14 +42,9 @@ class LocalDataSource(DataSource):
     def __filter_names(self, query: Optional[str], names: list[str]):
         return names if query is None else [name for name in names if query == name]
 
-    # TODO, what to do with query?
     def list(self, module: str, query: Optional[str] = None):
-        if module == None:
-            return self.map
         assert module in self.map.keys(), f"Folder {module} not found"
-        list = self.map[module]
-        return list
-        # ipdb.set_trace()
+        return self.__filter_names(query, self.map[module])
 
     def get_models(self, query: Optional[str] = None):
         return self.__filter_names(query, self.models)

@@ -13,8 +13,10 @@ class PackageRepository:
         self.remote = RemoteDataSource()
         self.local = LocalDataSource(config.project)
 
+    # def list(self, module: str, query: Optional[str] = None):
+    #     print(self.local.list(module, query))
     def list(self, module: str, query: Optional[str] = None):
-        print(self.local.list(module, query))
+         return self.local.list(module, query)
 
     """
     def query_models(self, query: Optional[str] = None):
