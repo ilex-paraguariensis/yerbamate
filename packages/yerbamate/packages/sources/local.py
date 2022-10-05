@@ -34,6 +34,9 @@ class LocalDataSource(DataSource):
             "experiments": self.experiments,
         }
 
+        # remove empty values
+        self.map = {k: v for k, v in self.map.items() if len(v) > 0}
+
         self.packages = []  # TODO: what's this?
 
     def __filter_regular_folders(self, names: list[str]):
@@ -43,6 +46,11 @@ class LocalDataSource(DataSource):
         return names if query is None else [name for name in names if query == name]
 
     def list(self, module: str, query: Optional[str] = None):
+
+        # if module is None, return all modules
+        if module is None:
+            return self.map
+
         assert module in self.map.keys(), f"Folder {module} not found"
         return self.__filter_names(query, self.map[module])
 

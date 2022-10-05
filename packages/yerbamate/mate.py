@@ -49,9 +49,10 @@ class Mate:
 
     def list(self, module_name: str = None, query: str = None):
 
-        return self.package_manager.list(module_name, query)
+        li = self.package_manager.list(module_name, query)
+        print(li)
 
-        return print("\t" + "\n\t".join(self.data_source.get(folder)))
+        # return print("\t" + "\n\t".join(self.data_source.get(folder)))
 
     def clone(self, source_model: str, target_model: str):
         io.clone(self.root_folder, source_model, target_model)
