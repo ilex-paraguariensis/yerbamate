@@ -1,5 +1,7 @@
 import os
 
+from yerbamate.packages.package_manager import PackageManager
+
 from .packages.metadata.generator import MetadataGenerator
 
 from .utils.bunch import Bunch
@@ -14,7 +16,7 @@ from . import io
 from bombilla import parser
 
 from typing import Optional
-from .packages.package_manager import PackageManager
+from .packages.package_repository import PackageRepository
 from .mate_config import MateConfig
 from .mateboard.mateboard import MateBoard
 
@@ -36,13 +38,7 @@ class Mate:
         self.run_params = None
         self.custom_save_path = None
         self.trainer: Optional[Trainer] = None
-        self.metadata_generator = MetadataGenerator(self.root_folder, self.config.metadata)
-        self.data_source = PackageManager(self.root_folder)
-        metadata = self.metadata_generator.generate()
-        # ipdb.set_trace()
-
-    def metadata(self):
-        self.metadata_generator.generate()
+        self.package_manager = PackageManager(self.config)
 
     def create(self, path: str):
         pass
@@ -50,27 +46,11 @@ class Mate:
     def remove(self, model_name: str):
         io.remove(self.root_folder, model_name)
 
-    def list(self, module_name: str):
+    def list(self, module_name: str = None, query: str = None):
 
-        """
-        if folder == "experiments":
-            io.list_experiments(self.root_folder)
-            return
+        return self.package_manager.list(module_name, query)
 
-        io.list(self.root_folder, folder)
-        """
-        module_names = {
-            "models": self.data_source.get_local_models,
-            "trainers": self.data_source.get_local_trainers,
-            "data_loaders": self.data_source.get_local_data_loaders,
-            "experiments": self.data_source.get_local_experiments
-        }
-        assert (
-            module_name in module_names
-        ), f"Invalid module name: {module_name}, must be one of {list(module_names.keys())}"
-        return module_names[module_name](query)
-
-        return print("\t"+"\n\t".join(self.data_source.get(folder)))
+        return print("\t" + "\n\t".join(self.data_source.get(folder)))
 
     def clone(self, source_model: str, target_model: str):
         io.clone(self.root_folder, source_model, target_model)

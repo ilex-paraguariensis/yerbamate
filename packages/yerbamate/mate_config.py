@@ -23,8 +23,9 @@ class Config:
                     config[key] in enum_type.__members__.keys()
                 ), "Invalid value for key {key}, must be one of {enum_type.__members__.keys()}"
                 config[key] = type(value)(config[key])
-            assert isinstance(config[key], type(value)), f"Wrong type for key {key}"
-            setattr(self, key, config[key])
+            if key in config:
+                assert isinstance(config[key], type(value)), f"Wrong type for key {key}"
+                setattr(self, key, config[key])
         for key in config.keys():
             assert key in self.__dict__.keys(), f"Unknown key {key} in config."
 

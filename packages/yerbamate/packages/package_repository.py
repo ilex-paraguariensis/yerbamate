@@ -1,25 +1,20 @@
 from yerbamate.mate_config import MateConfig
+from .sources.remote import RemoteDataSource
+from .sources.local import LocalDataSource
+
 from .package import Package
-from .package_repository import PackageRepository
-from .metadata.generator import MetadataGenerator
 from typing import Optional
 import ipdb
 
 
-"""
-should install packages, update packages, remove packages, list packages, etc
-"""
-
-
-class PackageManager:
+class PackageRepository:
     def __init__(self, config: MateConfig):
-        self.repository = PackageRepository(config)
-        self.metadata_generator = MetadataGenerator(
-            config.project, config.metadata, self.repository.local
-        )
+        self.config = config
+        self.remote = RemoteDataSource()
+        self.local = LocalDataSource(config.project)
 
     def list(self, module: str, query: Optional[str] = None):
-        return self.repository.list(module, query)
+        print(self.local.list(module, query))
 
     """
     def query_models(self, query: Optional[str] = None):

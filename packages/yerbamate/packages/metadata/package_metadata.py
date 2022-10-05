@@ -2,9 +2,12 @@ import os
 
 import sys, inspect
 
+from ..sources.local import LocalDataSource
+
 from .metadata import BaseMetadata, Metadata
 
 from ..package import Package
+from bombilla import Bombilla
 import ipdb
 
 from .utils import get_function_args
@@ -17,17 +20,19 @@ class ModuleMetadataGenerator:
         type_module: str,
         local_module: str,
         base_metadata: Metadata,
+        local_data_source: LocalDataSource,
     ):
 
         self.root_module = root_module
         self.type_module = type_module
         self.local_module = local_module
         self.base_metadata = base_metadata.copy()
+        self.local_data_source = local_data_source
 
         self.module_path = os.path.join(
             self.root_module, self.type_module, self.local_module
         )
-        # self.module = self.__get_local_module()
+
         self.module_files = os.listdir(self.module_path)
 
     def update_metadata(self):

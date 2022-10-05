@@ -4,6 +4,7 @@ from typing import Optional
 import ipdb
 from ..project_parser.project_parser import ProjectParser
 
+
 class LocalDataSource(DataSource):
     def __init__(
         self,
@@ -23,7 +24,16 @@ class LocalDataSource(DataSource):
         self.experiments = [
             os.path.splitext(exp_name)[0]
             for exp_name in os.listdir(os.path.join(root_dir, "experiments"))
+            if ".json" in exp_name
         ]
+
+        self.map = {
+            "models": self.models,
+            "trainers": self.trainers,
+            "data_loaders": self.data_loaders,
+            "experiments": self.experiments,
+        }
+
         self.packages = []  # TODO: what's this?
 
     def __filter_regular_folders(self, names: list[str]):
@@ -31,6 +41,15 @@ class LocalDataSource(DataSource):
 
     def __filter_names(self, query: Optional[str], names: list[str]):
         return names if query is None else [name for name in names if query == name]
+
+    # TODO, what to do with query?
+    def list(self, module: str, query: Optional[str] = None):
+        if module == None:
+            return self.map
+        assert module in self.map.keys(), f"Folder {module} not found"
+        list = self.map[module]
+        return list
+        # ipdb.set_trace()
 
     def get_models(self, query: Optional[str] = None):
         return self.__filter_names(query, self.models)
