@@ -71,7 +71,6 @@ This is how folders in a 🧉 project are organized:
 ```
 
 
-
 ### For Coders
 Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any maté class to your projects. Maté simply parses the configuration. To make your project maté compatible, you need to move a few files and make a Bombilla configuration file. 
 
@@ -119,6 +118,12 @@ maté clone resnet my_resnet
 
 **A**: No! 🧉 supports wandb. Just just choose it as a logger.
 
+## Test with Docker
+
+```bash
+cd docker
+bash run-test.sh
+```
 
 ## Contact 🤝 
 
