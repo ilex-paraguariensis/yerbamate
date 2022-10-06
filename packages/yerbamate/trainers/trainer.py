@@ -14,27 +14,25 @@ class Trainer:
         self.params = params
 
     @staticmethod
-    def create(params: Bunch, root_module, base_module, map_key_values, *kwargs):
+    def create(params: Bunch, root_module, map_key_values, *kwargs):
 
         if "train_function" in params:
             from .function_trainer import FunctionTrainer
 
-            return FunctionTrainer(
-                params, root_module, base_module, map_key_values, *kwargs
-            )
+            return FunctionTrainer(params, root_module, map_key_values, *kwargs)
 
         if "pytorch_lightning_module" in params:
             from .lightning_trainer import (
                 LightningTrainer,
             )  # importing it here avoids memory overload
 
-            return LightningTrainer(params, root_module, base_module, map_key_values)
+            return LightningTrainer(params, root_module, map_key_values)
         else:
             from .keras_trainer import (
                 KerasTrainer,
             )  # importing it here avoids memory overload
 
-            return KerasTrainer(params, root_module, base_module, map_key_values)
+            return KerasTrainer(params, root_module, map_key_values)
 
     def generate_full_dict(self) -> tuple:
 

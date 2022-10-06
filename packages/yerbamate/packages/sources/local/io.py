@@ -4,44 +4,22 @@ import shutil
 import sys
 from typing import Optional
 import ipdb
-from .utils.git_url_parser import GitUrlParser
-from .mate_config import MateConfig
 
-from .utils.bunch import Bunch
-from .utils.utils import once
+from ....mate_config import MateConfig
+
+from ....utils.bunch import Bunch
+from ....utils.utils import once
 
 
 def load_json(path):
     with open(path) as f:
         return Bunch(json.load(f))
 
-def install(local_destination_folder: str, url: str):
-    assert "local_destination_folder" in ["trainers", "models", "datasets"]
-    parser = GitUrlParser(url)
-    parser.clone(local_destination_folder)
 
+def set_save_path(root_save_folder: str, root_folder: str, params: str):
+    save_path = os.path.join(root_save_folder, root_folder, params)
 
-def set_save_path(
-    root_save_folder: str, root_folder: str, params: str
-):
-    # exp_path = __get_experiment_path(root_folder, model_name, params)
-    # exp_module = get_experiment_base_module(root_folder, model_name, params)
-    #
-    # if exp_module == root_folder:
-    #     # model name is actually the experiment name
-    #     save_path = os.path.join(
-    #         root_save_folder, root_folder, "experiments", model_name
-    #     )
-    #
-    # else:
-    #     save_path = os.path.join(
-    #         root_save_folder, root_folder, "models", model_name, "experiments", params
-    #     )
-    # if not os.path.exists(save_path):
-    #     os.makedirs(save_path)
-    #
-    # return save_path
-    return os.path.join(root_save_folder, root_folder, "experiments", params)
+    return save_path
 
 
 def save_train_experiments(save_path, hparams: Bunch, conf: MateConfig):
@@ -166,11 +144,11 @@ def read_experiments(
     conf: MateConfig,
     root_folder: str,
     hparams_name: str = "default",
-    run_params: Optional[dict] = None,
+    run_params: dict = None,
 ):
 
     hparams_path = __get_experiment_path(root_folder, hparams_name)
-    # assert hparams_path != None, f"Could not find the experiment {model_name}"
+    assert hparams_path != None, f"Could not find the experiment {hparams_name}"
 
     # exp = get_experiment_description(root_folder, model_name, hparams_name)
     # print_once(f"{exp[2]}: {exp[0]}/{exp[1]}.json")
@@ -187,13 +165,8 @@ def read_experiments(
 
     return hparams
 
-def update_dict_in_depth(d: dict, keys: list, value):
-    if len(keys) == 1:
-        d[keys[0]] = value
-    else:
-        update_dict_in_depth(d[keys[0]], keys[1:], value)
 
-def override_run_params(hparams: Bunch, run_params: Optional[dict]):
+def override_run_params(hparams: Bunch, run_params: dict):
 
     # parsed from mate {command} --param1=value1 --param2=value2
     # run params is a key value pair of parameters to override
@@ -204,7 +177,12 @@ def override_run_params(hparams: Bunch, run_params: Optional[dict]):
     if run_params == None:
         return hparams
 
-    
+    def update_dict_in_depth(d: dict, keys: list, value):
+        if len(keys) == 1:
+            d[keys[0]] = value
+        else:
+            update_dict_in_depth(d[keys[0]], keys[1:], value)
+
     for key, value in run_params.items():
         keys = key.split(".")
         if len(keys) == 1:
@@ -225,7 +203,7 @@ def find_root():
     found = False
     i = 0
     root_folder = ""
-    config : Optional[MateConfig] = None
+    config: Optional[MateConfig] = None
     while not found and i < 6:
 
         if os.path.exists(os.path.join(current_path, "mate.json")):
@@ -267,7 +245,7 @@ def get_experiment_description(root_folder: str, model_name: str, experiment: st
     return None
 
 
-def list_experiments(root_foolder: str, log=True):
+def list_experiments(root_foolder: str, model_name=None, log=True):
     """
     models = list_packages(root_foolder, "models")
 

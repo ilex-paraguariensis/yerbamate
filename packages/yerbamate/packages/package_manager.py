@@ -21,6 +21,9 @@ class PackageManager:
     def list(self, module: str, query: Optional[str] = None):
         return self.repository.list(module, query)
 
+    def load_experiment(self, experiment_name: str):
+        return self.repository.local.load_experiment(experiment_name)
+
     """
     def query_models(self, query: Optional[str] = None):
         return self.remote.get_models(query)

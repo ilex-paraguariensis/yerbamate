@@ -7,16 +7,13 @@ import ipdb
 
 
 class KerasTrainer(Trainer):
-    def __init__(
-        self, params: Bunch, root_module, base_module, map_key_values, *kwargs
-    ):
+    def __init__(self, params: Bunch, root_module, map_key_values, *kwargs):
 
         super().__init__(params, *kwargs)
 
         self.bombilla = Bombilla(
             params,
             root_module=root_module,
-            base_module=base_module,
             object_key_map=map_key_values,
         )
         self.install()
