@@ -67,7 +67,7 @@ class Mate:
         ), f'Experiment "{experiment_name}" does not exist.'
 
         # we need to load hyperparameters before training to set save_path
-        exp, self.save_path = self.__read_hyperparameters(experiment_name)
+        exp, self.save_path = self.package_manager.load_experiment(experiment_name)
 
         checkpoint_path = os.path.join(self.save_path, "checkpoints")
         if not os.path.exists(checkpoint_path):
@@ -151,19 +151,12 @@ class Mate:
         """
         self.root_folder, self.config = io.find_root()
         self.root_save_folder = self.config.results_folder
-        # self.save_path = self.root_save_folder
 
     def __load_exec_function(self, exec_file: str):
         return __import__(
             f"{self.root_folder}.exec.{exec_file}",
             fromlist=["exec"],
         ).run
-
-    def __read_hyperparameters(self, hparams_name: str = "default"):
-
-        hp, save_path = self.package_manager.load_experiment(hparams_name)
-
-        return hp, save_path
 
     def __parse_and_validate_params(self, params: str):
         assert (

@@ -109,43 +109,16 @@ class LocalDataSource(DataSource):
 
         return parsed_params
 
-    def __set_save_path(self, experiment: str):
-        self.save_path = io.set_save_path(
-            self.root_save_folder, self.root_folder, experiment
-        )
 
-    def __read_hyperparameters(
-        self, experiment: str = "default", run_params: dict = {}
-    ):
-
-        hp = io.read_experiments(
-            self.config,
-            self.root_folder,
-            experiment,
-            run_params,
-        )
-
-        # # this function will exit the program if there are missing parameters
-        # self.__validate_missing_params(hp, model_name, hparams_name)
-
-        # # all params are now validated, we can update the whole generated file
-        # all_params = self.__validate_missing_params(
-        #     hp, model_name, hparams_name, generate_defaults=True
-        # )
-
-        # io.save_train_experiments(self.save_path, all_params, self.config)
-
-        return hp
-
-    def __parse_and_validate_params(self, params: str):
+    def __parse_and_validate_params(self, trainer, experiment: str):
         assert (
             self.trainer is not None
         ), "Trainer must be initialized before parsing params (Bombilla is managed by Trainer)"
 
-        full, err = self.trainer.generate_full_dict()
+        full, err = trainer.generate_full_dict()
 
         if len(err) > 0:
-            print(f"Errors in {params}")
+            print(f"Errors in {experiment}")
             for error in err:
                 print(error)
 
@@ -155,13 +128,6 @@ class LocalDataSource(DataSource):
         io.save_train_experiments(self.save_path, full, self.config)
 
         return full
-
-    def __load_experiment_conf(self, params_name: str):
-        params = self.__read_hyperparameters(params_name)
-        self.__set_save_path(params_name)
-        params.save_path = self.save_path
-        params.root_folder = self.root_folder
-        return params
 
     # def get_models(self, query: Optional[str] = None):
     #     return self.__filter_names(query, self.models)

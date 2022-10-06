@@ -38,7 +38,9 @@ class ModuleMetadataGenerator:
     def update_metadata(self):
 
         # update URL to point to the right module
-        url_addition = "/".join([self.root_module, self.type_module, self.local_module])
+        url_addition = "/".join(
+            [self.root_module, self.type_module, self.local_module, ""]
+        )
         new_url = self.base_metadata.url + url_addition
         type = self.type_module
         self.base_metadata.update(url=new_url, type=type)
