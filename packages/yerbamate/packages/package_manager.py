@@ -17,6 +17,7 @@ class PackageManager:
         self.metadata_generator = MetadataGenerator(
             config.project, config.metadata, self.repository.local
         )
+        self.metadata_generator.generate()
 
     def list(self, module: str, query: Optional[str] = None):
         return self.repository.list(module, query)

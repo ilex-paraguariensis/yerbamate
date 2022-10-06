@@ -10,7 +10,7 @@ from ..package import Package
 from bombilla import Bombilla
 import ipdb
 
-from .utils import get_function_args
+from .utils import get_function_args, find_in_bombilla_dict
 
 
 class ModuleMetadataGenerator:
@@ -34,6 +34,29 @@ class ModuleMetadataGenerator:
         )
 
         self.module_files = os.listdir(self.module_path)
+
+    def get_possible_modules(self):
+        return [
+            ".".join([self.root_module, self.type_module, self.local_module]),
+            ".".join([self.type_module, self.local_module]),
+        ]
+
+    def search_experiments_for_defaults(self, module, function_name):
+
+        experiments = self.local_data_source.list("experiments")
+
+        samples = []
+
+        for experiment in experiments:
+
+            conf, _ = self.local_data_source.load_experiment(experiment)
+            # ipdb.set_trace()
+
+            sample = find_in_bombilla_dict(conf, module, function_name)
+            if sample:
+                samples += [{"sample": sample, "experiment": conf}]
+
+        return samples
 
     def update_metadata(self):
 
@@ -81,9 +104,9 @@ class ModuleMetadataGenerator:
 
         res = args.copy()
         for key, value in args.items():
-            # ipdb.set_trace()
             if type(value) == dict and "module" in value:
 
+                # shorterns the module name
                 value["module"] = value["module"].replace(
                     ".".join([self.root_module, self.type_module, ""]), ""
                 )
@@ -95,37 +118,41 @@ class ModuleMetadataGenerator:
 
         # ipdb.set_trace()
         args, errors = get_function_args(klass[1].__init__, {})
-        # ipdb.set_trace()
         args = self.format_modules(args)
-        if errors:
-            return {
-                "class_name": klass[0],
-                "module": self.local_module,
-                "params": args,
-                "errors": errors,
-            }
-        else:
-            return {
-                "class_name": klass[0],
-                "module": self.local_module,
-                "params": args,
-            }
+
+        defualts = self.search_experiments_for_defaults(klass[1], klass[0])
+
+        result = {
+            "class_name": klass[0],
+            "module": self.local_module,
+            "params": args,
+            "samples": defualts,
+            "errors": errors,
+        }
+
+        # remove non and empty values
+        result = {k: v for k, v in result.items() if v and v != "None" and v != []}
+
+        return result
 
     def generate_function_metadata(self, function):
         args, errors = get_function_args(function[1], {})
         args = self.format_modules(args)
-        if errors:
-            return {
-                "function_name": function[0],
-                "module": self.local_module,
-                "params": args,
-                "errors": errors,
-            }
-        return {
+
+        defualts = self.search_experiments_for_defaults(function[1], function[0])
+
+        result = {
             "function_name": function[0],
             "module": self.local_module,
             "params": args,
+            "samples": defualts,
+            "errors": errors,
         }
+
+        # remove non and empty values
+        result = {k: v for k, v in result.items() if v and v != "None" and v != []}
+
+        return result
 
     def __get_local_module(self):
         return __import__(

@@ -3,6 +3,28 @@ import inspect
 import ipdb
 
 
+def find_in_bombilla_dict(bombilla_dict, module, class_or_function_name):
+
+    # ipdb.set_trace()
+
+    if "module" in bombilla_dict:
+        if bombilla_dict["module"] in module.__module__:
+            if "class_name" in bombilla_dict:
+                if bombilla_dict["class_name"] == class_or_function_name:
+                    return bombilla_dict
+            elif "function" in bombilla_dict:
+                if bombilla_dict["function"] == class_or_function_name:
+                    return bombilla_dict
+            # return bombilla_dict
+    for k, v in bombilla_dict.items():
+        if type(v) == dict:
+            res = find_in_bombilla_dict(v, module, class_or_function_name)
+            if res is not None:
+                return res
+
+    return None
+
+
 def parse_default_param(param):
 
     # if param is object:
