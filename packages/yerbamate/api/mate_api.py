@@ -1,5 +1,6 @@
 import os
 import sys
+import threading
 from yerbamate.mate_config import MateConfig
 from yerbamate.trainers.trainer import Trainer
 from yerbamate.utils.bunch import Bunch
@@ -10,8 +11,13 @@ from typing import Optional, Union
 import ipdb
 
 
+import asyncio
+import websocket
+import websockets
+
 """
-should install packages, update packages, remove packages, list packages, etc
+MATE API
+
 """
 
 
@@ -24,6 +30,24 @@ class MateAPI:
         self.save_dir: str = None
         self.checkpoint_path: str = None
         self.trainer: Trainer = None
+
+        self.ws = websockets.serve(self.serve, "localhost", 8765)
+        event_loop = asyncio.get_event_loop()
+        self.ws_thread = threading.Thread(target=self.run_server, args=(event_loop,))
+        self.ws_thread.start()
+
+    def run_server(self, loop):
+
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(self.ws)
+        loop.run_forever()
+
+    async def serve(self, websocket, path):
+        data = await websocket.recv()
+        print(f"< {data}")
+        ack = f"ack: {data}"
+        await websocket.send(ack)
+        print(f"> {ack}")
 
     def list(self, module: str, query: Optional[str] = None):
         return self.repository.list(module, query)

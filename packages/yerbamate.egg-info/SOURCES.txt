@@ -44,6 +44,7 @@ packages/yerbamate/_legacy/plot.py
 packages/yerbamate/_legacy/tune_hyperparameters.py
 packages/yerbamate/api/__init__.py
 packages/yerbamate/api/mate_api.py
+packages/yerbamate/api/socket.py
 packages/yerbamate/api/__pycache__/__init__.cpython-310.pyc
 packages/yerbamate/api/__pycache__/mate_api.cpython-310.pyc
 packages/yerbamate/api/__pycache__/package.cpython-310.pyc
@@ -53,6 +54,9 @@ packages/yerbamate/api/_legacy/package_installer.py
 packages/yerbamate/api/data/__init__.py
 packages/yerbamate/api/data/package.py
 packages/yerbamate/api/data/package_repository.py
+packages/yerbamate/api/data/__pycache__/__init__.cpython-310.pyc
+packages/yerbamate/api/data/__pycache__/package.cpython-310.pyc
+packages/yerbamate/api/data/__pycache__/package_repository.cpython-310.pyc
 packages/yerbamate/api/data/metadata/__init__.py
 packages/yerbamate/api/data/metadata/generator.py
 packages/yerbamate/api/data/metadata/metadata.py
@@ -79,6 +83,8 @@ packages/yerbamate/api/data/sources/local/__pycache__/local.cpython-310.pyc
 packages/yerbamate/api/data/sources/local/__pycache__/server.cpython-310.pyc
 packages/yerbamate/api/data/sources/remote/__init__.py
 packages/yerbamate/api/data/sources/remote/remote.py
+packages/yerbamate/api/data/sources/remote/__pycache__/__init__.cpython-310.pyc
+packages/yerbamate/api/data/sources/remote/__pycache__/remote.cpython-310.pyc
 packages/yerbamate/api/project_parser/__init__.py
 packages/yerbamate/api/project_parser/_project_parser.py
 packages/yerbamate/api/project_parser/project_parser.py
