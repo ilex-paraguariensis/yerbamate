@@ -12,11 +12,12 @@ class Config:
 
         if "metadata" in config:
             config["metadata"] = Metadata(**config["metadata"])
-        # ipdb.set_trace()
 
         for key, value in self.__dict__.items():
             if value != None and value != {}:
-                assert key in config, f"Missing key {key} in config"
+                # Why assert when we can just set the default value?
+                setattr(self, key, value)
+                # assert key in config, f"Missing key {key} in config"
             if isinstance(value, Enum):
                 enum_type = type(value)
                 assert (
@@ -58,5 +59,6 @@ class MateConfig(Config):
         self.results_folder = ""
         # self.backbone: BackboneType = BackboneType.lightning
         self.override_params: dict[str, Any] = {}
+        self.restarting = False
         self.metadata: BaseMetadata = BaseMetadata()
         super().__init__(config)

@@ -34,77 +34,56 @@ class Mate:
         self.custom_save_path = None
         self.trainer: Optional[Trainer] = None
         assert self.config is not None
-        self.package_manager = MateAPI(self.config)
+        self.api = MateAPI(self.config)
 
     def create(self, path: str):
         pass
 
     def remove(self, model_name: str):
-        io.remove(self.root_folder, model_name)
+        pass
 
     def list(self, module_name: str = None, query: str = None):
-
-        li = self.package_manager.list(module_name, query)
+        li = self.api.list(module_name, query)
         print(li)
 
-        # return print("\t" + "\n\t".join(self.data_source.get(folder)))
-
     def clone(self, source_model: str, target_model: str):
-        io.clone(self.root_folder, source_model, target_model)
+        pass
 
     def snapshot(self, model_name: str):
-        io.snapshot(self.root_folder, model_name)
+        pass
 
     def train(self, experiment_name: str = "default"):
 
-        assert (
-            len(self.package_manager.list("experiments", experiment_name)) > 0
-        ), f'Experiment "{experiment_name}" does not exist.'
-
-        # we need to load hyperparameters before training to set save_path
-        exp, self.save_path = self.package_manager.load_experiment(experiment_name)
-
-        checkpoint_path = os.path.join(self.save_path, "checkpoints")
-        if not os.path.exists(checkpoint_path):
-            os.mkdir(checkpoint_path)
-        checkpoints = [
-            os.path.join(checkpoint_path, p) for p in os.listdir(checkpoint_path)
-        ]
-        """
-        action = "go"
-        if len(checkpoints) > 0:
-            while action not in ("y", "n", ""):
-                action = input(
-                    "Checkpiont file exists. Re-training will erase it. Continue? ([y]/n)\n"
-                )
-            if action in ("y", "", "Y"):
-                for checkpoint in checkpoints:
-                    os.remove(checkpoint)  # remove all checkpoint files
-            else:
-                print("Ok, exiting.")
-                return
-        """
-        self.__fit(experiment_name)
+        self.api.select_experiment(experiment_name)
+        self.api.train()
 
     def test(self, model_name: str, params: str):
-        assert model_name in self.models, f'Model "{model_name}" does not exist.'
-        params = "parameters" if params == "" or params == "None" else params
-        print(f"Testing model {model_name} with hyperparameters: {params}.json")
+        """
+        TODO: Implement test in trainer
+        """
+        pass
+        # assert model_name in self.models, f'Model "{model_name}" does not exist.'
+        # params = "parameters" if params == "" or params == "None" else params
+        # print(f"Testing model {model_name} with hyperparameters: {params}.json")
 
-        trainer = self.__get_trainer(model_name, params)
+        # trainer = self.__get_trainer(model_name, params)
 
-        checkpoint_path = os.path.join(self.save_path, "checkpoint", "best.ckpt")
+        # checkpoint_path = os.path.join(self.save_path, "checkpoint", "best.ckpt")
 
-        trainer.test(ckpt_path=checkpoint_path)
+        # trainer.test(ckpt_path=checkpoint_path)
 
     def restart(self, model_name: str, params: str = "default"):
+        """
+        TODO: Implement restart in trainer
+        """
+        pass
         # assert io.experiment_exists(
         #    self.root_folder, model_name, params
         # ), f'Model "{model_name}" does not exist.'
-        io.assert_experiment_exists(self.root_folder, model_name, params)
+        # io.assert_experiment_exists(self.root_folder, model_name, params)
 
-        self.is_restart = True
-        self.__fit(model_name, params)
+        # self.is_restart = True
+        # self.__fit(model_name, params)
 
     def tune(self, model: str, params: tuple[str, ...]):
         """

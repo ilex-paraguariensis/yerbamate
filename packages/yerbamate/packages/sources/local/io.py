@@ -150,9 +150,6 @@ def read_experiments(
     hparams_path = __get_experiment_path(root_folder, hparams_name)
     assert hparams_path != None, f"Could not find the experiment {hparams_name}"
 
-    # exp = get_experiment_description(root_folder, model_name, hparams_name)
-    # print_once(f"{exp[2]}: {exp[0]}/{exp[1]}.json")
-
     with open(hparams_path) as f:
         hparams = json.load(f)
 
@@ -160,7 +157,6 @@ def read_experiments(
     hparams = override_params(conf, hparams)
     hparams = override_run_params(hparams, run_params)
 
-    # trick to save parameters, otherwise changes are not saved after return!
     hparams = Bunch(json.loads(json.dumps(hparams)))
 
     return hparams

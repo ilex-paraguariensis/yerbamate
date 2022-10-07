@@ -6,11 +6,12 @@ from flask import request, jsonify
 import json
 from ...metadata.generator import MetadataGenerator
 
+
 class LocalServer:
-    def __init__(self, generator:MetadataGenerator, local_ds: LocalDataSource) -> None:
+    def __init__(self, generator: MetadataGenerator, local_ds: LocalDataSource) -> None:
         self.local_ds = local_ds
         self.metadata = generator.generate()
-        print(self.metadata)
+        # print(self.metadata)
         # run server in a thread
         t = Thread(target=self.run_server)
         t.start()
@@ -22,7 +23,7 @@ class LocalServer:
         def list(query):
             # query = request.args["query"]
             # return self.local_ds.list(query)
-            return jsonify( self.metadata[query])
+            return jsonify(self.metadata[query])
 
         @app.route("/experiment_<experiment>")
         def experiment(experiment: str):
@@ -34,23 +35,19 @@ class LocalServer:
             return self.local_ds.get_all_experiments()
 
         @app.route("/update_experiment_<experiment_name>", methods=["POST"])
-        def update_experiment(experiment_name:str):
+        def update_experiment(experiment_name: str):
             json_str = json.loads(request.data)
             # TODO: update experiment
             return "ok"
 
         app.route("/train_<experiment_name>")
+
         def train(experiment):
             # TODO: tell websocket to stop experiment
             pass
 
-
         def stop():
             # TOSO: tell websocket to stop
             pass
-
-        
-
-
 
         app.run(port=3001)

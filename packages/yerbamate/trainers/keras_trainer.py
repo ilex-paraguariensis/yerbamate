@@ -1,8 +1,6 @@
 from bombilla import Bombilla
-from ..packages.package import Package
 from .trainer import Trainer
 from yerbamate.utils.bunch import Bunch
-import tensorflow as tf
 import ipdb
 
 

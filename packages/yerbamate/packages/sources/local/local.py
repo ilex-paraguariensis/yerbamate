@@ -35,6 +35,9 @@ class LocalDataSource(DataSource):
 
         return results
 
+    def assert_experiment_exists(self, experiment):
+        assert experiment in self.experiments, f"Experiment {experiment} does not exist"
+
     def load_experiment(self, experiment: str):
 
         exp = io.read_experiments(self.config, self.root_folder, experiment)
