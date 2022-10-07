@@ -1,0 +1,14 @@
+FROM archlinux:latest
+RUN pacman -Syu --noconfirm
+RUN pacman -S python python-pip deno git --noconfirm
+RUN pip install numpy jax torch torchvision ipdb regex validators setuptools wheel
+WORKDIR /app
+RUN git clone --recurse-submodules https://github.com/ilex-paraguariensis/yerbamate -b v2
+RUN mkdir yerbamate/dist
+RUN git clone https://github.com/ilex-paraguariensis/bombilla
+RUN git clone https://github.com/ilex-paraguariensis/examples
+COPY ./__run__.py /app/run.py
+# CMD ["ls", "-lah", "/app"]
+CMD ["python", "run.py"]
+
+
