@@ -11,13 +11,9 @@ should install packages, update packages, remove packages, list packages, etc
 """
 
 
-class PackageManager:
+class MateAPI:
     def __init__(self, config: MateConfig):
         self.repository = PackageRepository(config)
-        self.metadata_generator = MetadataGenerator(
-            config.project, config.metadata, self.repository.local
-        )
-        self.metadata_generator.generate()
 
     def list(self, module: str, query: Optional[str] = None):
         return self.repository.list(module, query)

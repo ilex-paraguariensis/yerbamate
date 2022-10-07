@@ -1,12 +1,7 @@
 import os
 
-from yerbamate.packages.package_manager import PackageManager
+from yerbamate.packages.mate_api import MateAPI
 
-from .packages.metadata.generator import MetadataGenerator
-
-from .utils.bunch import Bunch
-
-import json
 import sys
 
 from .trainers.trainer import Trainer
@@ -39,7 +34,7 @@ class Mate:
         self.custom_save_path = None
         self.trainer: Optional[Trainer] = None
         assert self.config is not None
-        self.package_manager = PackageManager(self.config)
+        self.package_manager = MateAPI(self.config)
 
     def create(self, path: str):
         pass
@@ -75,6 +70,7 @@ class Mate:
         checkpoints = [
             os.path.join(checkpoint_path, p) for p in os.listdir(checkpoint_path)
         ]
+        """
         action = "go"
         if len(checkpoints) > 0:
             while action not in ("y", "n", ""):
@@ -87,7 +83,7 @@ class Mate:
             else:
                 print("Ok, exiting.")
                 return
-
+        """
         self.__fit(experiment_name)
 
     def test(self, model_name: str, params: str):

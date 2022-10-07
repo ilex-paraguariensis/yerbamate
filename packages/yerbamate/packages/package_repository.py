@@ -6,7 +6,7 @@ from .sources.local.server import LocalServer
 from .package import Package
 from typing import Optional
 import ipdb
-
+from .metadata.generator import MetadataGenerator
 
 
 class PackageRepository:
@@ -14,8 +14,12 @@ class PackageRepository:
         self.config = config
         self.remote = RemoteDataSource()
         self.local = LocalDataSource(config)
-        self.local_server = LocalServer(self.local)
-
+        self.metadata_generator = MetadataGenerator(
+            config.project, config.metadata, self.local
+        )
+        self.local_server = LocalServer(self.metadata_generator, self.local)
+        
+        self.metadata_generator.generate()
     # def list(self, module: str, query: Optional[str] = None):
     #     print(self.local.list(module, query))
     def list(self, module: str, query: Optional[str] = None):
