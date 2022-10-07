@@ -1,17 +1,17 @@
 import os
+from yerbamate.api.data.sources.local import io
 
-from yerbamate.packages.mate_api import MateAPI
+from yerbamate.api.mate_api import MateAPI
 
 import sys
 
 from .trainers.trainer import Trainer
 import ipdb
 from .utils import utils
-from .packages.sources.local import io
-from bombilla import parser
+
 
 from typing import Optional
-from .packages.package_repository import PackageRepository
+
 from .mate_config import MateConfig
 from .mateboard.mateboard import MateBoard
 
@@ -127,30 +127,10 @@ class Mate:
         self.root_folder, self.config = io.find_root()
         self.root_save_folder = self.config.results_folder
 
-    def __load_exec_function(self, exec_file: str):
-        return __import__(
-            f"{self.root_folder}.exec.{exec_file}",
-            fromlist=["exec"],
-        ).run
 
-    def __parse_and_validate_params(self, params: str):
-        assert (
-            self.trainer is not None
-        ), "Trainer must be initialized before parsing params (Bombilla is managed by Trainer)"
 
-        full, err = self.trainer.generate_full_dict()
-
-        if len(err) > 0:
-            print(f"Errors in {params}")
-            for error in err:
-                print(error)
-
-            sys.exit(1)
-
-        io.save_train_experiments(self.save_path, full, self.config)
-
-        return full
-
+    
+    
     def __get_trainer(self, params: str):
         if self.trainer is None:
 

@@ -1,4 +1,4 @@
-from yerbamate.packages.metadata.metadata import BaseMetadata, Metadata
+from .api.data.metadata.metadata import BaseMetadata, Metadata
 from .utils.bunch import Bunch
 from .backbone_type import BackboneType
 from enum import Enum
