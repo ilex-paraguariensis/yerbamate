@@ -25,6 +25,16 @@ class LocalDataSource(DataSource):
 
         self.__load_data(root_dir)
 
+    def get_all_experiments(self):
+        exps = self.list("experiments")
+
+        results = []
+        for experiment in exps:
+            exp, _ = self.load_experiment(experiment)
+            results += [exp]
+
+        return results
+
     def load_experiment(self, experiment: str):
 
         exp = io.read_experiments(self.config, self.root_folder, experiment)
@@ -108,7 +118,6 @@ class LocalDataSource(DataSource):
             sys.exit(1)
 
         return parsed_params
-
 
     def __parse_and_validate_params(self, trainer, experiment: str):
         assert (

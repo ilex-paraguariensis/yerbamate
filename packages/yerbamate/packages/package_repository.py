@@ -1,10 +1,12 @@
 from yerbamate.mate_config import MateConfig
 from .sources.remote import RemoteDataSource
 from .sources.local.local import LocalDataSource
+from .sources.local.server import LocalServer
 
 from .package import Package
 from typing import Optional
 import ipdb
+
 
 
 class PackageRepository:
@@ -12,6 +14,7 @@ class PackageRepository:
         self.config = config
         self.remote = RemoteDataSource()
         self.local = LocalDataSource(config)
+        self.local_server = LocalServer(self.local)
 
     # def list(self, module: str, query: Optional[str] = None):
     #     print(self.local.list(module, query))
