@@ -3,6 +3,7 @@ from flask import Flask
 import ipdb
 from threading import Thread
 from flask import request, jsonify
+from flask_cors import CORS
 import json
 from ...metadata.generator import MetadataGenerator
 
@@ -18,12 +19,16 @@ class LocalServer:
 
     def run_server(self):
         app = Flask(__name__)
-
+        CORS(app)
         @app.route("/list_<query>")
         def list(query):
             # query = request.args["query"]
             # return self.local_ds.list(query)
-            return jsonify(self.metadata[query])
+            if query != "experiments":
+                return jsonify(self.metadata[query])
+            else:
+                return jsonify(self.local_ds.list(query))
+
 
         @app.route("/experiment_<experiment>")
         def experiment(experiment: str):
