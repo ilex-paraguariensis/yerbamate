@@ -35,6 +35,15 @@ class LocalServer:
             exp, _ = self.local_ds.load_experiment(experiment)
             return exp
 
+        @app.route("/mate_summary")
+        def mate_summary():
+            mate_summary = {}
+            mate_summary["experiments"] = self.local_ds.get_all_experiments()
+            mate_summary["models"] = self.metadata["models"]
+            mate_summary["trainers"] = self.metadata["trainers"]
+            mate_summary["data_loaders"] = self.metadata["data_loaders"]
+            return jsonify(mate_summary)
+
         @app.route("/experiments")
         def experiments():
             return self.local_ds.get_all_experiments()

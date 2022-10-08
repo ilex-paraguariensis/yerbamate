@@ -7,7 +7,7 @@ from typing import Optional
 import ipdb
 from ....project_parser.project_parser import ProjectParser
 from ..local import io
-
+from typing import Any
 
 class LocalDataSource(DataSource):
     def __init__(
@@ -25,13 +25,13 @@ class LocalDataSource(DataSource):
 
         self.__load_data(root_dir)
 
-    def get_all_experiments(self):
+    def get_all_experiments(self) -> dict[str, Any]:
         exps = self.list("experiments")
 
-        results = []
+        results = {}
         for experiment in exps:
             exp, _ = self.load_experiment(experiment)
-            results += [exp]
+            results[experiment] = exp
 
         return results
 
