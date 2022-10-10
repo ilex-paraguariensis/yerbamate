@@ -2,3 +2,4 @@ bomba
 flask
 ipdb
 websockets
+flask_cors

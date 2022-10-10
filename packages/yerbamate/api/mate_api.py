@@ -32,6 +32,7 @@ class MateAPI:
         self.trainer: Trainer = None
 
         self.ws = websockets.serve(self.serve, "localhost", 8765)
+
         event_loop = asyncio.get_event_loop()
         self.ws_thread = threading.Thread(target=self.run_server, args=(event_loop,))
         self.ws_thread.start()
@@ -41,6 +42,9 @@ class MateAPI:
         asyncio.set_event_loop(loop)
         loop.run_until_complete(self.ws)
         loop.run_forever()
+
+    def send_message(self, message):
+        asyncio.run(self.ws.send(message))
 
     async def serve(self, websocket, path):
         data = await websocket.recv()

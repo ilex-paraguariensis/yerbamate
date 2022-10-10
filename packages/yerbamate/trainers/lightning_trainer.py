@@ -24,25 +24,35 @@ class LightningTrainer(Trainer):
         self.bombilla.load()
         self.bombilla.execute()
 
-        # rename
-
     def is_pl(self):
         return True
 
     def fit(self, *args, **kwargs):
         # ipdb.set_trace()
 
-        # ipdb.set_trace()
+        if self.bombilla.has_method("fit", "trainer"):
+            self.bombilla.execute_method("fit", "trainer", *args, **kwargs)
 
-        self.bombilla.execute_method("fit", "trainer", *args, **kwargs)
-        # self.root_node.trainer_node.call_method("fit", *args, **kwargs)
-        # self.trainer.fit(self.model, datamodule=self.datamodule, *args, **kwargs)
+        else:
+            self.bombilla["trainer"].fit(
+                self.bombilla["pytorch_lightning_module"],
+                self.bombilla["data"],
+                *args,
+                **kwargs
+            )
 
     def test(self, *args, **kwargs):
-        # self.trainer.test(self.model, datamodule=self.datamodule, *args, **kwargs)
-        self.bombilla.execute_method("fit", "trainer", *args, **kwargs)
 
-        # self.root_node.trainer_node.call_method("test", *args, **kwargs)
+        if self.bombilla.has_method("test", "trainer"):
+            self.bombilla.execute_method("fit", "trainer", *args, **kwargs)
+
+        else:
+            self.bombilla["trainer"].test(
+                self.bombilla["pytorch_lightning_module"],
+                self.bombilla["data"],
+                *args,
+                **kwargs
+            )
 
     def save(self, path: str):
         pass

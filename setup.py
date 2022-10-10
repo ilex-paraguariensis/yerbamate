@@ -27,7 +27,7 @@ setup(
     package_dir={"": "packages/"},
     license="Apache License 2.0",
     license_files=("LICENSE.md",),
-    install_requires=["bomba", "flask", "ipdb", "websockets"],
+    install_requires=["bomba", "flask", "ipdb", "websockets", "flask_cors"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
