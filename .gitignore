@@ -6,3 +6,4 @@ dist/
 packages/ymdl.egg-info/
 packages/yerbamate.egg-info/
 docker/dev/
+packages/yerbamate/mateboard/node_modules
