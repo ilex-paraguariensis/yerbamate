@@ -55,7 +55,7 @@ interface MateSummary {
   models: Package[];
   trainers: Package[];
   datasets: Package[];
-  experiments: Experiment[];
+  experiments: Record<string, Experiment>;
 }
 interface ExperimentResult {
   id: string;

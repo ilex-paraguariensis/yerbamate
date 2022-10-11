@@ -38,38 +38,32 @@ export default function ({ models }: { models: Package[] }) {
           <span style={{ marginLeft: "auto", marginRight: "auto" }}>+</span>
         </button>
       </div>
-      {Object.entries(models).map(
-        (entry) => {
-          const [localName, model] = entry;
-          console.log(`hey ${localName}:${model}`);
-          console.log(model.url);
-          return (
-            <div
-              className="card"
-              style={{
-                width: "25rem",
-                display: "block",
-                marginLeft: "auto",
-                marginRight: "auto",
-                marginBottom: "5px",
-                backgroundColor: "#D0FFC6",
-              }}
-            >
-              <div className="card-body">
-                <h5 className="card-title">Local Name: {localName}</h5>
-                <p className="card-text">{model.description}</p>
-                <a
-                  style={{ fontSize: "15px" }}
-                  href={model.url}
-                  target="_blank"
-                >
-                  {model.url}
-                </a>
-              </div>
+      {Object.entries(models).map((entry) => {
+        const [localName, model] = entry;
+        console.log(`hey ${localName}:${model}`);
+        console.log(model.url);
+        return (
+          <div
+            className="card"
+            style={{
+              width: "25rem",
+              display: "block",
+              marginLeft: "auto",
+              marginRight: "auto",
+              marginBottom: "5px",
+              backgroundColor: "#D0FFC6",
+            }}
+          >
+            <div className="card-body">
+              <h5 className="card-title">Local Name: {localName}</h5>
+              <p className="card-text">{model.description}</p>
+              <a style={{ fontSize: "15px" }} href={model.url} target="_blank">
+                {model.url}
+              </a>
             </div>
-          );
-        }
-      )}
+          </div>
+        );
+      })}
     </div>
   );
 }

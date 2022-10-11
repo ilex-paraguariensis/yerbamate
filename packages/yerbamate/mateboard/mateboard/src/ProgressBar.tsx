@@ -27,7 +27,7 @@ export default ({ totalTime, color }: { totalTime: number; color: string }) => {
       <div
         className={`progress-bar progress-bar-striped ${
           color === "red" ? "bg-danger" : "bg-success"
-       }`}
+        }`}
         role="progressbar"
         style={{ width: `${time}%` }}
         aria-valuenow={50}

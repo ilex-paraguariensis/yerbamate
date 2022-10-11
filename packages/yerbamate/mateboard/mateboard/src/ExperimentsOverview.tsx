@@ -86,7 +86,7 @@ export default function ({
   setSections,
   setSection,
 }: {
-  experiments: Experiment[];
+  experiments: Record<string, Experiment>;
   setSections: (sections: Record<string, JSX.Element>) => void;
   setSection: (section: string) => void;
 }) {
@@ -107,7 +107,7 @@ export default function ({
         <span style={{ marginLeft: "auto", marginRight: "auto" }}>+</span>
       </button>
 
-      {experiments.map((experiment) => (
+      {Object.entries(experiments).map(([localName, experiment]) => (
         <div
           onClick={() => {
             setSections({

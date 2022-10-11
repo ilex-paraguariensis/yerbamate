@@ -48,8 +48,8 @@ export default function NavBar({
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               {Object.keys(sections)
                 .filter((x) => x !== "default")
-                .map((sectionName) => (
-                  <li className="nav-item">
+                .map((sectionName, i) => (
+                  <li key={String(i)} className="nav-item">
                     <a
                       className={`nav-link ${
                         sectionName === section && "active"

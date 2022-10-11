@@ -11,14 +11,11 @@ import { MateSummary } from "./Interfaces";
 type View = "default" | "Results" | "Models" | "Trainers" | "Datasets";
 
 const App = () => {
-  const [mateSummary, setMateSummary] = useState({
-    models: [],
-    experiments: [],
-  } as unknown as MateSummary);
+  const [mateSummary, setMateSummary] = useState<MateSummary | null>(null);
   const [view, setView] = useState("" as View);
   const defaultSections = {
-    Results: <Results setSections={()=>{}}/>,
-    Models: <Models models={mateSummary.models} />,
+    Results: <Results setSections={() => {}} />,
+    Models: <Models models={mateSummary !== null ? mateSummary.models : []} />,
     Trainers: <Trainers />,
     Datasets: <Datasets />,
   } as Record<View, JSX.Element>;
@@ -31,13 +28,11 @@ const App = () => {
         setMateSummary(() => {
           defaultSections["Models"] = <Models models={data.models} />;
           // const experiments =
-
+          console.log(data);
           return data;
         })
       );
-  }, [1]);
-  const experiments = mateSummary.experiments;
-
+  }, []);
   return (
     <div>
       <title>Maté</title>
@@ -52,7 +47,6 @@ const App = () => {
       <style>
         {`html, body {
 				 		background-color: #37474F;
-
 				}	
 				`}
       </style>
@@ -63,7 +57,7 @@ const App = () => {
           defaultSections={defaultSections}
           defaultSection={
             <ExperimentsOverview
-              experiments={experiments}
+              experiments={mateSummary !== null ? mateSummary.experiments : {}}
               setSections={setSections}
               setSection={setSection}
             />

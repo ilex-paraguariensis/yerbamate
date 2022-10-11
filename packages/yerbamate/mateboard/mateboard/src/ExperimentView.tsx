@@ -9,12 +9,10 @@ import { MateSummary } from "./Interfaces";
 
 type View = "default" | "Config" | "Training" | "Visualizations";
 export default ({ experimentId }: { experimentId: string }) => {
-  const [mateSummary, setMateSummary] = useState({
-    experiments: [],
-  } as unknown as MateSummary);
+  const [mateSummary, setMateSummary] = useState<MateSummary | null>(null);
   const [view, setView] = useState("" as View);
-  const experiment = mateSummary.experiments.filter(
-    (e) => e.id === experimentId
+  const experiment = Object.entries(mateSummary !== null ? mateSummary.experiments : {}).filter(
+    ([key, e]) => e.id === experimentId
   )[0];
   // const namedSections =  as Record<View, Element>;
   console.log(mateSummary);
@@ -30,7 +28,7 @@ export default ({ experimentId }: { experimentId: string }) => {
       });
   }, []);
   const defaultSections = {
-    default: <ExperimentControl experiment={experiment} />,
+    default: <ExperimentControl experiment={experiment[1]} />,
     Config: <Config />,
     Training: <Training />,
     Visualizations: <Visualizations />,
