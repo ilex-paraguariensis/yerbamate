@@ -129,7 +129,7 @@ export default function ({
           }}
         >
           <div className="card-body">
-            <h5 className="card-title">{experiment.name}</h5>
+            <h5 className="card-title">Local Name: {localName}</h5>
             <p className="card-text">{experiment.description}</p>
             <table style={{ width: "100%" }}>
               <tbody>
