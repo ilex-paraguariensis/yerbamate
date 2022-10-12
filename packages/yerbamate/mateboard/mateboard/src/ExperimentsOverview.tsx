@@ -2,10 +2,10 @@ import { Experiment } from "./Interfaces";
 // imports the CSS file called ExperimentOverview.css
 // import "./ExperimentOverview.css";
 
-import Config from "./Config";
+import Config from "./ExperimentView/Config";
 import Training from "./Training";
 import Visualizations from "./Visualizations";
-import ExperimentControl from "./ExperimentControl";
+import ExperimentControl from "./ExperimentView/ExperimentControl";
 
 function Status({
   statusValue,

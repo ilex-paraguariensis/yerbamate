@@ -1,4 +1,5 @@
-import { Result } from "./Interfaces";
+import { Result } from "../Interfaces";
+
 export default ({ result }: { result: Result }) => {
   const metrics = Object.keys(result.experiments[0].metrics);
   return (

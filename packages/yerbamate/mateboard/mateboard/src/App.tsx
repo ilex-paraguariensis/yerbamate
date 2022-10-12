@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import NavBar from "./NavBar";
+import NavBar from "./components/NavBar";
 import Results from "./Results";
 import Models from "./Models";
 import Trainers from "./Trainers";

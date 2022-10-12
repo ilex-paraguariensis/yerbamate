@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-import NavBar from "./NavBar";
-import Config from "./Config";
+import NavBar from "./components/NavBar";
+import Config from "./ExperimentView/Config";
 import Training from "./Training";
 import Visualizations from "./Visualizations";
-import ExperimentControl from "./ExperimentControl";
+import ExperimentControl from "./ExperimentView/ExperimentControl";
 import { MateSummary } from "./Interfaces";
 
 type View = "default" | "Config" | "Training" | "Visualizations";
@@ -42,9 +42,9 @@ export default ({ experimentId }: { experimentId: string }) => {
         crossOrigin="anonymous"
       />
       <div className="App">
-        {/*mateSummary.experiments.length > 0 && (
+				{/*mateSummary && (
           <NavBar title="MateBoard" defaultSections={defaultSections} />
-        )*/}
+        */}
       </div>
       <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"

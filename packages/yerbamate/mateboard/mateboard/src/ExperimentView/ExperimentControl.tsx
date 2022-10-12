@@ -1,4 +1,4 @@
-import { Experiment } from "./Interfaces";
+import { Experiment } from "../Interfaces";
 import ProgressBar from "./ProgressBar";
 
 export default ({ experiment }: { experiment: Experiment }) => {

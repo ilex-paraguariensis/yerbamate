@@ -1,4 +1,4 @@
-import ResultDisplay from "./ResultDisplay";
+import ResultDisplay from "./Results/ResultDisplay";
 import { Result } from "./Interfaces";
 export default ({
   setSections,
