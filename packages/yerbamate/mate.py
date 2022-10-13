@@ -111,8 +111,8 @@ class Mate:
         self.__load_exec_function(exec_file)(model)
 
     def board(self):
-        board = MateBoard()
-        board.start()
+
+        self.api.start_mateboard()
 
     def __list_packages(self, folder: str):
         return io.list_packages(self.root_folder, folder)

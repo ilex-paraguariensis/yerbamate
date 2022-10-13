@@ -23,12 +23,12 @@ export default ({ experimentId }: { experimentId: string }) => {
         return res.json();
       })
       .then((data) => {
-        console.log("hoy" + data);
+        console.log("mate summary recieved" , data);
         setMateSummary(data);
       });
   }, []);
   const defaultSections = {
-    default: <ExperimentControl experiment={experiment[1]} />,
+    default: <ExperimentControl experiment={experiment[1]} experimentId={experimentId} />,
     Config: <Config />,
     Training: <Training />,
     Visualizations: <Visualizations />,

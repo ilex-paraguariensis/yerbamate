@@ -1,7 +1,11 @@
+import json
 import os
+import queue
 import sys
 import threading
+from time import sleep
 from yerbamate.mate_config import MateConfig
+from yerbamate.mateboard.mateboard import MateBoard
 from yerbamate.trainers.trainer import Trainer
 from yerbamate.utils.bunch import Bunch
 
@@ -14,11 +18,14 @@ import ipdb
 import asyncio
 import websocket
 import websockets
+from .socket import WebSocketServer
 
 """
 MATE API
 
 """
+
+from multiprocessing import Process, Queue
 
 
 class MateAPI:
@@ -31,27 +38,30 @@ class MateAPI:
         self.checkpoint_path: str = None
         self.trainer: Trainer = None
 
-        self.ws = websockets.serve(self.serve, "localhost", 8765)
+        self.ws = WebSocketServer(on_train_request=self.train_request)
 
-        event_loop = asyncio.get_event_loop()
-        self.ws_thread = threading.Thread(target=self.run_server, args=(event_loop,))
-        self.ws_thread.start()
+    def start_mateboard(self):
 
-    def run_server(self, loop):
+        board = MateBoard()
+        board.start()
 
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(self.ws)
-        loop.run_forever()
+    def train_request(self, request: dict):
+        # run on the main loop
 
-    def send_message(self, message):
-        asyncio.run(self.ws.send(message))
+        if request["type"] == "start_training":
+            print("start_training")
+            process = Process(
+                target=self._handle_train, args=(request["experiment_id"],)
+            )
+            process.start()
 
-    async def serve(self, websocket, path):
-        data = await websocket.recv()
-        print(f"< {data}")
-        ack = f"ack: {data}"
-        await websocket.send(ack)
-        print(f"> {ack}")
+        # print("select experiment", experiment_name)
+        # self.select_experiment(experiment_name)
+
+    def _handle_train(self, experiment_name: str):
+        self.select_experiment(experiment_name)
+        self.set_checkpoint_path()
+        self.train()
 
     def list(self, module: str, query: Optional[str] = None):
         return self.repository.list(module, query)
@@ -98,7 +108,8 @@ class MateAPI:
         return full
 
     def train(self):
-
+        # ensure that this runs on the main loop
+        print("train")
         self.init_trainer()
         self.validate_params()
         self.trainer.fit()
