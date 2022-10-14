@@ -36,5 +36,5 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
     ],
-    scripts=["./src/mate"],
+    scripts=["./src/mate", "./src/mateboard"],
 )

@@ -3,6 +3,7 @@ README.md
 setup.cfg
 setup.py
 ./src/mate
+./src/mateboard
 packages/mate/__init__.py
 packages/mate/cache.py
 packages/mate/keras_trainer.py
@@ -102,6 +103,7 @@ packages/yerbamate/mateboard/__init__.py
 packages/yerbamate/mateboard/mateboard.py
 packages/yerbamate/mateboard/package-lock.json
 packages/yerbamate/mateboard/package.json
+packages/yerbamate/mateboard/server.py
 packages/yerbamate/mateboard/__pycache__/__init__.cpython-310.pyc
 packages/yerbamate/mateboard/__pycache__/mateboard.cpython-310.pyc
 packages/yerbamate/mateboard/_old_mateboard/3
@@ -184,6 +186,7 @@ packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/00a3dd20
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/040ad2018c94ae2a5692292d9e7ed1a1.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/068fbb9a10f45b1d686a1b79fec46085.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/06bda8813fee49cc15bdddef724ed4ff.json
+packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/0989e876ec080e3f5fc3bc28c002c08c.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/0a2552ff1e67ee7bc836a4fe0d703cb6.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/0be473596e5dfef938c84ec30353c3f2.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/0dba5e20f81b844a78136a597e3a4c8f.json
@@ -218,6 +221,7 @@ packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/29ff847d
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/2a392ac3e32d59d23cbe9804ec2cae19.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/2e39bc7f7c6e3e2ffe4b22b6023847c1.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/2e3ed4f4873836e24a18a140d49f0b05.json
+packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/2e41356209448c7b396f268005a12897.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/303797e9f7caf227b2616e34c5fffa2b.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/30dc2dc37eedfd5c639e6c1d6a2561ad.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/3323f4993276c6020544bf444a68d73d.json
@@ -278,6 +282,7 @@ packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/6c6b419b
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/6da889164a951f571395b30e31f751e0.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/6e56cfa2fddb1fa6fc8aa8522b9e7465.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/6e873fdc5a893d4522b654a49c3eb307.json
+packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/6ebb87f3713356e453833d3a2cf31645.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/6f22c12aafa785743f1d6e807aa5fb37.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/744f15946183a30ac88233f0cd5ca197.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/74b99a591a73c55da73b095c73cd0325.json
@@ -299,6 +304,7 @@ packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/8576922e
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/8658094387991096c1fb93f0271fd27b.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/86dd484be392dbea2baafb7e278cdc27.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/8749d413f2c797cf6d3ecbcfe6045548.json
+packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/8a955831125b58375939a63c0308c015.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/8ae0c6b832444a8fb99496688894b608.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/8bfb2744b10e23c862edf8d2efed8199.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/8ea1b7ab4203b0cda1c1d0745a63711e.json
@@ -330,6 +336,7 @@ packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/a7c5771c
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/a8958cc7860afe9f6868a4452db89ccf.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/a96d4e60427334efd60d324558e0e59e.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/a9e1e3799c9ef86cfa3ba8f02cf00be6.json
+packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/aa2281b1222b3df6359f53334f1044da.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/ab6c70476b37e39ca2e91371c1901413.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/ac09be79342e712f7d5d7cd32a3cc64d.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/ac509beab98ba49c0417810274849cb3.json
@@ -356,6 +363,7 @@ packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/bd92d51d
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/beaff64198f18a1c55ae308ee222fd8a.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/bf87ac9f53e8d537a259fac66bd4883e.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/c117e9850abc3fb384d5f08c028d98c5.json
+packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/c2f7c7672664f2d48e2f61cfbb302395.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/c545af992fdbcadae83d9ce8b5584448.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/c57d6ca8b9ecfc7df1f2e84e22b8ace8.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/c6d0f52810bc409c6b152be13bb9cf3f.json
@@ -366,12 +374,14 @@ packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/ca295e5a
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/cb132fdf0d9c2d83be6d0149889847db.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/cd2c39ae8965fe161bd3551663a77622.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/cdc9b30d26c2c09b7c8c7f53154729df.json
+packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/cf7074a76d4d8fe97b633bed61ab00f6.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/d01699271895dd4e697933f701feea4d.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/d0dd5fd42f766ea75350ba03ac700dc7.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/d1b5216dbd8ac32e8c2ed7c01ad10c77.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/d20f318462d735a7bdcd91fb841cbc15.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/d2f7e78e5e53fef0aaa8d2fe72553b42.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/d343892fca3d4f0d2b9cc14659ee5fe7.json
+packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/d45557cb584ba54bf2220384d7ba3d9a.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/d53bfc39f143abf0aba1f3f65b85657a.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/d60761a92ba612e1bc75a037b6493cef.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/d6405a2c3e5f34b7fdb0108c0df312e9.json
@@ -379,6 +389,7 @@ packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/d8bedfb9
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/d8f3ba97b70bcd21037dcf3de4b07ec6.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/dcac5a387f3a586d82213196851f3068.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/dd8b1ae98ba11cdadb1c38579a357214.json
+packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/ddde722e381c6ece3d925631c964153e.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/df24f87f66401696546e335e618afa89.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/e0d72c28cdc77f55d384dcbd67c56ea3.json
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/babel-loader/e19de0f1915e5ccc665da9aa6aa5d1f6.json
@@ -411,6 +422,7 @@ packages/yerbamate/mateboard/mateboard/node_modules/.cache/default-development/1
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/default-development/12.pack
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/default-development/13.pack
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/default-development/14.pack
+packages/yerbamate/mateboard/mateboard/node_modules/.cache/default-development/15.pack
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/default-development/2.pack
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/default-development/3.pack
 packages/yerbamate/mateboard/mateboard/node_modules/.cache/default-development/4.pack

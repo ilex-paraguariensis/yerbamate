@@ -10,16 +10,18 @@ from .metadata.generator import MetadataGenerator
 
 
 class PackageRepository:
-    def __init__(self, config: MateConfig):
+    def __init__(self, config: MateConfig, run_local_api_server: bool = False):
         self.config = config
         self.remote = RemoteDataSource()
         self.local = LocalDataSource(config)
         self.metadata_generator = MetadataGenerator(
             config.project, config.metadata, self.local
         )
-        self.local_server = LocalServer(self.metadata_generator, self.local)
-        
+        if run_local_api_server:
+            self.local_server = LocalServer(self.metadata_generator, self.local)
+
         self.metadata_generator.generate()
+
     # def list(self, module: str, query: Optional[str] = None):
     #     print(self.local.list(module, query))
     def list(self, module: str, query: Optional[str] = None):

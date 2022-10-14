@@ -38,31 +38,6 @@ class MateAPI:
         self.checkpoint_path: Optional[str] = None
         self.trainer: Optional[Trainer] = None
 
-        self.ws = WebSocketServer(on_train_request=self.train_request)
-
-    def start_mateboard(self):
-
-        board = MateBoard()
-        board.start()
-
-    def train_request(self, request: dict):
-        # run on the main loop
-
-        if request["type"] == "start_training":
-            print("start_training")
-            process = Process(
-                target=self._handle_train, args=(request["experiment_id"],)
-            )
-            process.start()
-
-        # print("select experiment", experiment_name)
-        # self.select_experiment(experiment_name)
-
-    def _handle_train(self, experiment_name: str):
-        self.select_experiment(experiment_name)
-        self.set_checkpoint_path()
-        self.train()
-
     def list(self, module: str, query: Optional[str] = None):
         return self.repository.list(module, query)
 

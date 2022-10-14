@@ -2,6 +2,7 @@ import asyncio
 from asyncio import subprocess
 import json
 import multiprocessing
+import threading
 from time import sleep
 from traitlets import Callable
 import websocket
@@ -10,8 +11,7 @@ import threading
 import ipdb
 import queue
 
-# somewhere accessible to both:
-callback_queue = queue.Queue()
+
 
 
 class WebSocketServer:
@@ -21,12 +21,12 @@ class WebSocketServer:
         self.ws = websockets.serve(self.serve, "localhost", port)
         self.active_connections = []
 
-        self.ws_thread = multiprocessing.Process(target=self.run_server)
+        self.ws_thread = threading.Thread(target=self.run_server)
         self.ws_thread.start()
         # self.ws_thread.start()
 
     def run_server(self):
-
+        print("run_server")
         asyncio.run(self.main())
         print("run_server")
 
