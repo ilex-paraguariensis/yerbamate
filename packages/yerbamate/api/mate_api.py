@@ -32,11 +32,11 @@ class MateAPI:
     def __init__(self, config: MateConfig):
         self.config: MateConfig = config
         self.repository = PackageRepository(config)
-        self.exp: Union(Bunch | dict) = None
-        self.exp_name: str = None
-        self.save_dir: str = None
-        self.checkpoint_path: str = None
-        self.trainer: Trainer = None
+        self.exp: Optional[Bunch] = None
+        self.exp_name: Optional[str] = None
+        self.save_dir: Optional[str] = None
+        self.checkpoint_path: Optional[str] = None
+        self.trainer: Optional[Trainer] = None
 
         self.ws = WebSocketServer(on_train_request=self.train_request)
 
@@ -112,6 +112,7 @@ class MateAPI:
         print("train")
         self.init_trainer()
         self.validate_params()
+        assert self.trainer is not None
         self.trainer.fit()
 
     def restart(self):
@@ -138,6 +139,7 @@ class MateAPI:
         self.checkpoint_path = checkpoint_path
 
     def delete_checkpoints(self):
+        assert self.checkpoint_path is not None
         checkpoints = [
             os.path.join(self.checkpoint_path, p)
             for p in os.listdir(self.checkpoint_path)
