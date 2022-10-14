@@ -42,7 +42,7 @@ class Mate:
     def remove(self, model_name: str):
         pass
 
-    def list(self, module_name: str = None, query: str = None):
+    def list(self, module_name: str, query: Optional[str] = None):
         li = self.api.list(module_name, query)
         print(li)
 
