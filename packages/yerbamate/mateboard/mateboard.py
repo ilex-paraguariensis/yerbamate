@@ -2,7 +2,7 @@ import multiprocessing
 import os
 import subprocess
 import webbrowser
-
+from typing import Optional
 
 class MateBoard:
     def __init__(self):
@@ -13,6 +13,7 @@ class MateBoard:
         # p.start()
         self._start()
         # p.join()
+        self._p : Optional[subprocess.CompletedProcess]= None
 
     def _start(self):
         deno_installed = False
@@ -25,16 +26,13 @@ class MateBoard:
             ) from grepexc
         if deno_installed:
             os.system("killall node")
-            p = subprocess.run(
+            self._p = subprocess.run(
                 "npm start".split(),
                 capture_output=True,
                 cwd=os.path.join(os.path.dirname(__file__), "mateboard"),
                 start_new_session=True,
             )
-            stdout = p.stdout
-
-
             webbrowser.open("http://localhost:3000")
 
     def stop(self):
-        pass
+        self._p.kill()
