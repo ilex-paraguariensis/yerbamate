@@ -1,6 +1,6 @@
 import os
 from yerbamate.api.data.sources.local import io
-
+import json
 from yerbamate.api.mate_api import MateAPI
 
 import sys
@@ -42,9 +42,15 @@ class Mate:
     def remove(self, model_name: str):
         pass
 
-    def list(self, module_name: str, query: Optional[str] = None):
+    def list(self, module_name: str, query: Optional[str] = None, output_json: bool = True):
         li = self.api.list(module_name, query)
-        print(li)
+        if output_json:
+            print(json.dumps(li, indent=4))
+        else:
+            print(li)
+
+    def summary(self, output_json: bool = True):
+        print(json.dumps(self.api.summary(), indent=4))
 
     def clone(self, source_model: str, target_model: str):
         pass

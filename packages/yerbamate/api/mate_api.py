@@ -38,8 +38,12 @@ class MateAPI:
         self.checkpoint_path: Optional[str] = None
         self.trainer: Optional[Trainer] = None
 
+
     def list(self, module: str, query: Optional[str] = None):
         return self.repository.list(module, query)
+
+    def summary(self):
+        return self.repository.get_mate_summary()
 
     def load_experiment(self, experiment_name: str):
         return self.repository.local.load_experiment(experiment_name)

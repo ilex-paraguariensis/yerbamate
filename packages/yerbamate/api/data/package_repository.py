@@ -20,12 +20,22 @@ class PackageRepository:
         if run_local_api_server:
             self.local_server = LocalServer(self.metadata_generator, self.local)
 
-        self.metadata_generator.generate()
+        # TODO: we should refresh the metadata every time we run a command
+        self.metadata = self.metadata_generator.generate()
 
     # def list(self, module: str, query: Optional[str] = None):
     #     print(self.local.list(module, query))
     def list(self, module: str, query: Optional[str] = None):
         return self.local.list(module, query)
+
+    def get_mate_summary(self):
+        mate_summary = {}
+        mate_summary["experiments"] = self.local.get_all_experiments()
+        mate_summary["models"] = self.metadata["models"]
+        mate_summary["trainers"] = self.metadata["trainers"]
+        mate_summary["data_loaders"] = self.metadata["data_loaders"]
+        return mate_summary
+
 
     """
     def query_models(self, query: Optional[str] = None):
