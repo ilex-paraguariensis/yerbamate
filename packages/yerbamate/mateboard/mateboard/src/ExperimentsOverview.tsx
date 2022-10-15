@@ -111,7 +111,12 @@ export default function ({
         <div
           onClick={() => {
             setSections({
-              Control: <ExperimentControl experiment={experiment} experimentId={localName}/>,
+              Control: (
+                <ExperimentControl
+                  experiment={experiment}
+                  experimentId={localName}
+                />
+              ),
               Config: <Config />,
               Training: <Training />,
               Visualizations: <Visualizations />,

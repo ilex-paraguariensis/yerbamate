@@ -22,7 +22,7 @@ const App = () => {
   const [sections, setSections] = useState(defaultSections);
   const [section, setSection] = useState("default");
   useEffect(() => {
-    fetch(`http://localhost:3001/mate_summary`)
+    fetch(`http://localhost:3002/summary`)
       .then((res) => res.json())
       .then((data) =>
         setMateSummary(() => {

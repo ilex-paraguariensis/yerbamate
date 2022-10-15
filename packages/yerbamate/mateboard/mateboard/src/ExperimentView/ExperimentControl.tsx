@@ -1,6 +1,6 @@
 import { Experiment } from "../Interfaces";
 import ProgressBar from "./ProgressBar";
-import SocketAPIHook from "../api/SocketAPIHook";
+// import SocketAPIHook from "../api/SocketAPIHook";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useCallback, useEffect, useState } from "react";
 
@@ -12,30 +12,29 @@ enum ExperimentPageState {
   Test,
   TestRequested,
 }
-export default (
-  { experiment, experimentId }: {
-    experiment: Experiment;
-    experimentId: String;
-  },
-) => {
+export default ({
+  experiment,
+  experimentId,
+}: {
+  experiment: Experiment;
+  experimentId: String;
+}) => {
   const [viewState, setViewState] = useState(ExperimentPageState.Loading);
   const [socketUrl, setSocketUrl] = useState("ws://localhost:8765");
   const [messageHistory, setMessageHistory] = useState(
-    [] as Array<MessageEvent>,
+    [] as Array<MessageEvent>
   );
-  const [connectionStatusListener, setConnectionStatusListener] = useState(
-    {
-      onError: (event: Event) => {
-        console.log(event);
-      },
-      onOpen: (event: Event) => {
-        console.log(event);
-      },
-      onClose: (event: Event) => {
-        console.log(event);
-      },
+  const [connectionStatusListener, setConnectionStatusListener] = useState({
+    onError: (event: Event) => {
+      console.log(event);
     },
-  );
+    onOpen: (event: Event) => {
+      console.log(event);
+    },
+    onClose: (event: Event) => {
+      console.log(event);
+    },
+  });
   const { sendMessage, sendJsonMessage, lastMessage, readyState } =
     useWebSocket(socketUrl, connectionStatusListener, true);
 
@@ -61,15 +60,15 @@ export default (
 
   useEffect(() => {
     if (viewState == ExperimentPageState.Loading) {
-      sendJsonMessage({ "type": "handshake", "experimentId": experimentId });
+      sendJsonMessage({ type: "handshake", experimentId: experimentId });
     }
   }, [viewState]);
 
   const startTraining = () => {
     console.log("send message start training");
     sendJsonMessage({
-      "type": "start_training",
-      "experiment_id": experimentId,
+      type: "start_training",
+      experiment_id: experimentId,
     });
     sendMessage("start training");
     setViewState(ExperimentPageState.TrainRequested);
@@ -109,8 +108,9 @@ export default (
         <button
           type="button"
           className="btn btn-success btn-lg btn-block"
-          disabled={experiment.status === "running" ||
-            experiment.status === "never-run"}
+          disabled={
+            experiment.status === "running" || experiment.status === "never-run"
+          }
           style={{ marginBottom: "5px" }}
         >
           Test

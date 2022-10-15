@@ -1,17 +1,16 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+import React, { useState, useCallback, useEffect } from "react";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 import { Experiment } from "../Interfaces";
 import ProgressBar from "./ProgressBar";
 
-
 function SocketStatusView({ readyState }: { readyState: ReadyState }) {
   const style = {
-    padding: 20
-  }
+    padding: 20,
+  };
 
   switch (readyState) {
     case ReadyState.CONNECTING:
-      return <ProgressBar totalTime={10000} color="green"></ProgressBar>
+      return <ProgressBar totalTime={10000} color="green"></ProgressBar>;
 
     case ReadyState.OPEN:
       return <div style={style}>Connected</div>;
@@ -26,53 +25,56 @@ function SocketStatusView({ readyState }: { readyState: ReadyState }) {
 }
 
 export default ({ experiment }: { experiment: Experiment }) => {
+  const [socketUrl, setSocketUrl] = useState("ws://localhost:8765");
+  const [messageHistory, setMessageHistory] = useState(
+    [] as Array<MessageEvent>
+  );
 
-  const [socketUrl, setSocketUrl] = useState('ws://localhost:8765');
-  const [messageHistory, setMessageHistory] = useState([] as Array<MessageEvent>);
-
-  const { sendMessage, sendJsonMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
-    onError: (event) => console.log(event),
-    onOpen: (event) => console.log(event),
-    onClose: (event) => console.log(event),
-    shouldReconnect: (ss) => true
-  }, true);
+  const { sendMessage, sendJsonMessage, lastMessage, readyState } =
+    useWebSocket(
+      socketUrl,
+      {
+        onError: (event) => console.log(event),
+        onOpen: (event) => console.log(event),
+        onClose: (event) => console.log(event),
+        shouldReconnect: (ss) => true,
+      },
+      true
+    );
 
   // sendJsonMessage({
   //   "type": "experiment",
   //   "event": "select",
   //   "experiment": experiment
   // }, true)
-  sendMessage(JSON.stringify({
-    "hello": "world"
-  }))
+  sendMessage(
+    JSON.stringify({
+      hello: "world",
+    })
+  );
 
   useEffect(() => {
     if (lastMessage !== null) {
-
       setMessageHistory((prev) => prev.concat(lastMessage));
     }
   }, [lastMessage, setMessageHistory]);
 
-  const handleTrainClick = useCallback(
-    () => {
-      sendMessage(JSON.stringify({ type: "train", experiment: experiment }));
-    },
-    []
-  );
+  const handleTrainClick = useCallback(() => {
+    sendMessage(JSON.stringify({ type: "train", experiment: experiment }));
+  }, []);
 
-  const handleClickSendMessage = useCallback(() => sendMessage('Hello'), []);
+  const handleClickSendMessage = useCallback(() => sendMessage("Hello"), []);
 
   const connectionStatus = {
-    [ReadyState.CONNECTING]: 'Connecting',
-    [ReadyState.OPEN]: 'Open',
-    [ReadyState.CLOSING]: 'Closing',
-    [ReadyState.CLOSED]: 'Closed',
-    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+    [ReadyState.CONNECTING]: "Connecting",
+    [ReadyState.OPEN]: "Open",
+    [ReadyState.CLOSING]: "Closing",
+    [ReadyState.CLOSED]: "Closed",
+    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
 
   console.log(connectionStatus);
   console.log(messageHistory);
-
 
   return (
     <div style={{ textAlign: "center", width: "100%" }}>
