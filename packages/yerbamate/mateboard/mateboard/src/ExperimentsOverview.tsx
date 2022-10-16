@@ -37,7 +37,8 @@ function Status({
               border: "3px solid black",
             }}
             className="loader"
-          ></div>
+          >
+          </div>
         </div>
       </div>
     ),
@@ -143,7 +144,8 @@ export default function ({
                     <img
                       src="delete_icon.png"
                       style={{ height: "20px", width: "20px" }}
-                    ></img>
+                    >
+                    </img>
                   </td>
                   <td>
                     <Status statusValue={experiment.status} />
