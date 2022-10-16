@@ -84,13 +84,13 @@ export default ({
     [MessageType.train_logs]: (data: MessageEvent) => {
       console.log(data.data);
       if (termView) {
-        termView.writeln(data.data);
+        termView.write(data.data);
       }
     },
     [MessageType.train_error]: (data: MessageEvent) => {
       console.log(data.data);
 			if (termView) {
-				termView.writeln('\x1b[1;31m' + data.data+ '\x1b[0m');
+				termView.write('\x1b[1;31m' + data.data+ '\x1b[0m');
 			}
       // setViewState(ExperimentPageState.View);
     },
