@@ -2,13 +2,14 @@ import {
   WebSocketClient,
   WebSocketServer,
 } from "https://deno.land/x/websocket@v0.1.4/mod.ts";
-import { readLines } from "https://deno.land/std@0.104.0/io/mod.ts";
+import {stdOutStream} from "./stdoutstream.ts";
+import { Application, Router, send } from "https://deno.land/x/oak/mod.ts";
+import { oakCors } from "https://deno.land/x/cors/mod.ts";
 import {
   readableStreamFromReader,
 } from "https://deno.land/std@0.158.0/streams/conversion.ts";
+import { mergeReadableStreams } from "https://deno.land/std@0.158.0/streams/merge.ts";
 
-import { Application, Router, send } from "https://deno.land/x/oak/mod.ts";
-import { oakCors } from "https://deno.land/x/cors/mod.ts";
 enum MessageType {
 	handshake = "handshake",
 	status = "status",
@@ -66,26 +67,33 @@ class Server {
 		}
 		async startTraining(experimentId:string) {
 			console.log("Trying to start training experiment", experimentId)
+			const stdoutStream = new stdOutStream(this.cwd);
 			const p = Deno.run({
 				cmd: ["mate", "train", experimentId],
 				cwd: this.cwd,
 				stdout: "piped",
 				stderr: "piped",
 			})
-			
-			for await (const chunk of readLines(p.stdout)) {
-				console.log("Chunk:", chunk)
+			const decoder = new TextDecoder();
+			const merged = mergeReadableStreams(
+				readableStreamFromReader(p.stdout),
+				readableStreamFromReader(p.stderr),
+			);
+			for await (const chunk of merged) {
+				const textChunk = decoder.decode(chunk)
+				console.log("Chunk:", textChunk)
 				this.socket?.send(JSON.stringify({
 					type:"train_logs",
-					data: chunk
+					data:textChunk
 				}))
 			}
-			for await (const chunk of readLines(p.stderr)) {
+			/*
+			for await (const chunk of readableStreamFromReader(p.stderr)) {
 				// console.log("Sending chunk:", chunk)
-				this.socket?.send(JSON.stringify({type: "train_error", data: chunk}))
+				this.socket?.send(JSON.stringify({type: "train_error", data: decoder.decode(chunk)}))
 			}
+			*/
 			const status = await p.status();
-			this.status = Status.training;
 			return 
 	}
 		async stopTraining() {
