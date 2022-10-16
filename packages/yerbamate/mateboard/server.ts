@@ -2,6 +2,10 @@ import {
   WebSocketClient,
   WebSocketServer,
 } from "https://deno.land/x/websocket@v0.1.4/mod.ts";
+import { readLines } from "https://deno.land/std@0.104.0/io/mod.ts";
+import {
+  readableStreamFromReader,
+} from "https://deno.land/std@0.158.0/streams/conversion.ts";
 
 import { Application, Router, send } from "https://deno.land/x/oak/mod.ts";
 import { oakCors } from "https://deno.land/x/cors/mod.ts";
@@ -24,6 +28,8 @@ class Server {
 	cwd:string;
 	status: Status = Status.not_connected;
 	trainingProcess: Deno.Process;
+	socket?: WebSocketClient;
+	wsRoutes:Record<MessageType, (p:Record<string, any>) =>Record<string, any>>;
   constructor(cwd:string) {
 		this.cwd = cwd;
 		const router = new Router();
@@ -42,12 +48,15 @@ class Server {
 			this.staticServer = new Application();
 			this.staticServer.use(oakCors());
 			this.staticServer.use(router.routes());
-			const wsRoutes:Record<MessageType, (p:Record<string, any>) =>Record<string, any>> = {
-				[MessageType.handshake]: () => ({type: MessageType.handshake, data: "ok"}),
+			this.wsRoutes = {
+				[MessageType.handshake]: async ()=>{
+					this.status = Status.connected;
+					this.socket?.send(JSON.stringify({type: MessageType.handshake, data: "ok"}))
+				},
 				[MessageType.status]: () => ({type: MessageType.status, data: this.status}),
-				[MessageType.start_training]: (msg) => {
-					this.startTraining(msg.experimentId);
-					return {type: MessageType.start_training, data: "ok"}
+				[MessageType.start_training]: async (msg) => {
+					this.socket?.send(JSON.stringify({type: "train_started", data: this.status}))
+					await this.startTraining(msg.experiment_id);
 				},
 				[MessageType.stop_training]: () => {
 					this.stopTraining();
@@ -56,14 +65,29 @@ class Server {
 			}
 		}
 		async startTraining(experimentId:string) {
-			this.status = Status.training;
-			await Deno.run({
+			console.log("Trying to start training experiment", experimentId)
+			const p = Deno.run({
 				cmd: ["mate", "train", experimentId],
 				cwd: this.cwd,
 				stdout: "piped",
 				stderr: "piped",
-			}).status();
-		}
+			})
+			
+			for await (const chunk of readLines(p.stdout)) {
+				console.log("Chunk:", chunk)
+				this.socket?.send(JSON.stringify({
+					type:"train_logs",
+					data: chunk
+				}))
+			}
+			for await (const chunk of readLines(p.stderr)) {
+				// console.log("Sending chunk:", chunk)
+				this.socket?.send(JSON.stringify({type: "train_error", data: chunk}))
+			}
+			const status = await p.status();
+			this.status = Status.training;
+			return 
+	}
 		async stopTraining() {
 			this.status = Status.connected;
 			this.trainingProcess?.kill(9);
@@ -71,14 +95,12 @@ class Server {
 		async start() {
 			this.server = new WebSocketServer(8765);
 			this.server.on("connection", (socket: WebSocketClient) => {
-				socket.on("message", (message: string) => {
+				this.socket = socket;
+				socket.on("message", async (message: string) => {
 					const parsed = JSON.parse(message)
-					console.log(parsed)
-					if (parsed.type === "handshake"){
-						this.status = Status.connected
-						socket.send(JSON.stringify({type: "handshake", data: "ok"}))
-					}
-						
+					console.log("Received message:")
+					console.log(parsed)	
+					const response = await this.wsRoutes[parsed.type](parsed)
 				});
 			});
 			this.mateBoardServerProcess = Deno.run({

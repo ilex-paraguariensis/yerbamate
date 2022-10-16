@@ -1,12 +1,26 @@
 import { Experiment } from "../Interfaces";
 import ProgressBar from "./ProgressBar";
+import "../../node_modules/xterm/css/xterm.css"
 // import SocketAPIHook from "../api/SocketAPIHook";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
+import { Terminal } from "xterm";
 
+enum MessageType {
+  train_started = "train_started",
+  train_end = "train_end",
+  train_progress = "train_progress",
+  train_logs = "train_logs",
+  train_error = "train_error",
+  handshake = "handshake",
+}
+type MessageEvent = {
+  type: MessageType;
+  data: string;
+};
 enum ExperimentPageState {
   Loading,
-  View,
+  Connected,
   TrainRequested,
   Training,
   Test,
@@ -19,11 +33,25 @@ export default ({
   experiment: Experiment;
   experimentId: String;
 }) => {
+  const termComponent = useRef(null);
+  const [termView, setTermView] = useState<Terminal | null>(null);
   const [viewState, setViewState] = useState(ExperimentPageState.Loading);
   const [socketUrl, setSocketUrl] = useState("ws://localhost:8765");
   const [messageHistory, setMessageHistory] = useState(
     [] as Array<MessageEvent>
   );
+  useEffect(() => {
+    if (termComponent.current && (termComponent.current as HTMLElement).innerHTML === "") {
+      const term = new Terminal({
+        cursorBlink: true,
+        theme: { background: "black" },
+      });
+      term.open(termComponent.current);
+			// @ts-ignore
+			// term.setOption("theme", { background: "black" });
+      setTermView(() => term);
+    }
+  }, []);
   const [connectionStatusListener, setConnectionStatusListener] = useState({
     onError: (event: Event) => {
       console.log(event);
@@ -33,25 +61,54 @@ export default ({
     },
     onClose: (event: Event) => {
       console.log(event);
+      setViewState(ExperimentPageState.Loading);
     },
   });
   const { sendMessage, sendJsonMessage, lastMessage, readyState } =
     useWebSocket(socketUrl, connectionStatusListener, true);
 
+  const onMessageReactions = {
+    [MessageType.handshake]: (data: MessageEvent) => {
+      setViewState(ExperimentPageState.Connected);
+    },
+    [MessageType.train_started]: (data: MessageEvent) => {
+      setViewState(ExperimentPageState.Training);
+    },
+    [MessageType.train_end]: (data: MessageEvent) => {
+      setViewState(ExperimentPageState.TestRequested);
+    },
+    [MessageType.train_progress]: (data: MessageEvent) => {
+      setViewState(ExperimentPageState.Training);
+    },
+    [MessageType.train_logs]: (data: MessageEvent) => {
+      console.log(data.data);
+      if (termView) {
+        termView.writeln(data.data);
+      }
+    },
+    [MessageType.train_error]: (data: MessageEvent) => {
+      console.log(data.data);
+			if (termView) {
+				termView.writeln('\x1b[1;31m' + data.data+ '\x1b[0m');
+			}
+      // setViewState(ExperimentPageState.View);
+    },
+  };
   useEffect(() => {
     if (lastMessage !== null) {
-      setMessageHistory((prev) => prev.concat(lastMessage));
-
-      console.log(lastMessage);
-
       try {
-        const data = JSON.parse(lastMessage.data);
-        if (data.state == "training") {
+        const data = JSON.parse(lastMessage.data) as MessageEvent;
+        console.log(data);
+        setMessageHistory((prev) => prev.concat(data));
+        const reaction = onMessageReactions[data.type](data);
+        /*
+        if (data.type === "training") {
           setViewState(ExperimentPageState.Training);
         }
-        if (data.type == "handshake") {
+        if (data.type === "handshake") {
           setViewState(ExperimentPageState.View);
         }
+				*/
       } catch (e) {
         console.log(e);
       }
@@ -70,51 +127,54 @@ export default ({
       type: "start_training",
       experiment_id: experimentId,
     });
-    sendMessage("start training");
     setViewState(ExperimentPageState.TrainRequested);
   };
 
   return (
-    <div style={{ textAlign: "center", width: "100%" }}>
-      <div
-        className="card"
-        style={{
-          padding: "5px",
-          width: "25rem",
-          marginLeft: "auto",
-          marginRight: "auto",
-        }}
-      >
-        {<StatusView status={viewState}></StatusView>}
+    <div style={{ width: "100%" }}>
+      <div ref={termComponent} style={{width:"100%"}}></div>
+      <div style={{ textAlign: "center", width: "100%" }}>
+        <div
+          className="card"
+          style={{
+            padding: "5px",
+            width: "25rem",
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
+          {<StatusView status={viewState}></StatusView>}
 
-        {/* <SocketStatusView readyState={readyState}></SocketStatusView> */}
+          {/* <SocketStatusView readyState={readyState}></SocketStatusView> */}
 
-        <button
-          type="button"
-          className="btn btn-danger btn-lg btn-block"
-          disabled={experiment.status !== "running"}
-          style={{ marginBottom: "5px" }}
-        >
-          Stop Training
-        </button>
-        <button
-          type="button"
-          className="btn btn-success btn-lg btn-block"
-          onClick={() => startTraining()}
-          style={{ marginBottom: "5px" }}
-        >
-          Train
-        </button>
-        <button
-          type="button"
-          className="btn btn-success btn-lg btn-block"
-          disabled={
-            experiment.status === "running" || experiment.status === "never-run"
-          }
-          style={{ marginBottom: "5px" }}
-        >
-          Test
-        </button>
+          <button
+            type="button"
+            className="btn btn-danger btn-lg btn-block"
+            disabled={experiment.status !== "running"}
+            style={{ marginBottom: "5px" }}
+          >
+            Stop Training
+          </button>
+          <button
+            type="button"
+            className="btn btn-success btn-lg btn-block"
+            onClick={() => startTraining()}
+            style={{ marginBottom: "5px" }}
+          >
+            Train
+          </button>
+          <button
+            type="button"
+            className="btn btn-success btn-lg btn-block"
+            disabled={
+              experiment.status === "running" ||
+              experiment.status === "never-run"
+            }
+            style={{ marginBottom: "5px" }}
+          >
+            Test
+          </button>
+        </div>
       </div>
     </div>
   );
