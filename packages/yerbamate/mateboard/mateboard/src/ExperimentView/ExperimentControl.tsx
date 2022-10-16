@@ -44,6 +44,7 @@ export default ({
     if (termComponent.current && (termComponent.current as HTMLElement).innerHTML === "") {
       const term = new Terminal({
         cursorBlink: true,
+				cols: 200,
         theme: { background: "black" },
       });
       term.open(termComponent.current);
