@@ -45,6 +45,7 @@ export default ({
       const term = new Terminal({
         cursorBlink: true,
 				cols: 200,
+				convertEol:true,
         theme: { background: "black" },
       });
       term.open(termComponent.current);
