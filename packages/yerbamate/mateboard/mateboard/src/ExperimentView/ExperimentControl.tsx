@@ -137,7 +137,7 @@ export default ({
 
   return (
     <div style={{ width: "100%" }}>
-      <div ref={termComponent} style={{ width: "100%" }}></div>
+      <div ref={termComponent} style={{ width: "100%", borderRadius:"10%" }}></div>
       <div style={{ textAlign: "center", width: "100%" }}>
         <div
           className="card"

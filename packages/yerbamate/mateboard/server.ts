@@ -91,11 +91,10 @@ class Server {
       readableStreamFromReader(p.stderr),
     );
     for await (const chunk of merged) {
-      const textChunk = decoder.decode(chunk);
-      console.log("Chunk:", textChunk);
+      console.log("Chunk:", decoder.decode(chunk));
       this.socket?.send(JSON.stringify({
         type: "train_logs",
-        data: textChunk,
+        data: Array.from(chunk),
       }));
     }
     /*
