@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import getDAG from "./get_dag";
 import vis from "vis-network";
 import BombillaExplorer from "./BombillaExplorer";
@@ -7,7 +7,7 @@ const getNetwork = (
   nodes: Map<string, Record<string, any>>,
   edges: [string, string, string[]][],
   container: HTMLDivElement,
-  simplify = true
+  simplify = true,
 ) => {
   if (simplify) {
     // Simplify the graph, removing nodes with only one edge
@@ -41,7 +41,7 @@ const getNetwork = (
       id: key,
       label: key,
       shape: "box",
-    }))
+    })),
   );
   // @ts-ignore
   const graphEdges = new window.vis.DataSet(
@@ -52,7 +52,7 @@ const getNetwork = (
       label: path.join("."),
       directed: true,
       arrows: "to",
-    }))
+    })),
   );
   const netData = {
     nodes: netNodes,
@@ -80,12 +80,14 @@ const getNetwork = (
   // @ts-ignore
   return new window.vis.Network(container, netData, options);
 };
-const Config = () => {
+const Config = ({ experimentId }: { experimentId: string }) => {
   const [bombilla, setBombilla] = useState<Record<string, any> | null>(null);
-  const [dag, setDag] = useState<{
-    nodes: Map<string, Record<string, any>>;
-    edges: [string, string, string[]][];
-  } | null>(null);
+  const [dag, setDag] = useState<
+    {
+      nodes: Map<string, Record<string, any>>;
+      edges: [string, string, string[]][];
+    } | null
+  >(null);
   // loads bombilla which is a json file
   if (vis !== undefined) {
     // @ts-ignore
@@ -97,7 +99,7 @@ const Config = () => {
     fetch(`http://localhost:3002/summary`)
       .then((response) => response.json())
       .then((data) => {
-				data = data.experiments.default
+        data = data.experiments[experimentId];
         setBombilla(data);
         const dag = getDAG(data);
         setDag(dag);
@@ -115,20 +117,25 @@ const Config = () => {
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
         rel="stylesheet"
       />
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
-      {/*
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js">
+      </script>
+      {
+        /*
       <script
         src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"
         integrity="sha512-XHDcSyqhOoO2ocB7sKOCJEkUjw/pQCJViP1ynpy+EGh/LggzrP6U/V3a++LQTnZT7sCQKeHRyWHfhN2afjXjCg=="
       ></script>
-			*/}
-      {/*
+			*/
+      }
+      {
+        /*
       <div
         id="mynetwork"
         style={{ height: "100vh", width: "100vw" }}
         ref={div}
       />
-			*/}
+			*/
+      }
       {dag && (
         <BombillaExplorer
           nodes={dag.nodes}

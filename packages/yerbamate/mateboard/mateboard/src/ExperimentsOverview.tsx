@@ -118,7 +118,7 @@ export default function ({
                   experimentId={localName}
                 />
               ),
-              Config: <Config />,
+              Config: <Config experimentId={localName} />,
               Training: <Training />,
               Visualizations: <Visualizations />,
             } as Record<string, JSX.Element>);
