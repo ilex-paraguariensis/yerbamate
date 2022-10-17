@@ -34,7 +34,7 @@ export default ({ experimentId }: { experimentId: string }) => {
         experimentId={experimentId}
       />
     ),
-    Config: <Config />,
+    Config: <Config experimentId={experimentId} />,
     Training: <Training />,
     Visualizations: <Visualizations />,
   } as Record<View, JSX.Element>;

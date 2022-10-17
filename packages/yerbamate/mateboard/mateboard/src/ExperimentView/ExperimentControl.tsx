@@ -1,9 +1,9 @@
 import { Experiment } from "../Interfaces";
 import ProgressBar from "./ProgressBar";
-import "../../node_modules/xterm/css/xterm.css"
+import "../../node_modules/xterm/css/xterm.css";
 // import SocketAPIHook from "../api/SocketAPIHook";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Terminal } from "xterm";
 
 enum MessageType {
@@ -41,16 +41,19 @@ export default ({
     [] as Array<MessageEvent>
   );
   useEffect(() => {
-    if (termComponent.current && (termComponent.current as HTMLElement).innerHTML === "") {
+    if (
+      termComponent.current &&
+      (termComponent.current as HTMLElement).innerHTML === ""
+    ) {
       const term = new Terminal({
         cursorBlink: true,
-				cols: 200,
-				convertEol:true,
+        cols: 200,
+        convertEol: true,
         theme: { background: "black" },
       });
       term.open(termComponent.current);
-			// @ts-ignore
-			// term.setOption("theme", { background: "black" });
+      // @ts-ignore
+      // term.setOption("theme", { background: "black" });
       setTermView(() => term);
     }
   }, []);
@@ -77,7 +80,7 @@ export default ({
       setViewState(ExperimentPageState.Training);
     },
     [MessageType.train_end]: (data: MessageEvent) => {
-      setViewState(ExperimentPageState.TestRequested);
+      setViewState(ExperimentPageState.Connected);
     },
     [MessageType.train_progress]: (data: MessageEvent) => {
       setViewState(ExperimentPageState.Training);
@@ -90,9 +93,9 @@ export default ({
     },
     [MessageType.train_error]: (data: MessageEvent) => {
       console.log(data.data);
-			if (termView) {
-				termView.write('\x1b[1;31m' + data.data+ '\x1b[0m');
-			}
+      if (termView) {
+        termView.write("\x1b[1;31m" + data.data + "\x1b[0m");
+      }
       // setViewState(ExperimentPageState.View);
     },
   };
@@ -134,7 +137,10 @@ export default ({
 
   return (
     <div style={{ width: "100%" }}>
-      <div ref={termComponent} style={{width:"100%"}}></div>
+      <div
+        ref={termComponent}
+        style={{ width: "100%", borderRadius: "10%", marginTop: "8vh", marginLeft: "auto", marginRight: "auto", maxWidth: "94vw"}}
+      ></div>
       <div style={{ textAlign: "center", width: "100%" }}>
         <div
           className="card"
@@ -143,6 +149,7 @@ export default ({
             width: "25rem",
             marginLeft: "auto",
             marginRight: "auto",
+						marginTop: "2vh",
           }}
         >
           {<StatusView status={viewState}></StatusView>}
@@ -152,7 +159,13 @@ export default ({
           <button
             type="button"
             className="btn btn-danger btn-lg btn-block"
-            disabled={experiment.status !== "running"}
+            disabled={viewState !== ExperimentPageState.Training}
+            onClick={() => {
+              sendJsonMessage({
+                type: "stop_training",
+                experiment_id: experimentId,
+              });
+            }}
             style={{ marginBottom: "5px" }}
           >
             Stop Training

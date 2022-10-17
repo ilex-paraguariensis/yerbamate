@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default ({ totalTime, color }: { totalTime: number; color: string }) => {
   const [time, setTime] = useState(0);

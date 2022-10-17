@@ -91,69 +91,52 @@ export default function ({
   setSection: (section: string) => void;
 }) {
   return (
-    <div style={{ textAlign: "center", marginTop: "10vh" }}>
-      <button
-        type="button"
-        className="btn btn-success"
-        style={{
-          textAlign: "center",
-          marginBottom: "10px",
-          borderRadius: "50%",
-          maxHeight: "43px",
-          maxWidth: "43px",
-        }}
-        onClick={() => {}}
-      >
-        <span style={{ marginLeft: "auto", marginRight: "auto" }}>+</span>
-      </button>
-
-      {Object.entries(experiments).map(([localName, experiment]) => (
-        <div
-          onClick={() => {
-            setSections({
-              Control: (
-                <ExperimentControl
-                  experiment={experiment}
-                  experimentId={localName}
-                />
-              ),
-              Config: <Config />,
-              Training: <Training />,
-              Visualizations: <Visualizations />,
-            } as Record<string, JSX.Element>);
-            setSection("Control");
-          }}
-          className="card"
-          style={{
-            width: "25rem",
-            display: "block",
-            marginLeft: "auto",
-            marginRight: "auto",
-            marginBottom: "5px",
-            backgroundColor: "#D0FFC6",
-          }}
-        >
-          <div className="card-body">
-            <h5 className="card-title">Local Name: {localName}</h5>
-            <p className="card-text">{experiment.description}</p>
-            <table style={{ width: "100%" }}>
-              <tbody>
-                <tr>
-                  <td style={{ textAlign: "left" }}>
-                    <img
-                      src="delete_icon.png"
-                      style={{ height: "20px", width: "20px" }}
-                    ></img>
-                  </td>
-                  <td>
-                    <Status statusValue={experiment.status} />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+    <div style={{ textAlign: "center", marginTop: "9vh" }}>
+      <nav className="navbar fixed-bottom navbar-light bg-light">
+				<a className="navbar-brand" style={{marginLeft:"1vw"}} href="#">New Experiment</a>
+      </nav>
+      <div className="list-group" style={{marginTop:"3vh"}}>
+        {Object.entries(experiments).map(([localName, experiment]) => (
+          <div
+            onClick={() => {
+              setSections({
+                Control: (
+                  <ExperimentControl
+                    experiment={experiment}
+                    experimentId={localName}
+                  />
+                ),
+                Config: <Config experimentId={localName} />,
+                Training: <Training />,
+                Visualizations: <Visualizations />,
+              } as Record<string, JSX.Element>);
+              setSection("Control");
+            }}
+            className="list-group-item list-group-item-action flex-column align-items-start"
+            style={{
+              marginLeft: "auto",
+              marginRight: "auto",
+              backgroundColor: "#D0FFC6",
+              maxWidth: "500px",
+            }}
+          >
+            <div className="card-body">
+              <h5 className="card-title">{localName}</h5>
+              <p className="card-text">{experiment.description}</p>
+              <table style={{ width: "100%" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ textAlign: "left" }}></td>
+                    <td>
+                      <Status statusValue={experiment.status} />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
