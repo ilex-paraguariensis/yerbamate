@@ -15,6 +15,7 @@ enum MessageType {
   status = "status",
   start_training = "start_training",
   stop_training = "stop_training",
+	get_summary = "get_summary",
 }
 enum Status {
   not_connected = "not_connected",
@@ -32,7 +33,7 @@ class Server {
   socket?: WebSocketClient;
   wsRoutes: Record<
     MessageType,
-    (p: Record<string, any>) => Record<string, any>
+    (p: Record<string, any>) => void
   >;
   constructor(cwd: string) {
     this.cwd = cwd;
@@ -71,8 +72,17 @@ class Server {
       },
       [MessageType.stop_training]: () => {
         this.stopTraining();
-        return { type: MessageType.stop_training, data: "ok" };
+        this.socket?.send(JSON.stringify({ type: MessageType.stop_training, data: "ok" }))
       },
+			[MessageType.get_summary]: async () => {
+				const responseString = JSON.parse((new TextDecoder()).decode(await Deno.run({
+					cmd: ["mate", "summary"],
+					cwd: this.cwd,
+					stdout: "piped",
+					stderr: "piped",
+				}).output()))
+				this.socket?.send(JSON.stringify({ type: MessageType.get_summary, data: responseString }))
+			}
     };
   }
   async startTraining(experimentId: string) {
@@ -110,11 +120,12 @@ class Server {
   async stopTraining() {
     this.status = Status.connected;
 		if (this.trainingProcess){
-			Deno.kill(this.trainingProcess, "SIGINT");
+			await this.trainingProcess.kill("SIGINT")
 		}
   }
   async start() {
     this.server = new WebSocketServer(8765);
+		this.server.on("error", ()=>{})
     this.server.on("connection", (socket: WebSocketClient) => {
       this.socket = socket;
       socket.on("message", async (message: string) => {

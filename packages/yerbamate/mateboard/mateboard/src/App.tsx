@@ -7,11 +7,30 @@ import Trainers from "./Trainers";
 import Datasets from "./Datasets";
 import ExperimentsOverview from "./ExperimentsOverview";
 import { MateSummary } from "./Interfaces";
-
+import useWebSocket, { ReadyState } from "react-use-websocket";
+import socket from "./socket";
 type View = "default" | "Results" | "Models" | "Trainers" | "Datasets";
 
+enum ConnectionStatus {
+  connecting = "connecting",
+  connected = "connected",
+  disconnected = "disconnected",
+}
 const App = () => {
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
+    ConnectionStatus.connecting
+  );
   const [mateSummary, setMateSummary] = useState<MateSummary | null>(null);
+    useState<MessageEvent | null>(null);
+	socket.onopen = () => {
+		console.log("Connected to server")
+		socket.send(JSON.stringify({type:"get_summary", data:""}))
+		setConnectionStatus(ConnectionStatus.connected)
+	}
+	socket.onclose = () => {
+		console.log("Disconnected from server")
+		setConnectionStatus(ConnectionStatus.disconnected)
+	}
   const [view, setView] = useState("" as View);
   const defaultSections = {
     Results: <Results setSections={() => {}} />,
@@ -21,6 +40,18 @@ const App = () => {
   } as Record<View, JSX.Element>;
   const [sections, setSections] = useState(defaultSections);
   const [section, setSection] = useState("default");
+
+	socket.onmessage = (event) => {
+		const message = JSON.parse(event.data)
+		if (message.type === "get_summary"){
+			const data = message.data
+			setMateSummary(()=>{
+        defaultSections["Models"] = <Models models={message.models} />;
+				return data
+			})
+		}
+	}
+	/*
   useEffect(() => {
     fetch(`http://localhost:3002/summary`)
       .then((res) => res.json())
@@ -33,6 +64,7 @@ const App = () => {
         })
       );
   }, []);
+	*/
   return (
     <div>
       <title>Maté</title>
@@ -55,6 +87,7 @@ const App = () => {
           title="MateBoard"
           sections={sections}
           defaultSections={defaultSections}
+          connectionStatus={connectionStatus}
           defaultSection={
             <ExperimentsOverview
               experiments={mateSummary !== null ? mateSummary.experiments : {}}

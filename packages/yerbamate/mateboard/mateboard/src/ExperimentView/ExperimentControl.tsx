@@ -1,10 +1,10 @@
 import { Experiment } from "../Interfaces";
 import ProgressBar from "./ProgressBar";
 import "../../node_modules/xterm/css/xterm.css";
-// import SocketAPIHook from "../api/SocketAPIHook";
-import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Terminal } from "xterm";
+import socket from "../socket"
+
 
 enum MessageType {
   train_started = "train_started",
@@ -14,7 +14,7 @@ enum MessageType {
   train_error = "train_error",
   handshake = "handshake",
 }
-type MessageEvent = {
+type CustomMessageEvent = {
   type: MessageType;
   data: string;
 };
@@ -31,15 +31,11 @@ export default ({
   experimentId,
 }: {
   experiment: Experiment;
-  experimentId: String;
+  experimentId: string;
 }) => {
   const termComponent = useRef(null);
   const [termView, setTermView] = useState<Terminal | null>(null);
   const [viewState, setViewState] = useState(ExperimentPageState.Loading);
-  const [socketUrl, setSocketUrl] = useState("ws://localhost:8765");
-  const [messageHistory, setMessageHistory] = useState(
-    [] as Array<MessageEvent>
-  );
   useEffect(() => {
     if (
       termComponent.current &&
@@ -52,86 +48,63 @@ export default ({
         theme: { background: "black" },
       });
       term.open(termComponent.current);
-      // @ts-ignore
-      // term.setOption("theme", { background: "black" });
       setTermView(() => term);
     }
   }, []);
-  const [connectionStatusListener, setConnectionStatusListener] = useState({
-    onError: (event: Event) => {
-      console.log(event);
-    },
-    onOpen: (event: Event) => {
-      console.log(event);
-    },
-    onClose: (event: Event) => {
-      console.log(event);
-      setViewState(ExperimentPageState.Loading);
-    },
-  });
-  const { sendMessage, sendJsonMessage, lastMessage, readyState } =
-    useWebSocket(socketUrl, connectionStatusListener, true);
 
   const onMessageReactions = {
-    [MessageType.handshake]: (data: MessageEvent) => {
+    [MessageType.handshake]: (data: CustomMessageEvent) => {
       setViewState(ExperimentPageState.Connected);
     },
-    [MessageType.train_started]: (data: MessageEvent) => {
+    [MessageType.train_started]: (data: CustomMessageEvent) => {
       setViewState(ExperimentPageState.Training);
     },
-    [MessageType.train_end]: (data: MessageEvent) => {
+    [MessageType.train_end]: (data: CustomMessageEvent) => {
       setViewState(ExperimentPageState.Connected);
     },
-    [MessageType.train_progress]: (data: MessageEvent) => {
+    [MessageType.train_progress]: (data: CustomMessageEvent) => {
       setViewState(ExperimentPageState.Training);
     },
-    [MessageType.train_logs]: (data: MessageEvent) => {
+    [MessageType.train_logs]: (data: CustomMessageEvent) => {
       console.log(data.data);
       if (termView) {
         termView.write(data.data);
       }
     },
-    [MessageType.train_error]: (data: MessageEvent) => {
+    [MessageType.train_error]: (data: CustomMessageEvent) => {
       console.log(data.data);
       if (termView) {
         termView.write("\x1b[1;31m" + data.data + "\x1b[0m");
       }
-      // setViewState(ExperimentPageState.View);
     },
   };
-  useEffect(() => {
-    if (lastMessage !== null) {
+	socket.onmessage = (lastMessage)=>{
+      console.log("Child last message!! ", lastMessage);
+			let data :CustomMessageEvent|null = null
       try {
-        const data = JSON.parse(lastMessage.data) as MessageEvent;
+        data = JSON.parse(lastMessage.data) as CustomMessageEvent;
         console.log(data);
-        setMessageHistory((prev) => prev.concat(data));
-        const reaction = onMessageReactions[data.type](data);
-        /*
-        if (data.type === "training") {
-          setViewState(ExperimentPageState.Training);
-        }
-        if (data.type === "handshake") {
-          setViewState(ExperimentPageState.View);
-        }
-				*/
       } catch (e) {
         console.log(e);
       }
-    }
-  }, [lastMessage, setMessageHistory]);
+      const reaction = onMessageReactions[data!.type](data!);
+	};
 
   useEffect(() => {
     if (viewState == ExperimentPageState.Loading) {
-      sendJsonMessage({ type: "handshake", experimentId: experimentId });
+      socket.send(JSON.stringify({
+        type: "handshake",
+        experimentId: experimentId,
+      }));
     }
   }, [viewState]);
 
   const startTraining = () => {
     console.log("send message start training");
-    sendJsonMessage({
+    socket.send(JSON.stringify({
       type: "start_training",
       experiment_id: experimentId,
-    });
+    }));
     setViewState(ExperimentPageState.TrainRequested);
   };
 
@@ -139,7 +112,14 @@ export default ({
     <div style={{ width: "100%" }}>
       <div
         ref={termComponent}
-        style={{ width: "100%", borderRadius: "10%", marginTop: "8vh", marginLeft: "auto", marginRight: "auto", maxWidth: "94vw"}}
+        style={{
+          width: "100%",
+          borderRadius: "10%",
+          marginTop: "8vh",
+          marginLeft: "auto",
+          marginRight: "auto",
+          maxWidth: "94vw",
+        }}
       ></div>
       <div style={{ textAlign: "center", width: "100%" }}>
         <div
@@ -149,7 +129,7 @@ export default ({
             width: "25rem",
             marginLeft: "auto",
             marginRight: "auto",
-						marginTop: "2vh",
+            marginTop: "2vh",
           }}
         >
           {<StatusView status={viewState}></StatusView>}
@@ -161,10 +141,10 @@ export default ({
             className="btn btn-danger btn-lg btn-block"
             disabled={viewState !== ExperimentPageState.Training}
             onClick={() => {
-              sendJsonMessage({
+              socket.send(JSON.stringify({
                 type: "stop_training",
                 experiment_id: experimentId,
-              });
+              }));
             }}
             style={{ marginBottom: "5px" }}
           >
@@ -204,25 +184,4 @@ function StatusView({ status }: { status: ExperimentPageState }) {
   const statusName = ExperimentPageState[status];
 
   return <div style={style}>{statusName}</div>;
-}
-
-function SocketStatusView({ readyState }: { readyState: ReadyState }) {
-  const style = {
-    padding: 20,
-  };
-
-  switch (readyState) {
-    case ReadyState.CONNECTING:
-      return <ProgressBar totalTime={10000} color="green"></ProgressBar>;
-
-    case ReadyState.OPEN:
-      return <div style={style}>Connected</div>;
-    case ReadyState.CLOSING:
-      return <div>Closing...</div>;
-    case ReadyState.CLOSED:
-      return <div>Disconnected</div>;
-    case ReadyState.UNINSTANTIATED:
-    default:
-      return <div>Uninstantiated</div>;
-  }
 }

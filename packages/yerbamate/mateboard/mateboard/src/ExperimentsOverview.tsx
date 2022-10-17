@@ -85,17 +85,23 @@ export default function ({
   experiments,
   setSections,
   setSection,
+  //lastMessage,
+  //sendJsonMessage,
 }: {
   experiments: Record<string, Experiment>;
   setSections: (sections: Record<string, JSX.Element>) => void;
   setSection: (section: string) => void;
+  //lastMessage: MessageEvent | null;
+  //sendJsonMessage: (message: MessageEvent) => void;
 }) {
   return (
     <div style={{ textAlign: "center", marginTop: "9vh" }}>
       <nav className="navbar fixed-bottom navbar-light bg-light">
-				<a className="navbar-brand" style={{marginLeft:"1vw"}} href="#">New Experiment</a>
+        <a className="navbar-brand" style={{ marginLeft: "1vw" }} href="#">
+          New Experiment
+        </a>
       </nav>
-      <div className="list-group" style={{marginTop:"3vh"}}>
+      <div className="list-group" style={{ marginTop: "3vh" }}>
         {Object.entries(experiments).map(([localName, experiment]) => (
           <div
             onClick={() => {
@@ -104,6 +110,8 @@ export default function ({
                   <ExperimentControl
                     experiment={experiment}
                     experimentId={localName}
+                    //lastMessage={lastMessage}
+                    // sendJsonMessage={sendJsonMessage}
                   />
                 ),
                 Config: <Config experimentId={localName} />,

@@ -6,6 +6,7 @@ export default function NavBar({
   setSections,
   setSection,
   section,
+  connectionStatus,
 }: {
   title: string;
   sections: Record<string, JSX.Element>;
@@ -14,6 +15,7 @@ export default function NavBar({
   setSections: (sections: Record<string, JSX.Element>) => void;
   setSection: (section: string) => void;
   section: string;
+  connectionStatus: string;
 }) {
   console.assert(Object.keys(sections).length > 0);
   // const [view, setView] = useState("default");
@@ -63,6 +65,14 @@ export default function NavBar({
                     </a>
                   </li>
                 ))}
+              <li className="nav-item">
+                <span
+                  className={`nav-link badge badge-pill ${connectionStatus === 'connected' ? 'badge-primary': 'badge-danger'}`}
+									style={{ border: "1px solid black", marginTop: "12px", marginLeft: "10px" }}
+                >
+                  {connectionStatus}
+                </span>
+              </li>
             </ul>
           </div>
         </div>
