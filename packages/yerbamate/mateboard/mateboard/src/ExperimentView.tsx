@@ -12,7 +12,7 @@ export default ({ experimentId }: { experimentId: string }) => {
   const [mateSummary, setMateSummary] = useState<MateSummary | null>(null);
   const [view, setView] = useState("" as View);
   const experiment = Object.entries(
-    mateSummary !== null ? mateSummary.experiments : {},
+    mateSummary !== null ? mateSummary.experiments : {}
   ).filter(([key, e]) => e.id === experimentId)[0];
   // const namedSections =  as Record<View, Element>;
   console.log(mateSummary);
@@ -47,18 +47,15 @@ export default ({ experimentId }: { experimentId: string }) => {
         crossOrigin="anonymous"
       />
       <div className="App">
-        {
-          /*mateSummary && (
+        {/*mateSummary && (
           <NavBar title="MateBoard" defaultSections={defaultSections} />
-        */
-        }
+        */}
       </div>
       <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
         crossOrigin="anonymous"
-      >
-      </script>
+      ></script>
     </div>
   );
 };

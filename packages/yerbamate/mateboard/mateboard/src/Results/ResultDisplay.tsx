@@ -37,7 +37,9 @@ export default ({ result }: { result: Result }) => {
             <tr>
               <th scope="col">#</th>
               <th scope="col">Name</th>
-              {metrics.map((metric) => <th scope="col">{metric}</th>)}
+              {metrics.map((metric) => (
+                <th scope="col">{metric}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -47,7 +49,9 @@ export default ({ result }: { result: Result }) => {
                   {i + 1}
                 </td>
                 <td>{experiment.name}</td>
-                {metrics.map((metric) => <td>{experiment.metrics[metric]}</td>)}
+                {metrics.map((metric) => (
+                  <td>{experiment.metrics[metric]}</td>
+                ))}
               </tr>
             ))}
           </tbody>
@@ -62,8 +66,7 @@ export default ({ result }: { result: Result }) => {
               marginBottom: "20px",
               marginRight: "20px",
             }}
-          >
-          </img>
+          ></img>
         </div>
       </div>
     </div>

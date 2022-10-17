@@ -38,7 +38,7 @@ export default ({
   const [viewState, setViewState] = useState(ExperimentPageState.Loading);
   const [socketUrl, setSocketUrl] = useState("ws://localhost:8765");
   const [messageHistory, setMessageHistory] = useState(
-    [] as Array<MessageEvent>,
+    [] as Array<MessageEvent>
   );
   useEffect(() => {
     if (
@@ -137,8 +137,10 @@ export default ({
 
   return (
     <div style={{ width: "100%" }}>
-      <div ref={termComponent} style={{ width: "100%", borderRadius: "10%" }}>
-      </div>
+      <div
+        ref={termComponent}
+        style={{ width: "100%", borderRadius: "10%", marginTop: "8vh", marginLeft: "auto", marginRight: "auto", maxWidth: "94vw"}}
+      ></div>
       <div style={{ textAlign: "center", width: "100%" }}>
         <div
           className="card"
@@ -147,6 +149,7 @@ export default ({
             width: "25rem",
             marginLeft: "auto",
             marginRight: "auto",
+						marginTop: "2vh",
           }}
         >
           {<StatusView status={viewState}></StatusView>}
@@ -178,8 +181,10 @@ export default ({
           <button
             type="button"
             className="btn btn-success btn-lg btn-block"
-            disabled={experiment.status === "running" ||
-              experiment.status === "never-run"}
+            disabled={
+              experiment.status === "running" ||
+              experiment.status === "never-run"
+            }
             style={{ marginBottom: "5px" }}
           >
             Test

@@ -6,7 +6,7 @@ export default (bombilla: any) => {
     bomb: any,
     path: string[],
     parent: null | Record<string, any> = null,
-    setRef: boolean = true,
+    setRef: boolean = true
   ) => {
     if (isSimpleType(bomb)) {
       if (typeof bomb === "string" && re.test(bomb)) {
@@ -33,7 +33,7 @@ export default (bombilla: any) => {
         setAt(
           parent,
           slicedPath,
-          `{${bomb.reference_key + "." + bomb.function_call + "()"}}`,
+          `{${bomb.reference_key + "." + bomb.function_call + "()"}}`
         );
 
         for (const [key, value] of Object.entries(bomb.params)) {

@@ -27,7 +27,7 @@ function SocketStatusView({ readyState }: { readyState: ReadyState }) {
 export default ({ experiment }: { experiment: Experiment }) => {
   const [socketUrl, setSocketUrl] = useState("ws://localhost:8765");
   const [messageHistory, setMessageHistory] = useState(
-    [] as Array<MessageEvent>,
+    [] as Array<MessageEvent>
   );
 
   const { sendMessage, sendJsonMessage, lastMessage, readyState } =
@@ -39,7 +39,7 @@ export default ({ experiment }: { experiment: Experiment }) => {
         onClose: (event) => console.log(event),
         shouldReconnect: (ss) => true,
       },
-      true,
+      true
     );
 
   // sendJsonMessage({
@@ -50,7 +50,7 @@ export default ({ experiment }: { experiment: Experiment }) => {
   sendMessage(
     JSON.stringify({
       hello: "world",
-    }),
+    })
   );
 
   useEffect(() => {
@@ -78,14 +78,11 @@ export default ({ experiment }: { experiment: Experiment }) => {
 
   return (
     <div style={{ textAlign: "center", width: "100%" }}>
-      {
-        /*
+      {/*
 			<ProgressBar totalTime={100} color="red"></ProgressBar>
-			*/
-      }
+			*/}
       {/* <ProgressBar totalTime={10000} color="green"></ProgressBar> */}
-      {
-        /* <div
+      {/* <div
         id="plot"
         style={{
           marginLeft: "auto",
@@ -93,10 +90,8 @@ export default ({ experiment }: { experiment: Experiment }) => {
           maxWidth: "1000px",
           marginBottom: "10px",
         }}
-      ></div> */
-      }
-      {
-        /* <script>
+      ></div> */}
+      {/* <script>
         {`
 				var xs = [1, 2, 3, 4, 5];
 				var y = xs.map((x) => 1/Math.exp(x));
@@ -110,8 +105,7 @@ export default ({ experiment }: { experiment: Experiment }) => {
 
 				Plotly.newPlot('plot', data);
 				`}
-      </script> */
-      }
+      </script> */}
       <div
         className="card"
         style={{
@@ -142,8 +136,9 @@ export default ({ experiment }: { experiment: Experiment }) => {
         <button
           type="button"
           className="btn btn-success btn-lg btn-block"
-          disabled={experiment.status === "running" ||
-            experiment.status === "never-run"}
+          disabled={
+            experiment.status === "running" || experiment.status === "never-run"
+          }
           style={{ marginBottom: "5px" }}
         >
           Test

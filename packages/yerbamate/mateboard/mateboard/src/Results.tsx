@@ -51,7 +51,9 @@ export default ({
   ];
   return (
     <div style={{ marginTop: "10vh", textAlign: "center" }}>
-      {results.map((result) => <ResultDisplay result={result} />)}
+      {results.map((result) => (
+        <ResultDisplay result={result} />
+      ))}
     </div>
   );
 };

@@ -67,7 +67,6 @@ export default function NavBar({
           </div>
         </div>
       </nav>
-      <div style={{ marginTop: "10vh" }}></div>
       {section === "default" ? defaultSection : sections[section]}
     </div>
   );
