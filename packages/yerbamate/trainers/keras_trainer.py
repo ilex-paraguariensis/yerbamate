@@ -23,11 +23,14 @@ class KerasTrainer(Trainer):
         self.bombilla.load()
         self.bombilla.execute()
 
-        self.bombilla.execute_method("compile", "trainer")
+        if self.bombilla.has_method("compile", "trainer"):
+            self.bombilla.execute_method("compile", "trainer")
 
     def fit(self, *args, **kwargs):
-
-        self.bombilla.execute_method("fit", "trainer", *args, **kwargs)
+        if self.bombilla.has_method("fit", "trainer"):
+            self.bombilla.execute_method("fit", "trainer", *args, **kwargs)
+        else:
+            self.bombilla.call_all_methods("trainer")
 
     def test(self, train_loader, val_loader):
         pass
