@@ -37,7 +37,8 @@ function Status({
               border: "3px solid black",
             }}
             className="loader"
-          ></div>
+          >
+          </div>
         </div>
       </div>
     ),

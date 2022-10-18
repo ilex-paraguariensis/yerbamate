@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import NavBar from "./components/NavBar";
-import Results from "./Results";
+import ExperimentsTracker from "./ExperimentsTracker";
 import Models from "./Models";
 import Trainers from "./Trainers";
 import Datasets from "./Datasets";
@@ -9,7 +9,12 @@ import ExperimentsOverview from "./ExperimentsOverview";
 import { MateSummary } from "./Interfaces";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import socket from "./socket";
-type View = "default" | "Results" | "Models" | "Trainers" | "Datasets";
+type View =
+  | "default"
+  | "Experiments Tracker"
+  | "Models"
+  | "Trainers"
+  | "Datasets";
 
 enum ConnectionStatus {
   connecting = "connecting",
@@ -18,22 +23,22 @@ enum ConnectionStatus {
 }
 const App = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
-    ConnectionStatus.connecting
+    ConnectionStatus.connecting,
   );
   const [mateSummary, setMateSummary] = useState<MateSummary | null>(null);
-    useState<MessageEvent | null>(null);
-	socket.onopen = () => {
-		console.log("Connected to server")
-		socket.send(JSON.stringify({type:"get_summary", data:""}))
-		setConnectionStatus(ConnectionStatus.connected)
-	}
-	socket.onclose = () => {
-		console.log("Disconnected from server")
-		setConnectionStatus(ConnectionStatus.disconnected)
-	}
+  useState<MessageEvent | null>(null);
+  socket.onopen = () => {
+    console.log("Connected to server");
+    socket.send(JSON.stringify({ type: "get_summary", data: "" }));
+    setConnectionStatus(ConnectionStatus.connected);
+  };
+  socket.onclose = () => {
+    console.log("Disconnected from server");
+    setConnectionStatus(ConnectionStatus.disconnected);
+  };
   const [view, setView] = useState("" as View);
   const defaultSections = {
-    Results: <Results setSections={() => {}} />,
+    "Experiments Tracker": <ExperimentsTracker />,
     Models: <Models models={mateSummary !== null ? mateSummary.models : []} />,
     Trainers: <Trainers />,
     Datasets: <Datasets />,
@@ -41,17 +46,17 @@ const App = () => {
   const [sections, setSections] = useState(defaultSections);
   const [section, setSection] = useState("default");
 
-	socket.onmessage = (event) => {
-		const message = JSON.parse(event.data)
-		if (message.type === "get_summary"){
-			const data = message.data
-			setMateSummary(()=>{
+  socket.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+    if (message.type === "get_summary") {
+      const data = message.data;
+      setMateSummary(() => {
         defaultSections["Models"] = <Models models={message.models} />;
-				return data
-			})
-		}
-	}
-	/*
+        return data;
+      });
+    }
+  };
+  /*
   useEffect(() => {
     fetch(`http://localhost:3002/summary`)
       .then((res) => res.json())
@@ -104,7 +109,8 @@ const App = () => {
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
         crossOrigin="anonymous"
-      ></script>
+      >
+      </script>
     </div>
   );
 };

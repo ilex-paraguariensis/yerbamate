@@ -17,40 +17,44 @@ const isSimpleType = (obj: any) => {
 const re = RegExp("{(.*?)}");
 const render = (value: any, indent = 20): any => {
   if (typeof value === "string" && re.test(value)) {
-    return re.test(value) ? (
-      <span
-        className="badge rounded-pill bg-success"
-        style={{ textAlign: "center" }}
-      >
-        <span style={{ marginLeft: "auto", marginRight: "auto" }}>
-          {re.exec(value)![1]}
+    return re.test(value)
+      ? (
+        <span
+          className="badge rounded-pill bg-success"
+          style={{ textAlign: "center" }}
+        >
+          <span style={{ marginLeft: "auto", marginRight: "auto" }}>
+            {re.exec(value)![1]}
+          </span>
         </span>
-      </span>
-    ) : (
-      JSON.stringify(value)
-    );
+      )
+      : (
+        JSON.stringify(value)
+      );
   } else if (isSimpleType(value)) {
     return JSON.stringify(value);
   } else {
-    return Array.isArray(value) ? (
-      <p>
-        {value.map((val) => (
-          <div style={{ textIndent: indent + "px" }}>
-            {render(val, indent + 20)}
-          </div>
-        ))}
-      </p>
-    ) : (
-      <p>
-        &#123;
-        {Object.entries(value).map(([key, value]) => (
-          <div style={{ textIndent: indent + "px" }}>
-            {key}: {render(value, indent + 20)}
-          </div>
-        ))}
-        <div style={{ textIndent: indent - 20 + "px" }}>&#125;</div>
-      </p>
-    );
+    return Array.isArray(value)
+      ? (
+        <p>
+          {value.map((val) => (
+            <div style={{ textIndent: indent + "px" }}>
+              {render(val, indent + 20)}
+            </div>
+          ))}
+        </p>
+      )
+      : (
+        <p>
+          &#123;
+          {Object.entries(value).map(([key, value]) => (
+            <div style={{ textIndent: indent + "px" }}>
+              {key}: {render(value, indent + 20)}
+            </div>
+          ))}
+          <div style={{ textIndent: indent - 20 + "px" }}>&#125;</div>
+        </p>
+      );
   }
 };
 const Card = ({
@@ -122,7 +126,7 @@ const BombillaExplorer = ({
     return node._path.length < min ? node._path.length : min;
   }, Infinity);
   const rootNodes = Array.from(nodes.values()).filter(
-    (node) => node._path.length === minPath
+    (node) => node._path.length === minPath,
   );
   const [selectedNodes, setSelectedNodes] = useState(rootNodes);
   const selectNode = (node: Record<string, any>) => {
@@ -134,7 +138,7 @@ const BombillaExplorer = ({
         .map((edge) => nodes.get(edge[0])),
     ] as Record<string, any>[];
     const uniqueSelected = Array.from(
-      new Set(selected.map((node) => node.object_key)).values()
+      new Set(selected.map((node) => node.object_key)).values(),
     ).map((key) => nodes.get(key)) as Record<string, any>[];
     setSelectedNodes(uniqueSelected);
   };
@@ -146,7 +150,7 @@ const BombillaExplorer = ({
       >
         {selectedNodes.map((node, i) => {
           const edgesToNode = edges.filter(
-            (edge) => edge[1] === node.object_key
+            (edge) => edge[1] === node.object_key,
           );
           console.log(node.object_key);
           /*

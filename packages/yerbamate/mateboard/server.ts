@@ -9,21 +9,20 @@ import {
   readableStreamFromReader,
 } from "https://deno.land/std@0.158.0/streams/conversion.ts";
 import { mergeReadableStreams } from "https://deno.land/std@0.158.0/streams/merge.ts";
-
+import { existsSync } from "https://deno.land/std/fs/mod.ts";
+import * as path from "https://deno.land/std/path/mod.ts";
 enum MessageType {
   handshake = "handshake",
   status = "status",
   start_training = "start_training",
   stop_training = "stop_training",
-	get_summary = "get_summary",
+  get_summary = "get_summary",
 }
 enum Status {
   not_connected = "not_connected",
   connected = "connected",
   training = "training",
 }
-
-
 
 class Server {
   server: WebSocketServer;
@@ -33,13 +32,36 @@ class Server {
   status: Status = Status.not_connected;
   trainingProcess: Deno.Process;
   socket?: WebSocketClient;
-	aimLogger: Deno.Process;
+  aimLogger: Deno.Process;
   wsRoutes: Record<
     MessageType,
     (p: Record<string, any>) => void
   >;
   constructor(cwd: string) {
     this.cwd = cwd;
+    if (!existsSync(path.join(cwd, ".aim"))) {
+      Deno.run({
+        cmd: ["aim", "init"],
+        cwd: cwd,
+				stdout: "piped",
+      }).output().then((out) => {
+				console.log((new TextDecoder).decode(out))
+        this.aimLogger = Deno.run({
+          cmd: ["aim", "up", "-p", "8000"],
+          cwd: this.cwd,
+          stdout: "piped",
+          stderr: "piped",
+        });
+      });
+    } else {
+      this.aimLogger = Deno.run({
+        cmd: ["aim", "up", "-p", "8000"],
+        cwd: this.cwd,
+        stdout: "piped",
+        stderr: "piped",
+      });
+    }
+
     const router = new Router();
     router
       .get("/summary", async (context) => {
@@ -53,12 +75,6 @@ class Server {
 
         context.response.body = responseString;
       });
-		this.aimLogger = Deno.run({
-			cmd: ["aim", "up", "-p", "8000"],
-			cwd: this.cwd,
-			stdout: "piped",
-			stderr: "piped",
-		});
     this.staticServer = new Application();
     this.staticServer.use(oakCors());
     this.staticServer.use(router.routes());
@@ -81,37 +97,43 @@ class Server {
       },
       [MessageType.stop_training]: () => {
         this.stopTraining();
-        this.socket?.send(JSON.stringify({ type: MessageType.stop_training, data: "ok" }))
+        this.socket?.send(
+          JSON.stringify({ type: MessageType.stop_training, data: "ok" }),
+        );
       },
-			[MessageType.get_summary]: async () => {
-				const responseObject = await this.runMateCommand(["summary"])
-				this.socket?.send(JSON.stringify({ type: MessageType.get_summary, data: responseObject }))
-			}
+      [MessageType.get_summary]: async () => {
+        const responseObject = await this.runMateCommand(["summary"]);
+        this.socket?.send(
+          JSON.stringify({
+            type: MessageType.get_summary,
+            data: responseObject,
+          }),
+        );
+      },
     };
   }
-	async runMateCommand(command: string[]){
-		const p = Deno.run({
-			cmd: ["mate", ...command],
-			cwd: this.cwd,
-			stdout: "piped",
-			stderr: "piped",
-		});
-		const { code } = await p.status();
-		const rawOutput = await p.output();
-		const rawError = await p.stderrOutput();
-		p.close();
-		if (code !== 0) {
-			const errorString = new TextDecoder().decode(rawError);
-			throw new Error(errorString);
-		}
-		const outString = new TextDecoder().decode(rawOutput);
-		try {
-			return JSON.parse(outString);
-		}
-		catch (e){
-			return outString;
-		}
-	};
+  async runMateCommand(command: string[]) {
+    const p = Deno.run({
+      cmd: ["mate", ...command],
+      cwd: this.cwd,
+      stdout: "piped",
+      stderr: "piped",
+    });
+    const { code } = await p.status();
+    const rawOutput = await p.output();
+    const rawError = await p.stderrOutput();
+    p.close();
+    if (code !== 0) {
+      const errorString = new TextDecoder().decode(rawError);
+      throw new Error(errorString);
+    }
+    const outString = new TextDecoder().decode(rawOutput);
+    try {
+      return JSON.parse(outString);
+    } catch (e) {
+      return outString;
+    }
+  }
   async startTraining(experimentId: string) {
     console.log("Trying to start training experiment", experimentId);
     const stdoutStream = new stdOutStream(this.cwd);
@@ -146,13 +168,13 @@ class Server {
   }
   async stopTraining() {
     this.status = Status.connected;
-		if (this.trainingProcess){
-			await this.trainingProcess.kill("SIGINT")
-		}
+    if (this.trainingProcess) {
+      await this.trainingProcess.kill("SIGINT");
+    }
   }
   async start() {
     this.server = new WebSocketServer(8765);
-		this.server.on("error", ()=>{})
+    this.server.on("error", () => {});
     this.server.on("connection", (socket: WebSocketClient) => {
       this.socket = socket;
       socket.on("message", async (message: string) => {

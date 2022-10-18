@@ -67,8 +67,16 @@ export default function NavBar({
                 ))}
               <li className="nav-item">
                 <span
-                  className={`nav-link badge badge-pill ${connectionStatus === 'connected' ? 'badge-primary': 'badge-danger'}`}
-									style={{ border: "1px solid black", marginTop: "12px", marginLeft: "10px" }}
+                  className={`nav-link badge badge-pill ${
+                    connectionStatus === "connected"
+                      ? "badge-primary"
+                      : "badge-danger"
+                  }`}
+                  style={{
+                    border: "1px solid black",
+                    marginTop: "12px",
+                    marginLeft: "10px",
+                  }}
                 >
                   {connectionStatus}
                 </span>

@@ -5,7 +5,7 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 const SocketAPIHook = () => {
   const [socketUrl, setSocketUrl] = useState("ws://localhost:8765");
   const [messageHistory, setMessageHistory] = useState(
-    [] as Array<MessageEvent>
+    [] as Array<MessageEvent>,
   );
   const [connectionStatusListener, setConnectionStatusListener] = useState({
     onError: (event: Event) => {},

@@ -3,8 +3,7 @@ import ProgressBar from "./ProgressBar";
 import "../../node_modules/xterm/css/xterm.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Terminal } from "xterm";
-import socket from "../socket"
-
+import socket from "../socket";
 
 enum MessageType {
   train_started = "train_started",
@@ -78,17 +77,17 @@ export default ({
       }
     },
   };
-	socket.onmessage = (lastMessage)=>{
-      console.log("Child last message!! ", lastMessage);
-			let data :CustomMessageEvent|null = null
-      try {
-        data = JSON.parse(lastMessage.data) as CustomMessageEvent;
-        console.log(data);
-      } catch (e) {
-        console.log(e);
-      }
-      const reaction = onMessageReactions[data!.type](data!);
-	};
+  socket.onmessage = (lastMessage) => {
+    console.log("Child last message!! ", lastMessage);
+    let data: CustomMessageEvent | null = null;
+    try {
+      data = JSON.parse(lastMessage.data) as CustomMessageEvent;
+      console.log(data);
+    } catch (e) {
+      console.log(e);
+    }
+    const reaction = onMessageReactions[data!.type](data!);
+  };
 
   useEffect(() => {
     if (viewState == ExperimentPageState.Loading) {
@@ -120,7 +119,8 @@ export default ({
           marginRight: "auto",
           maxWidth: "94vw",
         }}
-      ></div>
+      >
+      </div>
       <div style={{ textAlign: "center", width: "100%" }}>
         <div
           className="card"
@@ -161,10 +161,8 @@ export default ({
           <button
             type="button"
             className="btn btn-success btn-lg btn-block"
-            disabled={
-              experiment.status === "running" ||
-              experiment.status === "never-run"
-            }
+            disabled={experiment.status === "running" ||
+              experiment.status === "never-run"}
             style={{ marginBottom: "5px" }}
           >
             Test

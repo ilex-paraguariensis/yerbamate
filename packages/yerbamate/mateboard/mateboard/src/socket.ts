@@ -1,6 +1,6 @@
-import openSocket from 'socket.io-client';
+import openSocket from "socket.io-client";
 
-const webSocket = new WebSocket("ws://localhost:8765")
+const webSocket = new WebSocket("ws://localhost:8765");
 /*
 webSocket.onopen = () => {
 	console.log("Connected to server")
@@ -10,4 +10,4 @@ webSocket.onmessage = (event) => {
 	console.log("Message from server", event.data)
 }
 */
-export default webSocket
+export default webSocket;
