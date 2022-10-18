@@ -95,8 +95,8 @@ export default function ({
 }) {
   return (
     <div style={{ textAlign: "center", marginTop: "9vh" }}>
-      <nav className="navbar fixed-bottom navbar-light bg-light">
-        <a className="navbar-brand" style={{ marginLeft: "1vw" }} href="#">
+      <nav className="navbar fixed-bottom navbar-expand-lg" style={{backgroundColor:"rgba(255, 255, 255, 0.14)"}}>
+        <a className="navbar-brand" style={{ marginLeft: "1vw", color:"white"}} href="#">
           New Experiment
         </a>
       </nav>
@@ -121,7 +121,8 @@ export default function ({
             style={{
               marginLeft: "auto",
               marginRight: "auto",
-              backgroundColor: "#D0FFC6",
+              backgroundColor: "rgba(255, 255, 255, 0.09)",
+							color: "white",
               maxWidth: "500px",
             }}
           >

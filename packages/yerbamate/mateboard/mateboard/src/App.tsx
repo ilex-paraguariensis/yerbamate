@@ -56,20 +56,6 @@ const App = () => {
       });
     }
   };
-  /*
-  useEffect(() => {
-    fetch(`http://localhost:3002/summary`)
-      .then((res) => res.json())
-      .then((data) =>
-        setMateSummary(() => {
-          defaultSections["Models"] = <Models models={data.models} />;
-          // const experiments =
-          console.log(data);
-          return data;
-        })
-      );
-  }, []);
-	*/
   return (
     <div>
       <title>Maté</title>
@@ -83,13 +69,14 @@ const App = () => {
       <script src="https://cdn.plot.ly/plotly-2.14.0.min.js"></script>
       <style>
         {`html, body {
-				 		background-color: #37474F;
+				 		background-color: #121212;
+						color: white
 				}	
 				`}
       </style>
       <div className="App">
         <NavBar
-          title="MateBoard"
+          title="MatéBoard"
           sections={sections}
           defaultSections={defaultSections}
           connectionStatus={connectionStatus}

@@ -1,7 +1,12 @@
 import Iframe from "react-iframe";
 export default () => {
-  const height = window.innerHeight;
+	const windowHeight = window.innerHeight;
+	const marginTop = 70//Math.round(windowHeight*0.06
+  const height = window.innerHeight - (marginTop)
   return (
-    <Iframe url="http://127.0.0.1:8000/" width="100%" height={height + "px"} />
+		<div style={{marginTop:marginTop + "px"}}>
+			<Iframe url="http://127.0.0.1:8000/" width="100%" height={height + "px"} />
+		</div>
+
   );
 };

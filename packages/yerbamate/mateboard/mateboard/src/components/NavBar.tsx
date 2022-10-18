@@ -23,7 +23,7 @@ export default function NavBar({
     <div>
       <nav
         className="navbar fixed-top navbar-expand-lg"
-        style={{ backgroundColor: "#6AA84F" }}
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.14)", color: "white" }}
       >
         <div className="container-fluid">
           <a
@@ -32,6 +32,7 @@ export default function NavBar({
               setSection("default");
               setSections(defaultSections);
             }}
+						style={{color:"rgb(50, 168, 82)", fontWeight: "bold"}}
           >
             {title}
           </a>
@@ -51,8 +52,8 @@ export default function NavBar({
               {Object.keys(sections)
                 .filter((x) => x !== "default")
                 .map((sectionName, i) => (
-                  <li key={String(i)} className="nav-item">
-                    <a
+                  <li key={String(i)} className="nav-item" >
+                    <a style={{color:"rgb(50, 168, 82)"}}
                       className={`nav-link ${
                         sectionName === section && "active"
                       }`}
@@ -65,22 +66,21 @@ export default function NavBar({
                     </a>
                   </li>
                 ))}
+						</ul>
+						<ul className="navbar-nav justify-content-end">
               <li className="nav-item">
                 <span
-                  className={`nav-link badge badge-pill ${
-                    connectionStatus === "connected"
-                      ? "badge-primary"
-                      : "badge-danger"
-                  }`}
-                  style={{
-                    border: "1px solid black",
-                    marginTop: "12px",
-                    marginLeft: "10px",
+                  className={"nav-link ms-auto"}
+									style={{
+										color:"green",
+										fontSize: "0.7em",
+										marginTop: "0.3em",
                   }}
                 >
-                  {connectionStatus}
+                  {connectionStatus === "connected" ? '🟢' : '🔴'}
                 </span>
               </li>
+
             </ul>
           </div>
         </div>

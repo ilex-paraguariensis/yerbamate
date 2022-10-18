@@ -57,7 +57,7 @@ class LocalDataSource(DataSource):
             os.listdir(os.path.join(root_dir, "trainers"))
         )
         self.data_loaders = self.__filter_regular_folders(
-            os.listdir(os.path.join(root_dir, "data_loaders"))
+            os.listdir(os.path.join(root_dir, "data"))
         )
         self.experiments = [
             os.path.splitext(exp_name)[0]

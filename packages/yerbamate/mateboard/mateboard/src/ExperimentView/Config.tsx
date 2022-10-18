@@ -119,9 +119,10 @@ const Config = ({ experimentId }: { experimentId: string }) => {
 	*/
   console.log(bombilla);
   // loads visjs
+	const marginTop = 70
   useEffect(() => {}, [1]);
   return (
-    <div>
+    <div style={{marginTop:marginTop}}>
       <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
         rel="stylesheet"

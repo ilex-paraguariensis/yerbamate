@@ -24,11 +24,11 @@ class MetadataGenerator:
     def generate(self) -> dict:
         model_meta = self.generate_module_metadata("models")
         trainer_meta = self.generate_module_metadata("trainers")
-        data_meta = self.generate_module_metadata("data_loaders")
+        data_meta = self.generate_module_metadata("data")
         return {
             "models": model_meta,
             "trainers": trainer_meta,
-            "data_loaders": data_meta,
+            "data": data_meta,
         }
 
     def generate_module_metadata(self, module: str) -> dict:
