@@ -34,6 +34,9 @@ class Mate:
         self.custom_save_path = None
         self.trainer: Optional[Trainer] = None
         assert self.config is not None
+        if not os.path.exists(os.path.join(self.root_folder, ".aim")):
+            print("Initializing Aim")
+            os.system("aim init")
         self.api = MateAPI(self.config)
 
     def create(self, path: str):
