@@ -3,8 +3,6 @@ import { Experiment } from "./Interfaces";
 // import "./ExperimentOverview.css";
 
 import Config from "./ExperimentView/Config";
-import Training from "./Training";
-import Visualizations from "./Visualizations";
 import ExperimentControl from "./ExperimentView/ExperimentControl";
 
 function Status({
@@ -116,8 +114,6 @@ export default function ({
                   />
                 ),
                 Config: <Config experimentId={localName} />,
-                Training: <Training />,
-                Visualizations: <Visualizations />,
               } as Record<string, JSX.Element>);
               setSection("Control");
             }}

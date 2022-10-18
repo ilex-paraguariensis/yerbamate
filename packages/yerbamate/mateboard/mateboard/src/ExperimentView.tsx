@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 
 import NavBar from "./components/NavBar";
 import Config from "./ExperimentView/Config";
-import Training from "./Training";
-import Visualizations from "./Visualizations";
 import ExperimentControl from "./ExperimentView/ExperimentControl";
 import { MateSummary } from "./Interfaces";
 
-type View = "default" | "Config" | "Training" | "Visualizations";
+type View = "default" | "Config";
 export default ({
   experimentId,
 }: {
@@ -40,8 +38,6 @@ export default ({
       />
     ),
     Config: <Config experimentId={experimentId} />,
-    Training: <Training />,
-    Visualizations: <Visualizations />,
   } as Record<View, JSX.Element>;
   return (
     <div>
