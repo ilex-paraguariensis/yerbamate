@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import getDAG from "./get_dag";
 import vis from "vis-network";
 import BombillaExplorer from "./BombillaExplorer";
+import socket from "../socket";
+
 
 const getNetwork = (
   nodes: Map<string, Record<string, any>>,
@@ -93,6 +95,15 @@ const Config = ({ experimentId }: { experimentId: string }) => {
     console.log("vis is defined");
   }
   const div = useRef<HTMLDivElement>(null);
+	socket.send(JSON.stringify({type: "get_summary", data:""}))
+	socket.onmessage = (msg) => {
+			const data = JSON.parse(msg.data).data.experiments[experimentId];
+			setBombilla(data);
+			const dag = getDAG(data);
+			setDag(dag);
+
+	}
+	/*
   useEffect(() => {
     fetch(`http://localhost:3002/summary`)
       .then((response) => response.json())
@@ -105,7 +116,7 @@ const Config = ({ experimentId }: { experimentId: string }) => {
         // getNetwork(nodes, edges, div.current!, false);
       });
   }, []);
-
+	*/
   console.log(bombilla);
   // loads visjs
   useEffect(() => {}, [1]);

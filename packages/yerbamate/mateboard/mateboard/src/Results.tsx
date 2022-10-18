@@ -1,59 +1,11 @@
-import ResultDisplay from "./Results/ResultDisplay";
-import { Result } from "./Interfaces";
+import Iframe from 'react-iframe'
 export default ({
   setSections,
 }: {
   setSections: (sections: Record<string, JSX.Element>) => void;
 }) => {
-  const results: Result[] = [
-    {
-      dataset: "MNIST",
-      experiments: [
-        {
-          name: "ResNet",
-          metrics: {
-            Accuracy: 0.95,
-            Precision: 0.95,
-            Recall: 0.95,
-          },
-        },
-        {
-          name: "ViT",
-          metrics: {
-            Accuracy: 0.95,
-            Precision: 0.95,
-            Recall: 0.95,
-          },
-        },
-      ],
-    },
-    {
-      dataset: "CIFAR10",
-      experiments: [
-        {
-          name: "ResNet",
-          metrics: {
-            Accuracy: 0.8,
-            Precision: 0.95,
-            Recall: 0.95,
-          },
-        },
-        {
-          name: "ViT",
-          metrics: {
-            Accuracy: 0.95,
-            Precision: 0.95,
-            Recall: 0.95,
-          },
-        },
-      ],
-    },
-  ];
+	const height = window.innerHeight;
   return (
-    <div style={{ marginTop: "10vh", textAlign: "center" }}>
-      {results.map((result) => (
-        <ResultDisplay result={result} />
-      ))}
-    </div>
+		<Iframe url="http://127.0.0.1:8000/" width="100%" height={height + "px"}/>
   );
 };

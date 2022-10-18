@@ -23,6 +23,8 @@ enum Status {
   training = "training",
 }
 
+
+
 class Server {
   server: WebSocketServer;
   mateBoardServerProcess: Deno.Process;
@@ -31,6 +33,7 @@ class Server {
   status: Status = Status.not_connected;
   trainingProcess: Deno.Process;
   socket?: WebSocketClient;
+	aimLogger: Deno.Process;
   wsRoutes: Record<
     MessageType,
     (p: Record<string, any>) => void
@@ -50,6 +53,12 @@ class Server {
 
         context.response.body = responseString;
       });
+		this.aimLogger = Deno.run({
+			cmd: ["aim", "up", "-p", "8000"],
+			cwd: this.cwd,
+			stdout: "piped",
+			stderr: "piped",
+		});
     this.staticServer = new Application();
     this.staticServer.use(oakCors());
     this.staticServer.use(router.routes());
@@ -75,16 +84,34 @@ class Server {
         this.socket?.send(JSON.stringify({ type: MessageType.stop_training, data: "ok" }))
       },
 			[MessageType.get_summary]: async () => {
-				const responseString = JSON.parse((new TextDecoder()).decode(await Deno.run({
-					cmd: ["mate", "summary"],
-					cwd: this.cwd,
-					stdout: "piped",
-					stderr: "piped",
-				}).output()))
-				this.socket?.send(JSON.stringify({ type: MessageType.get_summary, data: responseString }))
+				const responseObject = await this.runMateCommand(["summary"])
+				this.socket?.send(JSON.stringify({ type: MessageType.get_summary, data: responseObject }))
 			}
     };
   }
+	async runMateCommand(command: string[]){
+		const p = Deno.run({
+			cmd: ["mate", ...command],
+			cwd: this.cwd,
+			stdout: "piped",
+			stderr: "piped",
+		});
+		const { code } = await p.status();
+		const rawOutput = await p.output();
+		const rawError = await p.stderrOutput();
+		p.close();
+		if (code !== 0) {
+			const errorString = new TextDecoder().decode(rawError);
+			throw new Error(errorString);
+		}
+		const outString = new TextDecoder().decode(rawOutput);
+		try {
+			return JSON.parse(outString);
+		}
+		catch (e){
+			return outString;
+		}
+	};
   async startTraining(experimentId: string) {
     console.log("Trying to start training experiment", experimentId);
     const stdoutStream = new stdOutStream(this.cwd);
