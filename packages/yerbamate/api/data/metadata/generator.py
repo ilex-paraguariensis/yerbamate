@@ -22,6 +22,8 @@ class MetadataGenerator:
 
     # should generate a metadata package for the whole project
     def generate(self) -> dict:
+        modules = self.list_module([self.root_module])
+        return {module: self.generate_module_metadata(module) for module in modules}
         model_meta = self.generate_module_metadata("models")
         trainer_meta = self.generate_module_metadata("trainers")
         data_meta = self.generate_module_metadata("data")
