@@ -23,7 +23,11 @@ class MetadataGenerator:
     # should generate a metadata package for the whole project
     def generate(self) -> dict:
         modules = self.list_module([self.root_module])
-        return {module: self.generate_module_metadata(module) for module in modules}
+        for module in modules:
+            self.generate_module_metadata(module)
+        # gen = {module: self.generate_module_metadata(module) for module in modules}
+        # return gen
+        return
         model_meta = self.generate_module_metadata("models")
         trainer_meta = self.generate_module_metadata("trainers")
         data_meta = self.generate_module_metadata("data")
@@ -34,14 +38,25 @@ class MetadataGenerator:
         }
 
     def generate_module_metadata(self, module: str) -> dict:
-        return {
-            model_module: ModuleMetadataGenerator(
-                [self.root_module, module, model_module], self.root_meta, self.local_ds
-            )
-            .generate()
-            .to_dict()
-            for model_module in self.list_modules(module)
-        }
+
+        for sub_module in self.list_module([self.root_module, module]):
+            ModuleMetadataGenerator(
+                [self.root_module, module, sub_module], self.root_meta, self.local_ds
+            ).generate()
+
+            for thub_module in self.list_module([self.root_module, module, sub_module]):
+                ModuleMetadataGenerator(
+                    [self.root_module, module, sub_module, thub_module],self.root_meta, self.local_ds
+                ).generate()
+
+        # return {
+        #     model_module: ModuleMetadataGene  rator(
+        #         [self.root_module, module, model_module], self.root_meta, self.local_ds
+        #     )
+        #     .generate()
+        #     .to_dict()
+        #     for model_module in self.list_modules(module)
+        # }
 
     # returns a list of submodules in the root module, should be models, trainers, data
     def list_submodules(self) -> list:

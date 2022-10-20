@@ -41,6 +41,7 @@ class ModuleMetadataGenerator:
 
     def get_possible_modules(self):
         return [
+            ".".join([self.root_module, self.module]),
             self.module,
             # ".".join([self.root_module, self.type_module, self.local_module]),
             # ".".join([self.type_module, self.local_module]),
