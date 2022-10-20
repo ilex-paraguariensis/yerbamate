@@ -1,3 +1,4 @@
+import threading
 from yerbamate.mate_config import MateConfig
 from .sources.remote import RemoteDataSource
 from .sources.local.local import LocalDataSource
@@ -21,6 +22,14 @@ class PackageRepository:
             self.local_server = LocalServer(self.metadata_generator, self.local)
 
         # TODO: we should refresh the metadata every time we run a command
+        self.generate_metadata()
+
+    def generate_metadata(self):
+        # run in paralle
+        th = threading.Thread(target=self.__generate_metadata, args=())
+        th.start()
+
+    def __generate_metadata(self):
         self.metadata = self.metadata_generator.generate()
 
     # def list(self, module: str, query: Optional[str] = None):

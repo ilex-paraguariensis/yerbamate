@@ -23,9 +23,9 @@ packages/mate/migrator/__init__.py
 packages/mate/migrator/base_migrator.py
 packages/mate/migrator/params_migrator.py
 packages/yerbamate/__init__.py
+packages/yerbamate/_logger.py
 packages/yerbamate/backbone_type.py
 packages/yerbamate/constants.py
-packages/yerbamate/logger.py
 packages/yerbamate/mate.py
 packages/yerbamate/mate_cli.py
 packages/yerbamate/mate_config.py
