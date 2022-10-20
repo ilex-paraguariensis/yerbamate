@@ -91,19 +91,23 @@ export default ({
 
   useEffect(() => {
     if (viewState == ExperimentPageState.Loading) {
-      socket.send(JSON.stringify({
-        type: "handshake",
-        experimentId: experimentId,
-      }));
+      socket.send(
+        JSON.stringify({
+          type: "handshake",
+          experimentId: experimentId,
+        })
+      );
     }
   }, [viewState]);
 
   const startTraining = () => {
     console.log("send message start training");
-    socket.send(JSON.stringify({
-      type: "start_training",
-      experiment_id: experimentId,
-    }));
+    socket.send(
+      JSON.stringify({
+        type: "start_training",
+        experiment_id: experimentId,
+      })
+    );
     setViewState(ExperimentPageState.TrainRequested);
   };
 
@@ -119,8 +123,7 @@ export default ({
           marginRight: "auto",
           maxWidth: "94vw",
         }}
-      >
-      </div>
+      ></div>
       <div style={{ textAlign: "center", width: "100%" }}>
         <div
           className="card"
@@ -141,10 +144,12 @@ export default ({
             className="btn btn-danger btn-lg btn-block"
             disabled={viewState !== ExperimentPageState.Training}
             onClick={() => {
-              socket.send(JSON.stringify({
-                type: "stop_training",
-                experiment_id: experimentId,
-              }));
+              socket.send(
+                JSON.stringify({
+                  type: "stop_training",
+                  experiment_id: experimentId,
+                })
+              );
             }}
             style={{ marginBottom: "5px" }}
           >
@@ -161,8 +166,10 @@ export default ({
           <button
             type="button"
             className="btn btn-success btn-lg btn-block"
-            disabled={experiment.status === "running" ||
-              experiment.status === "never-run"}
+            disabled={
+              experiment.status === "running" ||
+              experiment.status === "never-run"
+            }
             style={{ marginBottom: "5px" }}
           >
             Test

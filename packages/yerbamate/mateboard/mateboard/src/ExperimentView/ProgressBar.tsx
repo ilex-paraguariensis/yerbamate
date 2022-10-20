@@ -33,8 +33,7 @@ export default ({ totalTime, color }: { totalTime: number; color: string }) => {
         aria-valuenow={50}
         aria-valuemin={0}
         aria-valuemax={100}
-      >
-      </div>
+      ></div>
     </div>
   );
 };
