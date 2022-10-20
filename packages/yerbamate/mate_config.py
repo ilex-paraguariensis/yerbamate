@@ -11,7 +11,9 @@ class Config:
     def __init__(self, config: Bunch):
 
         if "metadata" in config:
-            config["metadata"] = Metadata(**config["metadata"])
+            config["metadata"] = Metadata(
+                **config["metadata"], root_module=config.get("project", "")
+            )
 
         for key, value in self.__dict__.items():
             if value != None and value != {}:
@@ -27,8 +29,10 @@ class Config:
             if key in config:
                 assert isinstance(config[key], type(value)), f"Wrong type for key {key}"
                 setattr(self, key, config[key])
-        for key in config.keys():
-            assert key in self.__dict__.keys(), f"Unknown key {key} in config."
+
+        # Disable this for now as its changing the config
+        # for key in config.keys():
+        #     assert key in self.__dict__.keys(), f"Unknown key {key} in config."
 
     def __str__(self):
         return json.dumps(
@@ -60,5 +64,7 @@ class MateConfig(Config):
         # self.backbone: BackboneType = BackboneType.lightning
         self.override_params: dict[str, Any] = {}
         self.restarting = False
-        self.metadata: BaseMetadata = BaseMetadata()
+        self.metadata: BaseMetadata = BaseMetadata(
+            root_module=config.get("project", "")
+        )
         super().__init__(config)

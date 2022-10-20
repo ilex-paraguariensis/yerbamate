@@ -16,29 +16,34 @@ from .utils import get_function_args, find_in_bombilla_dict
 class ModuleMetadataGenerator:
     def __init__(
         self,
-        root_module: str,
-        type_module: str,
-        local_module: str,
+        module_paths: list[str],
         base_metadata: Metadata,
         local_data_source: LocalDataSource,
     ):
 
-        self.root_module = root_module
-        self.type_module = type_module
-        self.local_module = local_module
+        self.root_module = module_paths[0]
+        self.type_module = module_paths[1]
+        # self.local_module = module_paths[-1]
+
+        self.module_paths = module_paths
+
         self.base_metadata = base_metadata.copy()
+        self.base_metadata.update(module_path=module_paths[1:], root_module=None)
         self.local_data_source = local_data_source
 
-        self.module_path = os.path.join(
-            self.root_module, self.type_module, self.local_module
-        )
+        self.module_path = os.path.join(*module_paths)
 
-        self.module_files = os.listdir(self.module_path)
+        self.module = ".".join(module_paths)
+
+        self.local_module = ".".join(module_paths[1:])
+
+        self.module_files = os.listdir(os.path.join(*module_paths))
 
     def get_possible_modules(self):
         return [
-            ".".join([self.root_module, self.type_module, self.local_module]),
-            ".".join([self.type_module, self.local_module]),
+            self.module,
+            # ".".join([self.root_module, self.type_module, self.local_module]),
+            # ".".join([self.type_module, self.local_module]),
         ]
 
     def search_experiments_for_defaults(self, module, function_name):
@@ -61,9 +66,8 @@ class ModuleMetadataGenerator:
     def update_metadata(self):
 
         # update URL to point to the right module
-        url_addition = "/".join(
-            [self.root_module, self.type_module, self.local_module, ""]
-        )
+        # addition = self.module_paths + [""]
+        url_addition = "/".join(self.module_paths + [""])
         new_url = self.base_metadata.url + url_addition
         type = self.type_module
         self.base_metadata.update(url=new_url, type=type)
@@ -156,8 +160,8 @@ class ModuleMetadataGenerator:
 
     def __get_local_module(self):
         return __import__(
-            f"{self.root_module}.{self.type_module}.{self.local_module}",
-            fromlist=[self.local_module],
+            f"{self.module}",
+            fromlist=[self.module_paths[-1]],
         )
 
     def __find_functions(self, module):

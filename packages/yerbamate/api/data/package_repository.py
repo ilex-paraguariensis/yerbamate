@@ -36,6 +36,8 @@ class PackageRepository:
         mate_summary["data_loaders"] = self.metadata["data_loaders"]
         return mate_summary
 
+    def install_package(self, package: Package):
+        self.local.install_package(package)
 
     """
     def query_models(self, query: Optional[str] = None):

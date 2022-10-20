@@ -14,11 +14,14 @@ class BaseMetadata(dict):
         self.version: str = ""
         self.category: str = ""
         self.backbone: str = ""
+        self.root_module: str = ""
+        self.module_path: list[str] = []
 
         for key, value in self.__dict__.items():
             if key in kwargs:
                 setattr(self, key, kwargs[key])
 
+        self.set_url()
         # ipdb.set_trace()
 
     def __str__(self):
@@ -43,6 +46,8 @@ class BaseMetadata(dict):
     def update(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
+            if value == None:
+                delattr(self, key)
 
     def to_dict(self):
         return {
@@ -52,6 +57,37 @@ class BaseMetadata(dict):
 
     def copy(self):
         return BaseMetadata(**self.to_dict().copy())
+
+    def set_url(self):
+        self.url = self.get_url()
+
+    def get_url(self):
+        if self.url != "":
+            return self.url
+        else:
+            return self.parse_url_from_git()
+
+    def parse_url_from_git(self, path="."):
+
+        try:
+            from git import Repo
+
+            repo = Repo(path)
+
+            url = repo.remotes.origin.url
+
+            if url.startswith("git@"):
+                url = url.replace("git@", "https://")
+                url = url.replace(":", "/")
+                url = url.replace(".git", "")
+                url = url + "/"
+
+            return url
+
+        except Exception as e:
+            print(f"Error: {e} while trying to find root git repo")
+
+        return ""
 
 
 class Metadata(BaseMetadata):

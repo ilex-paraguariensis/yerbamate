@@ -1,11 +1,10 @@
-import json
 import os
-import queue
+
 import sys
-import threading
+
 from time import sleep
 from yerbamate.mate_config import MateConfig
-from yerbamate.mateboard.mateboard import MateBoard
+
 from yerbamate.trainers.trainer import Trainer
 from yerbamate.utils.bunch import Bunch
 
@@ -15,17 +14,10 @@ from typing import Optional, Union
 import ipdb
 
 
-import asyncio
-import websocket
-import websockets
-from .socket import WebSocketServer
-
 """
 MATE API
 
 """
-
-from multiprocessing import Process, Queue
 
 
 class MateAPI:
@@ -37,7 +29,6 @@ class MateAPI:
         self.save_dir: Optional[str] = None
         self.checkpoint_path: Optional[str] = None
         self.trainer: Optional[Trainer] = None
-
 
     def list(self, module: str, query: Optional[str] = None):
         return self.repository.list(module, query)

@@ -1,5 +1,4 @@
 from ..utils.bunch import Bunch
-from ..api.data.package import Package
 
 
 from typing import Optional, Union, Sequence, Type, Any

@@ -34,8 +34,10 @@ class MetadataGenerator:
     def generate_module_metadata(self, module: str) -> dict:
         return {
             model_module: ModuleMetadataGenerator(
-                self.root_module, module, model_module, self.root_meta, self.local_ds
-            ).generate().to_dict()
+                [self.root_module, module, model_module], self.root_meta, self.local_ds
+            )
+            .generate()
+            .to_dict()
             for model_module in self.list_modules(module)
         }
 
