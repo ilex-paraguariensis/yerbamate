@@ -85,11 +85,17 @@ class ModuleMetadataGenerator:
         fun_meta = [self.generate_function_metadata(function) for function in functions]
 
         self.update_metadata()
+
+        dependencies = self.__generate_pip_dependencies()
+
         results = {
             "exports": {
                 "classes": meta,
                 "functions": fun_meta,
-            }
+            },
+            "dependencies": {
+                "pip": dependencies,
+            },
         }
         self.base_metadata.add(**results)
 
@@ -157,6 +163,36 @@ class ModuleMetadataGenerator:
         result = {k: v for k, v in result.items() if v and v != "None" and v != []}
 
         return result
+
+    def __generate_pip_dependencies(self):
+        from pipreqs import pipreqs
+
+        # slows down mate, FIX THIS
+
+        imports = pipreqs.get_all_imports(self.module_path)
+        import_info_remote = pipreqs.get_imports_info(imports)
+        import_info_local = pipreqs.get_import_local(imports)
+
+        import_info = []
+
+        for im in import_info_local:
+
+            name = im["name"]
+            version = im["version"]
+
+            res = {
+                "name": name,
+                "version": version,
+            }
+
+            for remote in import_info_remote:
+                if remote["name"] == name:
+                    lastVersion = remote["version"]
+                    res["lastVersion"] = lastVersion
+
+            import_info.append(res)
+
+        return import_info
 
     def __get_local_module(self):
         return __import__(
