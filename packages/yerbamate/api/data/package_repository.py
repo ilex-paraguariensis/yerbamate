@@ -41,12 +41,9 @@ class PackageRepository:
         return self.local.list(module, query)
 
     def get_mate_summary(self):
-        mate_summary = {}
-        mate_summary["experiments"] = self.local.get_all_experiments()
-        mate_summary["models"] = self.metadata["models"]
-        mate_summary["trainers"] = self.metadata["trainers"]
-        mate_summary["data_loaders"] = self.metadata["data_loaders"]
-        return mate_summary
+        summary = {key:val for key,val in self.metadata.items()}
+        summary["experiments"] = self.local.get_all_experiments()
+        return summary
 
     def install_package(self, package: Package):
         self.local.install_package(package)

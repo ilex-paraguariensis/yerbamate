@@ -81,8 +81,10 @@ const getNetwork = (
   // @ts-ignore
   return new window.vis.Network(container, netData, options);
 };
+const views = ["graph", "explorer"];
 const Config = ({ experimentId }: { experimentId: string }) => {
   const [bombilla, setBombilla] = useState<Record<string, any> | null>(null);
+  const [view, setView] = useState<string>("explorer");
   const [dag, setDag] = useState<{
     nodes: Map<string, Record<string, any>>;
     edges: [string, string, string[]][];
@@ -94,44 +96,56 @@ const Config = ({ experimentId }: { experimentId: string }) => {
     console.log("vis is defined");
   }
   const div = useRef<HTMLDivElement>(null);
-	useEffect(() => {
-		
-		socket.send(JSON.stringify({ type: "get_summary", data: "" }));
-		socket.onmessage = (msg) => {
-			const data = JSON.parse(msg.data).data.experiments[experimentId];
-			setBombilla(data);
-			const dag = getDAG(data);
-			setDag(dag);
-		};
-	}, []);
-  /*
   useEffect(() => {
-    fetch(`http://localhost:3002/summary`)
-      .then((response) => response.json())
-      .then((data) => {
-        data = data.experiments[experimentId];
-        setBombilla(data);
-        const dag = getDAG(data);
-        setDag(dag);
-        const { edges, nodes } = dag;
-        // getNetwork(nodes, edges, div.current!, false);
-      });
+    socket.send(JSON.stringify({ type: "get_summary", data: "" }));
+    socket.onmessage = (msg) => {
+      const data = JSON.parse(msg.data).data.experiments[experimentId];
+      setBombilla(data);
+      const dag = getDAG(data);
+      setDag(dag);
+    };
   }, []);
-	*/
   console.log(bombilla);
   // loads visjs
   const marginTop = 70;
-  useEffect(() => {}, [1]);
   return (
-    <div style={{ marginTop: marginTop, zIndex:100 }}>
-      {dag && (
-        <BombillaExplorer
-          nodes={dag.nodes}
-          edges={dag.edges}
-          bombilla={bombilla}
-        />
-      )}
-    </div>
+    <>
+      {dag &&
+        (view === "explorer" ? (
+          <BombillaExplorer
+            nodes={dag.nodes}
+            edges={dag.edges}
+            bombilla={bombilla}
+          />
+        ) : (
+          <div
+            ref={div}
+            style={{
+              width: "100%",
+              height: `calc(100vh - ${marginTop}px)`,
+            }}
+          />
+        ))}
+      <nav
+        className="navbar fixed-bottom navbar-expand-lg"
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.14)" }}
+      >
+        <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+          {views.map((viewItem, i) => (
+            <button
+              onClick={() => setView(viewItem)}
+              key={i.toString()}
+              className={
+                "btn btn-" + (viewItem === view ? "primary" : "secondary")
+              }
+              style={{ marginLeft: "10px" }}
+            >
+              {viewItem}
+            </button>
+          ))}
+        </ul>
+      </nav>
+    </>
   );
 };
 export default Config;

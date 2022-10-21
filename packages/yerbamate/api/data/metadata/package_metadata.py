@@ -17,7 +17,7 @@ class ModuleMetadataGenerator:
     def __init__(
         self,
         module_paths: list[str],
-        base_metadata: Metadata,
+        base_metadata: BaseMetadata,
         local_data_source: LocalDataSource,
     ):
 
@@ -101,8 +101,7 @@ class ModuleMetadataGenerator:
         self.base_metadata.add(**results)
 
         self.save_metadata()
-
-        return self.base_metadata
+        return self.base_metadata.to_dict()
 
     def save_metadata(self):
 

@@ -35,6 +35,7 @@ class Mate:
         self.trainer: Optional[Trainer] = None
         assert self.config is not None
         self.api = MateAPI(self.config)
+        # ipdb.set_trace()
 
     def create(self, path: str):
         pass

@@ -35,8 +35,7 @@ function Status({
               border: "3px solid black",
             }}
             className="loader"
-          >
-          </div>
+          ></div>
         </div>
       </div>
     ),
@@ -84,9 +83,9 @@ export default function ({
   experiments,
   setSections,
   setSection,
-  //lastMessage,
-  //sendJsonMessage,
-}: {
+}: //lastMessage,
+//sendJsonMessage,
+{
   experiments: Record<string, Experiment>;
   setSections: (sections: Record<string, JSX.Element>) => void;
   setSection: (section: string) => void;
@@ -95,14 +94,21 @@ export default function ({
 }) {
   return (
     <div style={{ textAlign: "center", marginTop: "9vh" }}>
-      <nav className="navbar fixed-bottom navbar-expand-lg" style={{backgroundColor:"rgba(255, 255, 255, 0.14)"}}>
-        <a className="navbar-brand" style={{ marginLeft: "1vw", color:"white"}} href="#">
+      <nav
+        className="navbar fixed-bottom navbar-expand-lg"
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.14)" }}
+      >
+        <button
+          className="btn btn-secondary"
+          style={{ marginRight: "10px", marginLeft: "10px" }}
+        >
           New Experiment
-        </a>
+        </button>
       </nav>
       <div className="list-group" style={{ marginTop: "3vh" }}>
-        {Object.entries(experiments).map(([localName, experiment]) => (
+        {Object.entries(experiments).map(([localName, experiment], i) => (
           <div
+            key={i.toString()}
             onClick={() => {
               setSections({
                 Control: (
@@ -122,7 +128,7 @@ export default function ({
               marginLeft: "auto",
               marginRight: "auto",
               backgroundColor: "rgba(255, 255, 255, 0.09)",
-							color: "white",
+              color: "white",
               maxWidth: "500px",
             }}
           >

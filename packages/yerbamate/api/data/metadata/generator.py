@@ -11,7 +11,7 @@ from .package_metadata import ModuleMetadataGenerator
 
 class MetadataGenerator:
     def __init__(
-        self, root_module: str, metadata: Metadata, local_ds: LocalDataSource
+        self, root_module: str, metadata: BaseMetadata, local_ds: LocalDataSource
     ) -> None:
         # TODO root_package should have at least the author, type, version, description
 
@@ -19,14 +19,17 @@ class MetadataGenerator:
         self.root_meta = metadata
         self.local_ds = local_ds
         self.sub_modules = self.list_submodules()
+        self.two_level_modules = ("data",)
 
     # should generate a metadata package for the whole project
     def generate(self) -> dict:
         modules = self.list_module([self.root_module])
-        for module in modules:
-            self.generate_module_metadata(module)
-        # gen = {module: self.generate_module_metadata(module) for module in modules}
-        # return gen
+        result = {}
+        #for module in modules:
+        #    self.generate_module_metadata(module)
+
+        gen = {module: self.generate_module_metadata(module) for module in modules}
+        return gen
         return
         model_meta = self.generate_module_metadata("models")
         trainer_meta = self.generate_module_metadata("trainers")
@@ -38,16 +41,25 @@ class MetadataGenerator:
         }
 
     def generate_module_metadata(self, module: str) -> dict:
-
+        result = {}
         for sub_module in self.list_module([self.root_module, module]):
-            ModuleMetadataGenerator(
+            """
+            aba = ModuleMetadataGenerator(
                 [self.root_module, module, sub_module], self.root_meta, self.local_ds
             ).generate()
-
-            for thub_module in self.list_module([self.root_module, module, sub_module]):
-                ModuleMetadataGenerator(
-                    [self.root_module, module, sub_module, thub_module],self.root_meta, self.local_ds
+            ipdb.set_trace()
+            """
+            if module in self.two_level_modules:
+                result[sub_module] = {}
+                for thub_module in self.list_module([self.root_module, module, sub_module]):
+                    result[sub_module][thub_module] = ModuleMetadataGenerator(
+                        [self.root_module, module, sub_module, thub_module],self.root_meta, self.local_ds
+                    ).generate()
+            else:
+                result[sub_module] = ModuleMetadataGenerator(
+                    [self.root_module, module, sub_module], self.root_meta, self.local_ds
                 ).generate()
+        return result
 
         # return {
         #     model_module: ModuleMetadataGene  rator(
