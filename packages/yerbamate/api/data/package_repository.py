@@ -22,7 +22,6 @@ class PackageRepository:
             self.local_server = LocalServer(self.metadata_generator, self.local)
 
         # TODO: we should refresh the metadata every time we run a command
-        ipdb.set_trace()
         self.generate_metadata()
 
     def generate_metadata(self):
