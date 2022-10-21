@@ -1,8 +1,17 @@
+from asyncio import subprocess
 from enum import Enum
 import json
 import ipdb
 from git import Repo
+from git.exc import InvalidGitRepositoryError 
 import warnings
+import subprocess
+from subprocess import check_output
+import os
+
+def is_git_repo(path = '.'):
+    return subprocess.call(['git', '-C', path, 'status'], stderr=subprocess.STDOUT, stdout = open(os.devnull, 'w')) == 0
+
 
 
 class BaseMetadata(dict):
@@ -70,23 +79,9 @@ class BaseMetadata(dict):
             return self.parse_url_from_git()
 
     def parse_url_from_git(self, path="."):
-        try:
-            repo = Repo(path)
-
-            url = repo.remotes.origin.url
-
-            if url.startswith("git@"):
-                url = url.replace("git@", "https://")
-                url = url.replace(":", "/")
-                url = url.replace(".git", "")
-                url = url + "/"
-
-            return url
-
-        except Exception as e:
-            warnings.warn(f"Error: {e} while trying to find root git repo")
-
-        return ""
+        assert is_git_repo(path), f"Not a git repository: {path=}"
+        url = check_output(["git", "config", "--get", "remote.origin.url"], cwd=path).decode("utf-8").strip()
+        return url
 
 
 class Metadata(BaseMetadata):
