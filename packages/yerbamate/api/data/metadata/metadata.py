@@ -1,6 +1,8 @@
 from enum import Enum
 import json
 import ipdb
+from git import Repo
+import warnings
 
 
 class BaseMetadata(dict):
@@ -68,10 +70,8 @@ class BaseMetadata(dict):
             return self.parse_url_from_git()
 
     def parse_url_from_git(self, path="."):
-
+        ipdb.set_trace()
         try:
-            from git import Repo
-
             repo = Repo(path)
 
             url = repo.remotes.origin.url
@@ -85,7 +85,7 @@ class BaseMetadata(dict):
             return url
 
         except Exception as e:
-            print(f"Error: {e} while trying to find root git repo")
+            warnings.warn(f"Error: {e} while trying to find root git repo")
 
         return ""
 

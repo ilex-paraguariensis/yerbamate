@@ -119,10 +119,14 @@ class Server {
       stdout: "piped",
       stderr: "piped",
     });
+		const textDecoder = new TextDecoder();
     const { code } = await p.status();
     const rawOutput = await p.output();
     const rawError = await p.stderrOutput();
     p.close();
+		console.log(`Command: ${command.join(" ")}`);
+ 	  // console.log(textDecoder.decode(rawError))
+ 	  console.log(textDecoder.decode(rawOutput))
     if (code !== 0) {
       const errorString = new TextDecoder().decode(rawError);
       throw new Error(errorString);
