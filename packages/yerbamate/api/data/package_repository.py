@@ -23,6 +23,7 @@ class PackageRepository:
 
         # TODO: we should refresh the metadata every time we run a command
         self.generate_metadata()
+        self.metadata: Optional[dict] = None
 
     def generate_metadata(self):
         # run in paralle
@@ -41,6 +42,9 @@ class PackageRepository:
         return self.local.list(module, query)
 
     def get_mate_summary(self):
+        if self.metadata is None:
+            self.__generate_metadata()
+        assert self.metadata is not None, "Metadata shuldn't be None"
         summary = {key:val for key,val in self.metadata.items()}
         summary["experiments"] = self.local.get_all_experiments()
         return summary
