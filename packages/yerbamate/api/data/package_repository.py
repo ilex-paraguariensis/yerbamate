@@ -29,6 +29,9 @@ class PackageRepository:
         th = threading.Thread(target=self.__generate_metadata, args=())
         th.start()
 
+        th.join()
+        # we need to wait for the metadata to be generated, race condition with bombilla generating return types
+
     def __generate_metadata(self):
         self.metadata = self.metadata_generator.generate()
 
