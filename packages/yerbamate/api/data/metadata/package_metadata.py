@@ -100,7 +100,8 @@ class ModuleMetadataGenerator:
         }
         self.base_metadata.add(**results)
 
-        self.save_metadata()
+        if len(meta) != 0 or len(fun_meta) != 0:
+            self.save_metadata()
         return self.base_metadata.to_dict()
 
     def save_metadata(self):
