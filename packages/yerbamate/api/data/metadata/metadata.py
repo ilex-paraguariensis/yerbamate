@@ -70,7 +70,6 @@ class BaseMetadata(dict):
             return self.parse_url_from_git()
 
     def parse_url_from_git(self, path="."):
-        ipdb.set_trace()
         try:
             repo = Repo(path)
 

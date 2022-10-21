@@ -102,6 +102,7 @@ class Server {
         );
       },
       [MessageType.get_summary]: async () => {
+				console.log("Dude!")
         const responseObject = await this.runMateCommand(["summary"]);
         this.socket?.send(
           JSON.stringify({
