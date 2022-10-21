@@ -2,7 +2,6 @@ import {
   WebSocketClient,
   WebSocketServer,
 } from "https://deno.land/x/websocket@v0.1.4/mod.ts";
-import { stdOutStream } from "./stdoutstream.ts";
 import { Application, Router, send } from "https://deno.land/x/oak/mod.ts";
 import { oakCors } from "https://deno.land/x/cors/mod.ts";
 import {
@@ -102,7 +101,6 @@ class Server {
         );
       },
       [MessageType.get_summary]: async () => {
-				console.log("Dude!")
         const responseObject = await this.runMateCommand(["summary"]);
         this.socket?.send(
           JSON.stringify({
@@ -125,14 +123,13 @@ class Server {
     const rawOutput = await p.output();
     const rawError = await p.stderrOutput();
     p.close();
-		console.log(`Command: ${command.join(" ")}`);
+		console.log(`Command: mate ${command.join(" ")}`);
  	  // console.log(textDecoder.decode(rawError))
- 	  console.log(textDecoder.decode(rawOutput))
     if (code !== 0) {
-      const errorString = new TextDecoder().decode(rawError);
+      const errorString = textDecoder.decode(rawError);
       throw new Error(errorString);
     }
-    const outString = new TextDecoder().decode(rawOutput);
+    const outString = textDecoder.decode(rawOutput);
     try {
       return JSON.parse(outString);
     } catch (e) {
@@ -140,8 +137,7 @@ class Server {
     }
   }
   async startTraining(experimentId: string) {
-    console.log("Trying to start training experiment", experimentId);
-    const stdoutStream = new stdOutStream(this.cwd);
+    console.log("Trying to start training experiment:", experimentId);
     const p = Deno.run({
       cmd: ["mate", "train", experimentId],
       cwd: this.cwd,
@@ -155,7 +151,7 @@ class Server {
       readableStreamFromReader(p.stderr),
     );
     for await (const chunk of merged) {
-      console.log("Chunk:", decoder.decode(chunk));
+      console.log(decoder.decode(chunk));
       this.socket?.send(JSON.stringify({
         type: "train_logs",
         data: Array.from(chunk),

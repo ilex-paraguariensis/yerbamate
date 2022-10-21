@@ -32,7 +32,8 @@ class MateBoard:
                 cwd=os.path.join(os.path.dirname(__file__), "mateboard"),
                 start_new_session=True,
             )
-            webbrowser.open("http://localhost:3000")
+            print("You can now open:\n\thttp://localhost:3000")
 
     def stop(self):
-        self._p.kill()
+        if self._p:
+            self._p.kill()
