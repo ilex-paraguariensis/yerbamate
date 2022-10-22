@@ -30,6 +30,9 @@ class MateAPI:
         self.checkpoint_path: Optional[str] = None
         self.trainer: Optional[Trainer] = None
 
+    def install_url(self, url: str):
+        self.repository.install_url(url)
+
     def list(self, module: str, query: Optional[str] = None):
         return self.repository.list(module, query)
 

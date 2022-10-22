@@ -11,7 +11,7 @@ from ...metadata.generator import MetadataGenerator
 class LocalServer:
     def __init__(self, generator: MetadataGenerator, local_ds: LocalDataSource) -> None:
         self.local_ds = local_ds
-        self.metadata = generator.generate()
+        self.metadata = generator
         # print(self.metadata)
         # run server in a thread
         t = Thread(target=self.run_server)
@@ -25,7 +25,7 @@ class LocalServer:
             # query = request.args["query"]
             # return self.local_ds.list(query)
             if query != "experiments":
-                return jsonify(self.metadata[query])
+                return jsonify(self.metadata.generate()[query])
             else:
                 return jsonify(self.local_ds.list(query))
 

@@ -104,11 +104,11 @@ class Mate:
     def sample(self, model_name: str, params: str):
         pass
 
-    def install(self, source: str, destination: str):
+    def install(self, url: str):
         """
         Adds a dependency to a model.
         """
-        io.install(self.root_folder, source, destination)
+        self.api.install_url(url)
 
     def exec(self, model: str, params: str, exec_file: str):
         params = "parameters" if params == "" or params == "None" else params
