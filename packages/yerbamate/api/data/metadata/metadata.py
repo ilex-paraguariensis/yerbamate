@@ -1,6 +1,7 @@
 from asyncio import subprocess
 from enum import Enum
 import json
+from typing import Union
 import ipdb
 from git import Repo
 from git.exc import InvalidGitRepositoryError
@@ -8,6 +9,9 @@ import warnings
 import subprocess
 from subprocess import check_output
 import os
+
+primitary_types = [int, float, str, bool, list, dict, tuple]
+P_Types = Union[int, float, str, bool, list, dict, tuple]
 
 
 def is_git_repo(path="."):
@@ -35,6 +39,9 @@ class BaseMetadata(dict):
         self.root_module: str = ""
         self.module_path: list[str] = []
         self.hash: str = ""
+        self.type: str = ""
+        self.exports: dict = {}
+        self.history_url: list[str] = []
 
         for key, value in self.__dict__.items():
             if key in kwargs:
@@ -46,11 +53,14 @@ class BaseMetadata(dict):
     def __str__(self):
         return json.dumps(
             {
-                key: (val if not isinstance(val, Enum) else str(val))
+                key: (val if not isinstance(val, P_Types) else str(val))
                 for key, val in self.__dict__.items()
             },
             indent=4,
         )
+
+    def contains(self, key):
+        return key in self.__dict__.keys()
 
     def __repr__(self):
         return self.__str__()
@@ -70,7 +80,7 @@ class BaseMetadata(dict):
 
     def to_dict(self):
         return {
-            key: (val if not isinstance(val, Enum) else str(val))
+            key: (val if isinstance(val, P_Types) else str(val))
             for key, val in self.__dict__.items()
         }
 
@@ -86,6 +96,12 @@ class BaseMetadata(dict):
         else:
             return self.parse_url_from_git()
 
+    def get(self, key, default=None):
+        if key in self.__dict__.keys():
+            return getattr(self, key)
+        else:
+            return default
+
     def parse_url_from_git(self, path="."):
         assert is_git_repo(path), f"Not a git repository: {path=}"
         url = (
@@ -94,6 +110,12 @@ class BaseMetadata(dict):
             .strip()
         )
         return url
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+
+    def __getitem__(self, key):
+        return getattr(self, key)
 
 
 class Metadata(BaseMetadata):

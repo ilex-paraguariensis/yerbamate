@@ -55,6 +55,14 @@ class Config:
     def copy(self):
         return self.json().copy()
 
+    # add mate["item"] = "value" functionality
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+
+    # add mate["item"] functionality
+    def __getitem__(self, key):
+        return getattr(self, key)
+
 
 class MateConfig(Config):
     def __init__(self, config):

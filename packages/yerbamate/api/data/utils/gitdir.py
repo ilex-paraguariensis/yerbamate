@@ -85,10 +85,12 @@ def download(repo_url, output_dir="./"):
 
     # ipdb.set_trace()
 
-    if len(download_dirs.split(".")) == 0:
-        dir_out = os.path.join(output_dir, download_dirs)
-    else:
-        dir_out = os.path.join(output_dir, *download_dirs.split("/")[:-1])
+    dir_out = [d for d in download_dirs.split("/") if d != ""]
+    dir_out = os.path.join(output_dir, *dir_out)
+    # if len(download_dirs.split(".")) == 0:
+    #     dir_out = os.path.join(output_dir, download_dirs)
+    # else:
+    #     dir_out = os.path.join(output_dir, *download_dirs.split("/")[:-1])
 
     # print(f"Downloading {repo_url} to: " + dir_out)
 
@@ -176,7 +178,7 @@ def download(repo_url, output_dir="./"):
                     print_text("✘ Got interrupted", "red", in_place=False)
                     sys.exit()
             else:
-                download(file["html_url"], dir_out)
+                download(file["html_url"], output_dir)
 
     return total_files
 
