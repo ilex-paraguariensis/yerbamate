@@ -9,6 +9,8 @@ from .metadata import BaseMetadata, Metadata
 from ..package import Package
 from bombilla import Bombilla
 import ipdb
+import json
+from dirhash import dirhash
 
 from .utils import get_function_args, find_in_bombilla_dict
 
@@ -40,6 +42,8 @@ class ModuleMetadataGenerator:
         self.module_files = os.listdir(os.path.join(*module_paths))
 
     def get_possible_modules(self):
+
+        # Automatically adds the root module to the path, so data/loaders can be imported
         return [
             ".".join([self.root_module, self.module]),
             self.module,
@@ -73,15 +77,37 @@ class ModuleMetadataGenerator:
         type = self.type_module
         self.base_metadata.update(url=new_url, type=type)
 
+    def read_metadata(self):
+        json_path = os.path.join(self.module_path, "metadata.json")
+
+        if os.path.exists(json_path):
+            with open(json_path, "r") as f:
+                try:
+                    return Metadata(**json.load(f))
+                except:
+                    return None
+
+        return None
+
     def generate(self):
 
         self.module = self.__get_local_module()
 
         classes = self.__find_classes(self.module)
+        functions = self.__find_functions(self.module)
+
+        # No Metadata for empty modules
+        if len(classes) == 0 and len(functions) == 0:
+            return {}
+
+        hash = self.__calculate_module_hash()
+
+        old_meta = self.read_metadata()
+
+        if old_meta and old_meta.hash == hash:
+            return old_meta.to_dict()
 
         meta = [self.generate_class_metadata(klass) for klass in classes]
-
-        functions = self.__find_functions(self.module)
 
         fun_meta = [self.generate_function_metadata(function) for function in functions]
 
@@ -99,6 +125,8 @@ class ModuleMetadataGenerator:
             },
         }
         self.base_metadata.add(**results)
+
+        self.base_metadata.update(hash=hash)
 
         if len(meta) != 0 or len(fun_meta) != 0:
             self.save_metadata()
@@ -208,3 +236,11 @@ class ModuleMetadataGenerator:
     def __find_classes(self, module):
 
         return inspect.getmembers(module, inspect.isclass)
+
+    def __calculate_module_hash(self):
+        path = os.path.join(*self.module_paths)
+
+        hash = dirhash(path, "sha1", ignore=["*.pyc", "*.json", "__pycache__"])
+        # ipdb.set_trace()
+
+        return hash

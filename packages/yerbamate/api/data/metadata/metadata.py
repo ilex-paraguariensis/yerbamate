@@ -3,15 +3,22 @@ from enum import Enum
 import json
 import ipdb
 from git import Repo
-from git.exc import InvalidGitRepositoryError 
+from git.exc import InvalidGitRepositoryError
 import warnings
 import subprocess
 from subprocess import check_output
 import os
 
-def is_git_repo(path = '.'):
-    return subprocess.call(['git', '-C', path, 'status'], stderr=subprocess.STDOUT, stdout = open(os.devnull, 'w')) == 0
 
+def is_git_repo(path="."):
+    return (
+        subprocess.call(
+            ["git", "-C", path, "status"],
+            stderr=subprocess.STDOUT,
+            stdout=open(os.devnull, "w"),
+        )
+        == 0
+    )
 
 
 class BaseMetadata(dict):
@@ -27,6 +34,7 @@ class BaseMetadata(dict):
         self.backbone: str = ""
         self.root_module: str = ""
         self.module_path: list[str] = []
+        self.hash: str = ""
 
         for key, value in self.__dict__.items():
             if key in kwargs:
@@ -80,7 +88,11 @@ class BaseMetadata(dict):
 
     def parse_url_from_git(self, path="."):
         assert is_git_repo(path), f"Not a git repository: {path=}"
-        url = check_output(["git", "config", "--get", "remote.origin.url"], cwd=path).decode("utf-8").strip()
+        url = (
+            check_output(["git", "config", "--get", "remote.origin.url"], cwd=path)
+            .decode("utf-8")
+            .strip()
+        )
         return url
 
 
