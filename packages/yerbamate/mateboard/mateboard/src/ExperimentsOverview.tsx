@@ -3,7 +3,9 @@ import { Experiment } from "./Interfaces";
 // import "./ExperimentOverview.css";
 
 import Config from "./ExperimentView/Config";
+import Loader from "./components/Loader";
 import ExperimentControl from "./ExperimentView/ExperimentControl";
+import exp from "constants";
 
 function Status({
   statusValue,
@@ -105,6 +107,7 @@ export default function ({
           New Experiment
         </button>
       </nav>
+			<Loader show={Object.entries(experiments).length === 0} />
       <div className="list-group" style={{ marginTop: "3vh" }}>
         {Object.entries(experiments).map(([localName, experiment], i) => (
           <div
@@ -119,7 +122,7 @@ export default function ({
                     // sendJsonMessage={sendJsonMessage}
                   />
                 ),
-                Config: <Config experimentId={localName} />,
+                Config: <Config experimentId={localName} experiment={experiment}/>,
               } as Record<string, JSX.Element>);
               setSection("Control");
             }}

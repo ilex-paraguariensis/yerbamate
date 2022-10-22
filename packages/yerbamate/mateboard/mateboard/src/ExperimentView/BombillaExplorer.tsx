@@ -68,6 +68,7 @@ const Card = ({
       href="#"
       className="list-group-item list-group-item-action flex-column align-items-start"
       onClick={() => selectNode(module)}
+      style={{ zIndex: 1000 }}
     >
       <div className="d-flex w-100 justify-content-between">
         <h5 className="mb-1">Name: {module.object_key}</h5>
@@ -139,17 +140,21 @@ const BombillaExplorer = ({
     setSelectedNodes(uniqueSelected);
   };
   return (
-    <div style={{ width: "100vw", textAlign: "center" }}>
-      <div
-        className="list-group w-50"
-        style={{ margin: "auto", textAlign: "center" }}
-      >
-        {selectedNodes.map((node, i) => {
-          const edgesToNode = edges.filter(
-            (edge) => edge[1] === node.object_key
-          );
-          console.log(node.object_key);
-          /*
+    <div
+      className="list-group w-50"
+      style={{
+        marginLeft: "auto",
+        marginRight: "auto",
+        marginTop: "7vh",
+        maxHeight: "70vh",
+        textAlign: "center",
+        zIndex: 1000,
+      }}
+    >
+      {selectedNodes.map((node, i) => {
+        const edgesToNode = edges.filter((edge) => edge[1] === node.object_key);
+        console.log(node.object_key);
+        /*
 			for (const edge of edgesToNode) {
 				const [from, to, path] = edge;
 				if (from === "optimizer"){
@@ -159,12 +164,9 @@ const BombillaExplorer = ({
 				console.log(node)
 			}
 			*/
-          console.log(node);
-          return (
-            <Card key={i} module={node as Module} selectNode={selectNode} />
-          );
-        })}
-      </div>
+        console.log(node);
+        return <Card key={i} module={node as Module} selectNode={selectNode} />;
+      })}
     </div>
   );
 };

@@ -3,6 +3,7 @@ import getDAG from "./get_dag";
 import vis from "vis-network";
 import BombillaExplorer from "./BombillaExplorer";
 import socket from "../socket";
+import exp from "constants";
 
 const getNetwork = (
   nodes: Map<string, Record<string, any>>,
@@ -82,13 +83,13 @@ const getNetwork = (
   return new window.vis.Network(container, netData, options);
 };
 const views = ["graph", "explorer"];
-const Config = ({ experimentId }: { experimentId: string }) => {
-  const [bombilla, setBombilla] = useState<Record<string, any> | null>(null);
+const Config = ({ experimentId, experiment }: { experimentId: string, experiment:Record<string, any> }) => {
+  const [bombilla, setBombilla] = useState<Record<string, any>>(experiment);
   const [view, setView] = useState<string>("explorer");
   const [dag, setDag] = useState<{
     nodes: Map<string, Record<string, any>>;
     edges: [string, string, string[]][];
-  } | null>(null);
+  }>(getDAG(experiment));
   // loads bombilla which is a json file
   if (vis !== undefined) {
     // @ts-ignore
@@ -96,6 +97,7 @@ const Config = ({ experimentId }: { experimentId: string }) => {
     console.log("vis is defined");
   }
   const div = useRef<HTMLDivElement>(null);
+	/*
   useEffect(() => {
     socket.send(JSON.stringify({ type: "get_summary", data: "" }));
     socket.onmessage = (msg) => {
@@ -105,6 +107,7 @@ const Config = ({ experimentId }: { experimentId: string }) => {
       setDag(dag);
     };
   }, []);
+	*/
   console.log(bombilla);
   // loads visjs
   const marginTop = 70;
@@ -128,7 +131,7 @@ const Config = ({ experimentId }: { experimentId: string }) => {
         ))}
       <nav
         className="navbar fixed-bottom navbar-expand-lg"
-        style={{ backgroundColor: "rgba(255, 255, 255, 0.14)" }}
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.14)", zIndex: 10000 }}
       >
         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
           {views.map((viewItem, i) => (
