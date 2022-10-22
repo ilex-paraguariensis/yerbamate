@@ -74,20 +74,23 @@ def download(repo_url, output_dir="./"):
     sub-directories will be pulled upwards into the root folder."""
 
     # generate the url which returns the JSON data
+
     api_url, download_dirs = create_url(repo_url)
 
     # ipdb.set_trace()
 
-    print("Output directory: " + output_dir)
-    print("Downloading from: " + api_url)
-    print("Download dirs: " + download_dirs)
+    # print("Output directory: " + output_dir)
+    # print("Downloading from: " + api_url)
+    # print("Download dirs: " + download_dirs)
+
+    # ipdb.set_trace()
 
     if len(download_dirs.split(".")) == 0:
         dir_out = os.path.join(output_dir, download_dirs)
     else:
         dir_out = os.path.join(output_dir, *download_dirs.split("/")[:-1])
 
-    print(f"Downloading {repo_url} to: " + dir_out)
+    # print(f"Downloading {repo_url} to: " + dir_out)
 
     try:
         opener = urllib.request.build_opener()

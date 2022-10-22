@@ -50,19 +50,24 @@ class PackageManager:
 
     def __download_package(self, url):
 
-        url_hash = hashlib.sha1(url.encode("utf-8")).hexdigest()
+        # just git url
+        base_git_url = "/".join(url.split("/")[:7])
 
-        print("downloading url", url)
+        # ipdb.set_trace()
+
+        url_hash = hashlib.sha1(base_git_url.encode("utf-8")).hexdigest()
+
+        # print("downloading url", url)
 
         output_path = self.get_path(url_hash)
 
         if not os.path.exists(output_path):
             os.makedirs(output_path, exist_ok=True)
 
-        print("Cloning repository to {}".format(output_path))
+        # print("Cloning repository to {}".format(output_path))
 
         output_dir = os.path.join(os.getcwd(), output_path)
 
-        print("Cloning into {}".format(output_dir))
+        # print("Cloning into {}".format(output_dir))
 
         download(url, output_dir=output_dir)
