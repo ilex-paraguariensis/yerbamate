@@ -11,7 +11,7 @@ export default ({ experimentId }: { experimentId: string }) => {
   const [view, setView] = useState("" as View);
   const experiment = Object.entries(
     mateSummary !== null ? mateSummary.experiments : {}
-  ).filter(([key, e]) => e.id === experimentId)[0];
+  ).filter(([key, e]) => e.id === experimentId)[0][1];
   console.log(mateSummary);
   /*
   useEffect(() => {
@@ -29,11 +29,11 @@ export default ({ experimentId }: { experimentId: string }) => {
   const defaultSections = {
     default: (
       <ExperimentControl
-        experiment={experiment[1]}
+        experiment={experiment}
         experimentId={experimentId}
       />
     ),
-    Config: <Config experimentId={experimentId} />,
+    Config: <Config experimentId={experimentId} experiment={experiment}/>,
   } as Record<View, JSX.Element>;
   return (
     <div>

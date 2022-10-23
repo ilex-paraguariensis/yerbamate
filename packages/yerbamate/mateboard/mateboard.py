@@ -13,7 +13,7 @@ class MateBoard:
         # p.start()
         self._start()
         # p.join()
-        self._p : Optional[subprocess.CompletedProcess]= None
+        self._p: Optional[subprocess.Popen] = None
 
     def _start(self):
         deno_installed = False
@@ -26,6 +26,8 @@ class MateBoard:
             ) from grepexc
         if deno_installed:
             os.system("killall node")
+            import ipdb
+            ipdb.set_trace()
             self._p = subprocess.run(
                 "npm start".split(),
                 capture_output=True,
