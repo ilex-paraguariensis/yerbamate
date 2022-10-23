@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import getDAG from "./get_dag";
-import vis from "vis-network";
+// @ts-ignore
 import BombillaExplorer from "./BombillaExplorer";
 import socket from "../socket";
 import exp from "constants";
@@ -9,7 +9,7 @@ const getNetwork = (
   nodes: Map<string, Record<string, any>>,
   edges: [string, string, string[]][],
   container: HTMLDivElement,
-  simplify = true
+  simplify = false
 ) => {
   if (simplify) {
     // Simplify the graph, removing nodes with only one edge
@@ -91,12 +91,20 @@ const Config = ({ experimentId, experiment }: { experimentId: string, experiment
     edges: [string, string, string[]][];
   }>(getDAG(experiment));
   // loads bombilla which is a json file
-  if (vis !== undefined) {
+	//@ts-ignore
+  if (typeof vis !== "undefined") {
     // @ts-ignore
     window.vis = vis;
     console.log("vis is defined");
   }
   const div = useRef<HTMLDivElement>(null);
+	useEffect(()=>{
+		if (view === "graph") {
+			if (div.current !== null) {
+				getNetwork(dag.nodes, dag.edges, div.current, false);
+			}
+		}
+	}, [view])
 	/*
   useEffect(() => {
     socket.send(JSON.stringify({ type: "get_summary", data: "" }));
@@ -116,9 +124,9 @@ const Config = ({ experimentId, experiment }: { experimentId: string, experiment
       {dag &&
         (view === "explorer" ? (
           <BombillaExplorer
-            nodes={dag.nodes}
-            edges={dag.edges}
-            bombilla={bombilla}
+            nodes={new Map(dag.nodes)}
+            edges={dag.edges.slice()}
+            bombilla={Object.assign({}, bombilla)}
           />
         ) : (
           <div

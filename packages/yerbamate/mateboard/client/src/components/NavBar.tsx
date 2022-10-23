@@ -26,7 +26,7 @@ export default function NavBar({
         style={{
           backgroundColor: "rgba(255, 255, 255, 0.14)",
           color: "white",
-          zIndex: -1000,
+          zIndex: 100
         }}
       >
         <div className="container-fluid">

@@ -140,7 +140,7 @@ class Server {
   }
   stopTraining() {
     this.status = Status.connected;
-    this.ptyProcess.kill('SIGINT');
+		this.ptyProcess.write('\x03');
   }
 }
 
