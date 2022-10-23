@@ -7,6 +7,7 @@ from yerbamate.mate_config import MateConfig
 from .sources.remote import RemoteDataSource
 from .sources.local.local import LocalDataSource
 from .sources.local.server import LocalServer
+from pipreqs import pipreqs
 
 from .package import Package
 from typing import Optional
@@ -40,6 +41,8 @@ class PackageRepository:
             # ipdb.set_trace()
             base_meta = self.config.metadata.base_metadata()
             base_meta["exports"] = self.__export_metadata()
+            base_meta["dependencies"] = self.__generate_pip_requirements()
+            base_meta["experiments"] = self.local.list("experiments")
             self.config.metadata = base_meta
             self.config.save()
 
@@ -66,6 +69,33 @@ class PackageRepository:
                                         continue
 
         return exports
+
+    def __generate_pip_requirements(self):
+
+        imports = pipreqs.get_all_imports(self.config.project)
+        # import_info_remote = pipreqs.get_imports_info(imports)
+        import_info_local = pipreqs.get_import_local(imports)
+
+        import_info = []
+
+        for im in import_info_local:
+
+            name = im["name"]
+            version = im["version"]
+
+            res = {
+                "name": name,
+                "version": version,
+            }
+
+            # for remote in import_info_remote:
+            #     if remote["name"] == name:
+            #         lastVersion = remote["version"]
+            #         res["last_version"] = lastVersion
+
+            import_info.append(res)
+
+        return {"pip": import_info}
 
     def __generate_metadata(self):
         self.metadata = self.metadata_generator.generate()

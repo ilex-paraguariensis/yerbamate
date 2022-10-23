@@ -91,6 +91,8 @@ class ModuleMetadataGenerator:
 
         return None
 
+
+
     def generate(self):
 
         self.module = self.__get_local_module()
@@ -107,6 +109,7 @@ class ModuleMetadataGenerator:
         old_meta = self.read_metadata()
 
         if old_meta != None and old_meta.hash == hash:
+
             return old_meta.to_dict()
 
         meta = [self.generate_class_metadata(klass) for klass in classes]
@@ -219,7 +222,7 @@ class ModuleMetadataGenerator:
             for remote in import_info_remote:
                 if remote["name"] == name:
                     lastVersion = remote["version"]
-                    res["lastVersion"] = lastVersion
+                    res["last_version"] = lastVersion
 
             import_info.append(res)
 

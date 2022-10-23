@@ -34,6 +34,8 @@ class BaseMetadata(dict):
         self.authors: list[str] = []
         self.license: str = ""
         self.url: str = ""
+        self.experiments: list[str] = []
+        self.exports: dict = {}
         self.version: str = ""
         self.category: str = ""
         self.backbone: str = ""
@@ -41,7 +43,7 @@ class BaseMetadata(dict):
         self.module_path: list[str] = []
         self.hash: str = ""
         self.type: str = ""
-        self.exports: dict = {}
+        self.dependencies: dict = {}
         # self.history_url: list[str] = []
 
         for key, value in self.__dict__.items():
@@ -59,10 +61,12 @@ class BaseMetadata(dict):
             "name",
             "description",
             "url",
+            "experiments",
             "version",
             "author",
             "authors",
             "license",
+            "dependencies",
         ]
 
         return {
