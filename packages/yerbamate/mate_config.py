@@ -76,3 +76,8 @@ class MateConfig(Config):
             root_module=config.get("project", "")
         )
         super().__init__(config)
+
+    def save(self, path="mate.json"):
+        
+        with open(path, "w") as f:
+            f.write(self.__str__())

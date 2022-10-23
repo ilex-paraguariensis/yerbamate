@@ -1,4 +1,7 @@
+from distutils.command.config import config
 import threading
+from sympy import re
+from yerbamate.api.data.metadata.metadata import Metadata
 from yerbamate.api.data.package_manager import PackageManager
 from yerbamate.mate_config import MateConfig
 from .sources.remote import RemoteDataSource
@@ -31,12 +34,38 @@ class PackageRepository:
         self.package_manager.install_package(url)
 
     def generate_metadata(self):
-        # run in paralle
-        th = threading.Thread(target=self.__generate_metadata, args=())
-        th.start()
 
-        th.join()
-        # we need to wait for the metadata to be generated, race condition with bombilla generating return types
+        self.__generate_metadata()
+        if self.config.metadata == None or self.config.metadata == {}:
+            # ipdb.set_trace()
+            base_meta = self.config.metadata.base_metadata()
+            base_meta["exports"] = self.__export_metadata()
+            self.config.metadata = base_meta
+            self.config.save()
+
+    def __export_metadata(self):
+        assert self.metadata is not None, "Metadata shuldn't be None"
+        meta = self.metadata
+
+        exports = {k: {} for k in meta.keys()}
+        for key, value in meta.items():
+            if type(value) == dict:
+                for key2, value2 in value.items():
+                    if type(value2) == dict:
+                        if "url" in value2:
+                            exports[key][key2] = value2["url"]
+                            continue
+                        else:
+                            for key3, value3 in value2.items():
+                                if type(value3) == dict:
+                                    if "url" in value3:
+                                        if key2 not in exports[key]:
+                                            exports[key][key2] = {}
+
+                                        exports[key][key2][key3] = value3["url"]
+                                        continue
+
+        return exports
 
     def __generate_metadata(self):
         self.metadata = self.metadata_generator.generate()

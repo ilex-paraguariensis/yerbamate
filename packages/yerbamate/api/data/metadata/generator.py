@@ -6,7 +6,7 @@ from .metadata import BaseMetadata, Metadata
 from ..package import Package
 import os
 import ipdb
-from .module_metadata import ModuleMetadataGenerator
+from .module_metadata_generator import ModuleMetadataGenerator
 
 
 class MetadataGenerator:

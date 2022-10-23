@@ -31,6 +31,7 @@ class BaseMetadata(dict):
         self.description: str = ""
         self.version: str = ""
         self.author: str = ""
+        self.authors: list[str] = []
         self.license: str = ""
         self.url: str = ""
         self.version: str = ""
@@ -41,7 +42,7 @@ class BaseMetadata(dict):
         self.hash: str = ""
         self.type: str = ""
         self.exports: dict = {}
-        self.history_url: list[str] = []
+        # self.history_url: list[str] = []
 
         for key, value in self.__dict__.items():
             if key in kwargs:
@@ -49,6 +50,26 @@ class BaseMetadata(dict):
 
         self.set_url()
         # ipdb.set_trace()
+
+    def base_metadata(self):
+        return self.__get_base__metadata()
+
+    def __get_base__metadata(self):
+        base_list = [
+            "name",
+            "description",
+            "url",
+            "version",
+            "author",
+            "authors",
+            "license",
+        ]
+
+        return {
+            key: (val if isinstance(val, P_Types) else str(val))
+            for key, val in self.__dict__.items()
+            if key in base_list
+        }
 
     def __str__(self):
         return json.dumps(
@@ -129,7 +150,7 @@ class BaseMetadata(dict):
 
         if repo:
             parsed_url = self.__parse_repo(repo)
-            
+
             nodes = nodes[::-1]
             parsed_url = (
                 parsed_url + "/".join(nodes + [""]) if len(nodes) > 0 else parsed_url
