@@ -6,7 +6,7 @@ from .metadata import BaseMetadata, Metadata
 from ..package import Package
 import os
 import ipdb
-from .package_metadata import ModuleMetadataGenerator
+from .module_metadata import ModuleMetadataGenerator
 
 
 class MetadataGenerator:
@@ -25,6 +25,8 @@ class MetadataGenerator:
     # should generate a metadata package for the whole project
     def generate(self) -> dict:
 
+        print("Generating metadata... might take a while") 
+
         if self.cached_metadata:
             return self.cached_metadata
 
@@ -42,6 +44,7 @@ class MetadataGenerator:
                 for thub_module in self.list_module(
                     [self.root_module, module, sub_module]
                 ):
+                    # ipdb.set_trace()
                     result[sub_module][thub_module] = ModuleMetadataGenerator(
                         [self.root_module, module, sub_module, thub_module],
                         self.root_meta,

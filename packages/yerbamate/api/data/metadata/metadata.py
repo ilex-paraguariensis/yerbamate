@@ -53,7 +53,7 @@ class BaseMetadata(dict):
     def __str__(self):
         return json.dumps(
             {
-                key: (val if not isinstance(val, P_Types) else str(val))
+                key: (val if isinstance(val, P_Types) else str(val))
                 for key, val in self.__dict__.items()
             },
             indent=4,

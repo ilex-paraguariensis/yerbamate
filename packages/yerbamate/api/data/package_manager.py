@@ -141,6 +141,7 @@ class PackageManager:
             # copytree(output_dir, path)
             copytree(src_path, dest_path)
             self.__update_metadata(metadata)
+            self.__auto_create_init_pys(metadata)
             print(f"Successfully installed package in {dest_path}")
 
         else:
@@ -149,26 +150,41 @@ class PackageManager:
 
     # def __copy_installed_package()
 
-    def __find_metadata_path(self, metadata: Metadata):
+    def __find_save_metadata_path(self, metadata: Metadata):
 
         root_module = self.conf["project"]
         modules = metadata.module_path
 
-        path = os.path.join(root_module, *modules, "metadata.json")
+        path = os.path.join(root_module, *modules, "fork_metadata.json")
         return path
         pass
 
+    def __auto_create_init_pys(self, metadata: Metadata):
+
+        path = [self.conf["project"]] + metadata.module_path
+
+        for i in range(len(path)):
+            init_path = os.path.join(*path[:i], "__init__.py")
+            if not os.path.exists(init_path):
+                with open(init_path, "w") as f:
+                    f.write("")
+
+        # ipdb.set_trace()
+        #
+        #
+
     def __update_metadata(self, metadata: Metadata):
 
-        hist_url = metadata.get("history_url", [])
+        # hist_url = metadata.get("history_url", [])
 
-        hist_url += [metadata.url]
+        # hist_url += [metadata.url]
 
-        metadata["url"] = ""
-        metadata["history_url"] = hist_url
+        # metadata["url"] = ""
+        # metadata["history_url"] = hist_url
 
-        path = self.__find_metadata_path(metadata)
-        assert os.path.exists(path), "metadata.json not found"
+        path = self.__find_save_metadata_path(metadata)
+
+        # assert os.path.exists(path), "metadata.json not found"
         # ipdb.set_trace()
         with open(path, "w") as f:
             json.dump(metadata.to_dict(), f, indent=4)
