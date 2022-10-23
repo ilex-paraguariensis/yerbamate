@@ -102,20 +102,56 @@ class BaseMetadata(dict):
         else:
             return default
 
-    def parse_url_from_git(self, path="."):
-        assert is_git_repo(path), f"Not a git repository: {path=}"
-        url = (
-            check_output(["git", "config", "--get", "remote.origin.url"], cwd=path)
-            .decode("utf-8")
-            .strip()
-        )
-        return url
-
     def __setitem__(self, key, value):
         setattr(self, key, value)
 
     def __getitem__(self, key):
         return getattr(self, key)
+
+    # def find
+
+    def parse_url_from_git(self):
+
+        max_depth = 3
+
+        root_search = os.getcwd()
+        nodes = []
+
+        for i in range(max_depth):
+            try:
+                repo = Repo(root_search)
+                break
+            except:
+                nodes.append(root_search.split("/")[-1])
+                # ipdb.set_trace()
+                root_search = os.path.join(root_search, "..")
+                root_search = os.path.abspath(root_search)
+
+        if repo:
+            parsed_url = self.__parse_repo(repo)
+            
+            nodes = nodes[::-1]
+            parsed_url = (
+                parsed_url + "/".join(nodes + [""]) if len(nodes) > 0 else parsed_url
+            )
+            return parsed_url
+
+        return ""
+
+    def __parse_repo(self, repo):
+        url = repo.remotes[0].url
+
+        # transform url to https
+        if url.startswith("git@"):
+            url = url.replace("git@", "https:/").replace(":", "/")
+
+        # remove .git
+        if url.endswith(".git"):
+            url = url[:-4]
+
+        branch = repo.active_branch.name
+        url = f"{url}/tree/{branch}/"
+        return url
 
 
 class Metadata(BaseMetadata):
