@@ -2,6 +2,9 @@ from typing import Callable
 import inspect
 import ipdb
 
+import docstring_parser
+from docstring_parser import parse_from_object
+
 
 def find_in_bombilla_dict(bombilla_dict, module, class_or_function_name):
 
@@ -57,9 +60,6 @@ def parse_type_annotation(annotation):
     }
 
 
-
-
-
 def get_function_args(
     function: Callable,
     args={},
@@ -70,6 +70,7 @@ def get_function_args(
     params = args.to_dict() if hasattr(args, "to_dict") else args
     default = {}
     errors = []
+    # ipdb.set_trace()
 
     for param_name, param in inspect.signature(function).parameters.items():
         # only add parameters that are not self or exist in the params
@@ -107,4 +108,17 @@ def get_function_args(
 
     params.update(default)
 
+    parse_docs(function)
+
     return params, errors
+
+
+def parse_docs(callable):
+    try:
+
+        docs = parse_from_object(callable)
+        if docs.short_description != None:
+            ipdb.set_trace()
+
+    except:
+        return {}

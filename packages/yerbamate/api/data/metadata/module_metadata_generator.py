@@ -91,7 +91,7 @@ class ModuleMetadataGenerator:
 
         return None
 
-    def generate(self):
+    def generate(self, rewrite=False):
 
         self.module = self.__get_local_module()
 
@@ -106,9 +106,13 @@ class ModuleMetadataGenerator:
 
         old_meta = self.read_metadata()
 
-        if old_meta != None and old_meta.hash == hash:
+        print("rewriting", rewrite)
+
+        if old_meta != None and old_meta.hash == hash and not rewrite:
 
             return old_meta.to_dict()
+
+        # ipdb.set_trace()
 
         meta = [self.generate_class_metadata(klass) for klass in classes]
 
@@ -133,6 +137,7 @@ class ModuleMetadataGenerator:
 
         if len(meta) != 0 or len(fun_meta) != 0:
             self.save_metadata()
+
         return self.base_metadata.to_dict()
 
     def save_metadata(self):

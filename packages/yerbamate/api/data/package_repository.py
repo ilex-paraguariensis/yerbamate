@@ -34,7 +34,7 @@ class PackageRepository:
     def install_url(self, url: str):
         self.package_manager.install_package(url)
 
-    def generate_metadata(self):
+    def generate_metadata(self, rewrite: bool = False):
 
         self.__generate_metadata()
         if self.config.metadata == None or self.config.metadata == {}:

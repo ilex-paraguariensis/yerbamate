@@ -23,19 +23,21 @@ class MetadataGenerator:
         self.cached_metadata = None
 
     # should generate a metadata package for the whole project
-    def generate(self) -> dict:
+    def generate(self, rewrite: bool = False) -> dict:
 
-        print("Generating metadata... might take a while") 
+        print("Generating metadata... might take a while")
 
-        if self.cached_metadata:
+        if self.cached_metadata and not rewrite:
             return self.cached_metadata
 
         modules = self.list_module([self.root_module])
-        gen = {module: self.generate_module_metadata(module) for module in modules}
+        gen = {
+            module: self.generate_module_metadata(module, rewrite) for module in modules
+        }
         self.cached_metadata = gen
         return self.cached_metadata
 
-    def generate_module_metadata(self, module: str) -> dict:
+    def generate_module_metadata(self, module: str, rewrite: bool = False) -> dict:
         result = {}
         for sub_module in self.list_module([self.root_module, module]):
 
@@ -49,16 +51,14 @@ class MetadataGenerator:
                         [self.root_module, module, sub_module, thub_module],
                         self.root_meta,
                         self.local_ds,
-                    ).generate()
+                    ).generate(rewrite)
             else:
                 result[sub_module] = ModuleMetadataGenerator(
                     [self.root_module, module, sub_module],
                     self.root_meta,
                     self.local_ds,
-                ).generate()
+                ).generate(rewrite)
         return result
-
-
 
     # returns a list of submodules in the root module, should be models, trainers, data
     def list_submodules(self) -> list:

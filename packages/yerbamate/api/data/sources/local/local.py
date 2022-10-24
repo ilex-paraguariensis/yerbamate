@@ -52,7 +52,7 @@ class LocalDataSource(DataSource):
         return self.__findroot()
 
     def save_experiment(self, experiment, name):
-        save_path = os.path.join(self.config.project, "experiments", f"{name}.json")
+        save_path = os.path.join(self.config.project, "experiments", name)
         with open(save_path, "w") as f:
             f.write(json.dumps(experiment, indent=4))
 

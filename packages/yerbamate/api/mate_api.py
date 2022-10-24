@@ -30,6 +30,9 @@ class MateAPI:
         self.checkpoint_path: Optional[str] = None
         self.trainer: Optional[Trainer] = None
 
+    def generate_metadata(self, rewrite: bool = False):
+        return self.repository.metadata_generator.generate(rewrite)
+
     def install_url(self, url: str):
         self.repository.install_url(url)
 
@@ -76,10 +79,11 @@ class MateAPI:
 
             # save the full dict
             full["errors"] = err
-            self.repository.local.save_experiment(full, self.exp_name)
+            self.repository.local.save_experiment(full, f"{self.exp_name}.json")
 
             sys.exit(1)
 
+        self.repository.local.save_experiment(full, f"{self.exp_name}.metadata")
         # ipdb.set_trace()
         # io.save_train_experiments(self.save_path, full, self.config)
 

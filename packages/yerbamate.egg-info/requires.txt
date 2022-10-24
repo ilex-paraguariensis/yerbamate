@@ -5,3 +5,4 @@ websockets
 flask_cors
 pipreqs
 dirhash
+docstring-parser

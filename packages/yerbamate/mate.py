@@ -43,7 +43,9 @@ class Mate:
     def remove(self, model_name: str):
         pass
 
-    def list(self, module_name: str, query: Optional[str] = None, output_json: bool = True):
+    def list(
+        self, module_name: str, query: Optional[str] = None, output_json: bool = True
+    ):
         li = self.api.list(module_name, query)
         if output_json:
             print(json.dumps(li, indent=4))
@@ -63,6 +65,11 @@ class Mate:
 
         self.api.select_experiment(experiment_name)
         self.api.train()
+
+    def metadata(
+        self,
+    ):
+        self.api.generate_metadata(True)
 
     def test(self, model_name: str, params: str):
         """
@@ -134,10 +141,6 @@ class Mate:
         self.root_folder, self.config = io.find_root()
         self.root_save_folder = self.config.results_folder
 
-
-
-    
-    
     def __get_trainer(self, params: str):
         if self.trainer is None:
 
