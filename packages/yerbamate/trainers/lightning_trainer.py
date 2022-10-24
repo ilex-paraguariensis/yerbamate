@@ -22,13 +22,14 @@ class LightningTrainer(Trainer):
         ), "params must contain pytorch_lightning_module, trainer and data"
 
         self.bombilla.load()
-        self.bombilla.execute()
 
     def is_pl(self):
         return True
 
     def fit(self, *args, **kwargs):
         # ipdb.set_trace()
+        self.bombilla.execute()
+
 
         if self.bombilla.has_method("fit", "trainer"):
             self.bombilla.execute_method("fit", "trainer", *args, **kwargs)

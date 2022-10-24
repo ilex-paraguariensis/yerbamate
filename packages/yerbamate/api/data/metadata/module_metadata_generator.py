@@ -91,8 +91,6 @@ class ModuleMetadataGenerator:
 
         return None
 
-
-
     def generate(self):
 
         self.module = self.__get_local_module()
@@ -131,7 +129,7 @@ class ModuleMetadataGenerator:
         }
         self.base_metadata.add(**results)
 
-        self.base_metadata.update(hash=hash)
+        self.base_metadata.update(hash=hash, experiments=None)
 
         if len(meta) != 0 or len(fun_meta) != 0:
             self.save_metadata()

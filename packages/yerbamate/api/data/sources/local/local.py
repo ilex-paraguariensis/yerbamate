@@ -1,3 +1,4 @@
+import json
 import sys
 from yerbamate.mate_config import MateConfig
 from yerbamate.utils.bunch import Bunch
@@ -8,6 +9,7 @@ import ipdb
 from ....project_parser.project_parser import ProjectParser
 from ..local import io
 from typing import Any
+
 
 class LocalDataSource(DataSource):
     def __init__(
@@ -48,6 +50,11 @@ class LocalDataSource(DataSource):
 
     def load_mate_config_and_root(self):
         return self.__findroot()
+
+    def save_experiment(self, experiment, name):
+        save_path = os.path.join(self.config.project, "experiments", f"{name}.json")
+        with open(save_path, "w") as f:
+            f.write(json.dumps(experiment, indent=4))
 
     def __load_data(self, root_dir: str):
         self.models = self.__filter_regular_folders(
@@ -140,21 +147,6 @@ class LocalDataSource(DataSource):
         io.save_train_experiments(self.save_path, full, self.config)
 
         return full
-
-    # def get_models(self, query: Optional[str] = None):
-    #     return self.__filter_names(query, self.models)
-
-    # def get_trainers(self, query: Optional[str] = None):
-    #     return self.__filter_names(query, self.trainers)
-
-    # def get_data_loaders(self, query: Optional[str] = None):
-    #     return self.__filter_names(query, self.data_loaders)
-
-    # def get_experiments(self, query: Optional[str] = None):
-    #     return self.__filter_names(query, self.experiments)
-
-    def get_packages(self, query: Optional[str] = None):
-        return self.packages
 
     def add_model(self, model):
         self.models.append(model)

@@ -26,13 +26,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var os_1 = __importDefault(require("os"));
-var path_1 = __importDefault(require("path"));
-var fs_1 = __importDefault(require("fs"));
-var pty = __importStar(require("node-pty"));
-var ws_1 = require("ws");
-var node_child_process_1 = require("node:child_process");
-var shell = os_1.default.platform() === 'win32' ? 'powershell.exe' : 'bash';
+const os_1 = __importDefault(require("os"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
+const pty = __importStar(require("node-pty"));
+const ws_1 = require("ws");
+const node_child_process_1 = require("node:child_process");
+const shell = os_1.default.platform() === 'win32' ? 'powershell.exe' : 'bash';
 var MessageType;
 (function (MessageType) {
     MessageType["handshake"] = "handshake";
@@ -47,76 +47,90 @@ var Status;
     Status["connected"] = "connected";
     Status["training"] = "training";
 })(Status || (Status = {}));
-var Server = /** @class */ (function () {
-    function Server(cwd) {
-        var _a;
-        var _this = this;
+const jsonFromThere = (data) => {
+    const lines = data.split('\n');
+    let result = null;
+    for (let i = 0; i < lines.length; i++) {
+        try {
+            result = JSON.parse(lines.slice(i, lines.length).join('\n'));
+            break;
+        }
+        catch (e) { }
+    }
+    return result;
+};
+class Server {
+    constructor(cwd) {
         this.status = Status.not_connected;
         this.socket = null;
         this.currentMessage = null;
-        this.wsRoutes = (_a = {},
-            _a[MessageType.handshake] = function () {
+        this.wsRoutes = {
+            [MessageType.handshake]: () => {
                 var _a;
-                _this.status = Status.connected;
-                (_a = _this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({ type: MessageType.handshake, data: 'ok' }));
+                this.status = Status.connected;
+                (_a = this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({ type: MessageType.handshake, data: 'ok' }));
             },
-            _a[MessageType.status] = function () { return ({
+            [MessageType.status]: () => ({
                 type: MessageType.status,
-                data: _this.status,
-            }); },
-            _a[MessageType.start_training] = function (msg) {
+                data: this.status,
+            }),
+            [MessageType.start_training]: (msg) => {
                 var _a;
-                (_a = _this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({ type: 'train_started', data: _this.status }));
-                _this.startTraining(msg.experiment_id);
+                (_a = this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({ type: 'train_started', data: this.status }));
+                this.startTraining(msg.experiment_id);
             },
-            _a[MessageType.stop_training] = function () {
+            [MessageType.stop_training]: () => {
                 var _a;
-                _this.stopTraining();
-                (_a = _this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({ type: MessageType.stop_training, data: 'ok' }));
+                this.stopTraining();
+                (_a = this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({ type: MessageType.stop_training, data: 'ok' }));
             },
-            _a[MessageType.get_summary] = function () {
-                _this.currentMessage = MessageType.get_summary;
-                _this.runMateCommand('summary');
+            [MessageType.get_summary]: () => {
+                this.currentMessage = MessageType.get_summary;
+                const result = (0, node_child_process_1.spawnSync)('mate', ['summary'], { cwd: this.cwd });
+                const summary = jsonFromThere(result.stdout.toString());
+                console.log("Summary:", summary);
+                this.socket.send(JSON.stringify({ type: MessageType.get_summary, data: summary }));
             },
-            _a);
+        };
         this.cwd = cwd;
         this.ptyProcess = this.initPty();
         this.socketServer = new ws_1.WebSocketServer({ port: 8765 });
-        this.socketServer.on('connection', function (ws) {
-            _this.status = Status.connected;
-            _this.ptyProcess.onData(function (data) {
+        this.socketServer.on('connection', (ws) => {
+            this.socket = ws;
+            console.log('Connection established');
+            this.status = Status.connected;
+            this.ptyProcess.onData((data) => {
                 process.stdout.write(data);
                 ws.send(data);
             });
-            ws.on('message', function (message) {
-                var parsed = JSON.parse(message);
+            ws.on('message', (message) => {
+                const parsed = JSON.parse(message);
                 console.log('Received message:');
                 console.log(parsed);
-                _this.wsRoutes[parsed.type](parsed);
+                this.wsRoutes[parsed.type](parsed);
             });
             //ptyProcess.resize(100, 40);
             //ptyProcess.write('ls\r');
         });
-        this.socketServer.on('close', function () {
-            _this.status = Status.not_connected;
+        this.socketServer.on('close', () => {
+            this.status = Status.not_connected;
         });
         if (!fs_1.default.existsSync(path_1.default.join(cwd, '.aim'))) {
-            (0, node_child_process_1.spawnSync)('aim', ['init'], { cwd: cwd });
+            (0, node_child_process_1.spawnSync)('aim', ['init'], { cwd });
         }
-        this.aimLogger = (0, node_child_process_1.spawn)('aim', ['up', '-p', '8000'], { cwd: cwd });
+        this.aimLogger = (0, node_child_process_1.spawn)('aim', ['up', '-p', '8000'], { cwd });
         this.mateBoardServerProcess = (0, node_child_process_1.spawn)('npm', ['start'], { cwd: '../client' });
-        this.mateBoardServerProcess.stdout.on('data', function (data) {
-            console.log("stdout: ".concat(data));
+        this.mateBoardServerProcess.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
         });
-        this.mateBoardServerProcess.stderr.on('data', function (data) {
-            console.error("stderr: ".concat(data));
+        this.mateBoardServerProcess.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
         });
-        this.mateBoardServerProcess.on('close', function (code) {
-            console.log("child process exited with code ".concat(code));
+        this.mateBoardServerProcess.on('close', (code) => {
+            console.log(`child process exited with code ${code}`);
         });
     }
-    Server.prototype.initPty = function () {
-        var _this = this;
+    initPty() {
         this.ptyProcess = pty.spawn(shell, [], {
             name: 'xterm-color',
             cols: 80,
@@ -124,45 +138,25 @@ var Server = /** @class */ (function () {
             cwd: this.cwd,
             env: process.env,
         });
-        this.ptyProcess.onData(function (data) {
+        this.ptyProcess.onData((data) => {
             var _a;
             // check if data contains a substring
-            console.log("currentMessage:".concat(_this.currentMessage));
-            var toSend = null;
-            if (_this.currentMessage === MessageType.get_summary) {
-                try {
-                    var summary = JSON.parse(data);
-                    toSend = {
-                        type: MessageType.get_summary,
-                        data: summary
-                    };
-                }
-                catch (e) { }
-            }
-            else if (_this.currentMessage) {
-                // console.log(data);
-                toSend = { type: _this.currentMessage, data: data };
-            }
-            console.log({ toSend: toSend });
-            if (toSend) {
-                (_a = _this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify(toSend));
-            }
+            (_a = this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({ type: "train_logs", data }));
         });
         return this.ptyProcess;
-    };
-    Server.prototype.runMateCommand = function (command) {
-        var fullCommand = 'mate ' + command;
-        console.log("Command: ".concat(fullCommand));
+    }
+    runMateCommand(command) {
+        const fullCommand = 'mate ' + command;
+        console.log(`Command: ${fullCommand}`);
         this.ptyProcess.write(fullCommand + '\r');
-    };
-    Server.prototype.startTraining = function (experimentId) {
+    }
+    startTraining(experimentId) {
         console.log('Trying to start training experiment:', experimentId);
-        this.runMateCommand("train ".concat(experimentId));
-    };
-    Server.prototype.stopTraining = function () {
+        this.runMateCommand(`train ${experimentId}`);
+    }
+    stopTraining() {
         this.status = Status.connected;
-        this.ptyProcess.kill('SIGINT');
-    };
-    return Server;
-}());
+        this.ptyProcess.write('\x03');
+    }
+}
 exports.default = Server;

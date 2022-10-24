@@ -21,12 +21,14 @@ class KerasTrainer(Trainer):
         assert "trainer", "params must contain trainer"
 
         self.bombilla.load()
+
+    def fit(self, *args, **kwargs):
+
         self.bombilla.execute()
 
         if self.bombilla.has_method("compile", "trainer"):
             self.bombilla.execute_method("compile", "trainer")
 
-    def fit(self, *args, **kwargs):
         if self.bombilla.has_method("fit", "trainer"):
             self.bombilla.execute_method("fit", "trainer", *args, **kwargs)
         else:

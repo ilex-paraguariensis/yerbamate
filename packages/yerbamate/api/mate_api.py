@@ -74,8 +74,13 @@ class MateAPI:
             for error in err:
                 print(error)
 
+            # save the full dict
+            full["errors"] = err
+            self.repository.local.save_experiment(full, self.exp_name)
+
             sys.exit(1)
 
+        # ipdb.set_trace()
         # io.save_train_experiments(self.save_path, full, self.config)
 
         return full
@@ -84,6 +89,7 @@ class MateAPI:
         # ensure that this runs on the main loop
         print("train")
         self.init_trainer()
+        # ipdb.set_trace()
         self.validate_params()
         assert self.trainer is not None
         self.trainer.fit()

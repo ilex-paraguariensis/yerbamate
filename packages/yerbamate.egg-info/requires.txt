@@ -5,4 +5,3 @@ websockets
 flask_cors
 pipreqs
 dirhash
-gitdir
