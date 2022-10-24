@@ -103,24 +103,26 @@ const Card = ({
         <small>{module.module}</small>
         <h5>{module.class_name}</h5>
       </p>
-      {module.params &&
-        Object.entries(module.params).map(([key, value]) => (
-          <div className="input-group mb-3">
-            <div className="input-group-prepend">
-              <span className="input-group-text" id="basic-addon1">
-                {key}
-              </span>
+      <div>
+        {module.params &&
+          Object.entries(module.params).map(([key, value], i) => (
+            <div key={i.toString()} className="input-group mb-3">
+              <div className="input-group-prepend">
+                <span className="input-group-text" id="basic-addon1">
+                  {key}
+                </span>
+              </div>
+              <div
+                className="form-control enabled"
+                aria-label="Username"
+                aria-describedby="basic-addon1"
+                style={{ textAlign: "left" }}
+              >
+                {render(value)}
+              </div>
             </div>
-            <div
-              className="form-control enabled"
-              aria-label="Username"
-              aria-describedby="basic-addon1"
-              style={{ textAlign: "left" }}
-            >
-              {render(value)}
-            </div>
-          </div>
-        ))}
+          ))}
+      </div>
     </a>
   );
 };

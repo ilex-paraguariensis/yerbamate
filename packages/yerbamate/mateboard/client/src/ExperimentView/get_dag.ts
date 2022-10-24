@@ -8,9 +8,9 @@ export default (bombilla: any) => {
     parent: null | Record<string, any> = null,
     setRef: boolean = true
   ) => {
-		if (path.at(-1) === "train_function"){
-			console.log('here')
-		}
+    if (path.at(-1) === "train_function") {
+      console.log("here");
+    }
     if (isSimpleType(bomb)) {
       if (typeof bomb === "string" && re.test(bomb)) {
         console.assert(parent !== null, "parent is null");
@@ -107,7 +107,7 @@ const isFunctionCall = (obj: any) => {
   return "function_call" in obj && "reference_key" in obj;
 };
 const isMethodArgs = (obj: any) => {
-  return "function" in obj && "params" in obj && (!("module" in obj));
+  return "function" in obj && "params" in obj && !("module" in obj);
 };
 const genRanHex = (size: number) =>
   [...Array(size)]

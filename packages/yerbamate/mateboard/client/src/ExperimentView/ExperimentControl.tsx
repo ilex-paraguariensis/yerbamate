@@ -40,7 +40,7 @@ export default ({
       termComponent.current &&
       (termComponent.current as HTMLElement).innerHTML === ""
     ) {
-			const rows = Math.round((window.innerHeight * 0.7)/15)
+      const rows = Math.round((window.innerHeight * 0.7) / 15);
       const term = new Terminal({
         cursorBlink: true,
         cols: 200,
@@ -67,7 +67,7 @@ export default ({
       setViewState(ExperimentPageState.Training);
     },
     [MessageType.train_logs]: (data: CustomMessageEvent) => {
-			setViewState(ExperimentPageState.Training);
+      setViewState(ExperimentPageState.Training);
       console.log(data.data);
       if (termView) {
         termView.write(data.data);
@@ -132,7 +132,8 @@ export default ({
         className="navbar fixed-bottom navbar-expand-lg"
         style={{ backgroundColor: "rgba(255, 255, 255, 0.14)" }}
       >
-        <div key="0"
+        <div
+          key="0"
           className={`btn btn-${
             viewState !== ExperimentPageState.Training ? "outline-" : ""
           }danger btn-block`}
@@ -144,20 +145,22 @@ export default ({
                 experiment_id: experimentId,
               })
             );
-						setViewState(ExperimentPageState.Connected)
+            setViewState(ExperimentPageState.Connected);
           }}
           style={{ marginLeft: "10px" }}
         >
           Stop
         </div>
-        <div key="1"
+        <div
+          key="1"
           className="btn btn-success btn-block"
           onClick={() => startTraining()}
           style={{ marginLeft: "10px" }}
         >
           Train
         </div>
-        <div key="2"
+        <div
+          key="2"
           className="btn btn-success btn-block"
           //disabled={
           //  experiment.status === "running" ||

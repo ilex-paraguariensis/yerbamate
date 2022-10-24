@@ -20,18 +20,21 @@ export default ({
     flattenedModules = flattened;
   }
   return (
-		<div style={{width:"100%", textAlign:"center"}}>
-    <div className="list-group w-50" style={{marginTop:'7vh', marginLeft:"auto", marginRight:"auto"}}>
-      {Object.entries(flattenedModules).map(([name, module], index) => (
-        <div
-          className="list-group-item list-group-item-action flex-column align-items-start"
-          key={index}
-        >
-					<h5>{name}</h5>
-          {module.url}
-        </div>
-      ))}
+    <div style={{ width: "100%", textAlign: "center" }}>
+      <div
+        className="list-group w-50"
+        style={{ marginTop: "7vh", marginLeft: "auto", marginRight: "auto" }}
+      >
+        {Object.entries(flattenedModules).map(([name, module], index) => (
+          <div
+            className="list-group-item list-group-item-action flex-column align-items-start"
+            key={index}
+          >
+            <h5>{name}</h5>
+            {module.url}
+          </div>
+        ))}
+      </div>
     </div>
-		</div>
   );
 };

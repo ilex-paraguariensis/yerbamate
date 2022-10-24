@@ -34,11 +34,24 @@ const App = () => {
   const [view, setView] = useState("" as View);
   let defaultSections = {
     Tracker: <ExperimentsTracker />,
-    Models: <ModulesList name="models" modules={mateSummary !== null ? mateSummary.models : []} />,
-    Trainers: (
-      <ModulesList name="trainers" modules={mateSummary !== null ? mateSummary.trainers : []} />
+    Models: (
+      <ModulesList
+        name="models"
+        modules={mateSummary !== null ? mateSummary.models : []}
+      />
     ),
-    Data: <ModulesList name="data" modules={mateSummary !== null ? mateSummary.data : []} />,
+    Trainers: (
+      <ModulesList
+        name="trainers"
+        modules={mateSummary !== null ? mateSummary.trainers : []}
+      />
+    ),
+    Data: (
+      <ModulesList
+        name="data"
+        modules={mateSummary !== null ? mateSummary.data : []}
+      />
+    ),
   } as Record<View, JSX.Element>;
   const [sections, setSections] = useState(defaultSections);
   const [section, setSection] = useState("default");
@@ -49,14 +62,29 @@ const App = () => {
     if (message.type === "get_summary") {
       const data = message.data;
       setMateSummary(() => {
-			 setSections(() => {return {
-					Tracker: <ExperimentsTracker />,
-					Models: <ModulesList name="models" modules={data !== null ? data.models : []} />,
-					Trainers: (
-						<ModulesList name="trainers" modules={data !== null ? data.trainers : []} />
-					),
-					Data: <ModulesList name="data" modules={data !== null ? data.data : []} />,
-				} as Record<View, JSX.Element>})
+        setSections(() => {
+          return {
+            Tracker: <ExperimentsTracker />,
+            Models: (
+              <ModulesList
+                name="models"
+                modules={data !== null ? data.models : []}
+              />
+            ),
+            Trainers: (
+              <ModulesList
+                name="trainers"
+                modules={data !== null ? data.trainers : []}
+              />
+            ),
+            Data: (
+              <ModulesList
+                name="data"
+                modules={data !== null ? data.data : []}
+              />
+            ),
+          } as Record<View, JSX.Element>;
+        });
         return data;
       });
     }
