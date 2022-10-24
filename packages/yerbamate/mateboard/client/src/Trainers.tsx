@@ -1,4 +1,4 @@
-export default (trainers:) => {
+export default (trainers: Record<string, any>) => {
   return (
     <div>
       <h1>Datasets</h1>
