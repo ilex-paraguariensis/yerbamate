@@ -43,6 +43,7 @@ export default ({
       const term = new Terminal({
         cursorBlink: true,
         cols: 200,
+				rows: 55,
         convertEol: true,
         theme: { background: "black" },
       });
@@ -118,31 +119,20 @@ export default ({
         style={{
           width: "100%",
           borderRadius: "10%",
-          marginTop: "8vh",
+          marginTop: "7vh",
           marginLeft: "auto",
           marginRight: "auto",
-          maxWidth: "94vw",
+          maxWidth: "98vw",
+					height: "80vh",
         }}
       ></div>
-      <div style={{ textAlign: "center", width: "100%" }}>
-        <div
-          className="card"
-          style={{
-            padding: "5px",
-            width: "25rem",
-            marginLeft: "auto",
-            marginRight: "auto",
-            marginTop: "2vh",
-          }}
-        >
-          {<StatusView status={viewState}></StatusView>}
-
-          {/* <SocketStatusView readyState={readyState}></SocketStatusView> */}
-
-          <button
-            type="button"
-            className="btn btn-danger btn-lg btn-block"
-            disabled={viewState !== ExperimentPageState.Training}
+			<nav
+        className="navbar fixed-bottom navbar-expand-lg"
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.14)" }}
+      >
+					<div
+            className={`btn btn-${viewState !== ExperimentPageState.Training ? "outline-" : ""}danger btn-block`}
+            //disabled={viewState !== ExperimentPageState.Training}
             onClick={() => {
               socket.send(
                 JSON.stringify({
@@ -151,31 +141,29 @@ export default ({
                 })
               );
             }}
-            style={{ marginBottom: "5px" }}
+            style={{ marginLeft: "10px" }}
           >
-            Stop Training
-          </button>
-          <button
-            type="button"
-            className="btn btn-success btn-lg btn-block"
+            Stop
+          </div>
+          <div
+            className="btn btn-success btn-block"
             onClick={() => startTraining()}
-            style={{ marginBottom: "5px" }}
+            style={{ marginLeft: "10px" }}
           >
             Train
-          </button>
-          <button
-            type="button"
-            className="btn btn-success btn-lg btn-block"
-            disabled={
-              experiment.status === "running" ||
-              experiment.status === "never-run"
-            }
-            style={{ marginBottom: "5px" }}
+          </div>
+          <div
+            className="btn btn-success btn-block"
+            //disabled={
+            //  experiment.status === "running" ||
+            //  experiment.status === "never-run"
+            //}
+            style={{ marginLeft: "10px" }}
           >
             Test
-          </button>
-        </div>
-      </div>
+          </div>
+        </nav>
+
     </div>
   );
 };
