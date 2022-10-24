@@ -108,17 +108,10 @@ def get_function_args(
 
     params.update(default)
 
-    parse_docs(function)
+    # parse_docs(function)
 
     return params, errors
 
 
-def parse_docs(callable):
-    try:
 
-        docs = parse_from_object(callable)
-        if docs.short_description != None:
-            ipdb.set_trace()
 
-    except:
-        return {}

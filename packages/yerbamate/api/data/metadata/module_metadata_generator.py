@@ -13,6 +13,7 @@ import json
 from dirhash import dirhash
 
 from .utils import get_function_args, find_in_bombilla_dict
+from .doc_parser import parse_docs
 
 
 class ModuleMetadataGenerator:
@@ -106,7 +107,7 @@ class ModuleMetadataGenerator:
 
         old_meta = self.read_metadata()
 
-        print("rewriting", rewrite)
+        # print("rewriting", rewrite)
 
         if old_meta != None and old_meta.hash == hash and not rewrite:
 
@@ -165,6 +166,8 @@ class ModuleMetadataGenerator:
 
         # ipdb.set_trace()
         args, errors = get_function_args(klass[1].__init__, {})
+        docs = parse_docs(klass[1].__init__)
+
         args = self.format_modules(args)
 
         defualts = self.search_experiments_for_defaults(klass[1], klass[0])
@@ -175,6 +178,7 @@ class ModuleMetadataGenerator:
             "params": args,
             "samples": defualts,
             "errors": errors,
+            "docs": docs,
         }
 
         # remove non and empty values
@@ -184,6 +188,7 @@ class ModuleMetadataGenerator:
 
     def generate_function_metadata(self, function):
         args, errors = get_function_args(function[1], {})
+        docs = parse_docs(function[1])
         args = self.format_modules(args)
 
         defualts = self.search_experiments_for_defaults(function[1], function[0])
@@ -194,6 +199,7 @@ class ModuleMetadataGenerator:
             "params": args,
             "samples": defualts,
             "errors": errors,
+            "docs": docs,
         }
 
         # remove non and empty values
