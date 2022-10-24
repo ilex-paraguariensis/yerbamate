@@ -1,4 +1,4 @@
-export default () => {
+export default ({data}:{data:Record<string, any>}) => {
   return (
     <div>
       <h1>Datasets</h1>

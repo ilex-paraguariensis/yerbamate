@@ -54,7 +54,7 @@ interface Experiment {
 interface MateSummary {
   models: Package[];
   trainers: Package[];
-  datasets: Package[];
+  data: Package[];
   experiments: Record<string, Experiment>;
 }
 interface ExperimentResult {
