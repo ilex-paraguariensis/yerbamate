@@ -100,14 +100,17 @@ export default function ({
         className="navbar fixed-bottom navbar-expand-lg"
         style={{ backgroundColor: "rgba(255, 255, 255, 0.14)" }}
       >
-        <button
+        <div
           className="btn btn-secondary"
           style={{ marginRight: "10px", marginLeft: "10px" }}
         >
           New Experiment
-        </button>
+        </div>
+				<div className="btn btn-secondary">
+					Install
+				</div>
       </nav>
-			<Loader show={Object.entries(experiments).length === 0} />
+      <Loader show={Object.entries(experiments).length === 0} />
       <div className="list-group" style={{ marginTop: "3vh" }}>
         {Object.entries(experiments).map(([localName, experiment], i) => (
           <div
@@ -122,7 +125,9 @@ export default function ({
                     // sendJsonMessage={sendJsonMessage}
                   />
                 ),
-                Config: <Config experimentId={localName} experiment={experiment}/>,
+                Config: (
+                  <Config experimentId={localName} experiment={experiment} />
+                ),
               } as Record<string, JSX.Element>);
               setSection("Control");
             }}

@@ -83,29 +83,36 @@ const getNetwork = (
   return new window.vis.Network(container, netData, options);
 };
 const views = ["graph", "explorer"];
-const Config = ({ experimentId, experiment }: { experimentId: string, experiment:Record<string, any> }) => {
+const Config = ({
+  experimentId,
+  experiment,
+}: {
+  experimentId: string;
+  experiment: Record<string, any>;
+}) => {
   const [bombilla, setBombilla] = useState<Record<string, any>>(experiment);
   const [view, setView] = useState<string>("explorer");
+	const [backExplorer, setBackExplorer] = useState<(()=>void) | null>(null);
   const [dag, setDag] = useState<{
     nodes: Map<string, Record<string, any>>;
     edges: [string, string, string[]][];
   }>(getDAG(JSON.parse(JSON.stringify(experiment))));
   // loads bombilla which is a json file
-	//@ts-ignore
+  //@ts-ignore
   if (typeof vis !== "undefined") {
     // @ts-ignore
     window.vis = vis;
     console.log("vis is defined");
   }
   const div = useRef<HTMLDivElement>(null);
-	useEffect(()=>{
-		if (view === "graph") {
-			if (div.current !== null) {
-				getNetwork(dag.nodes, dag.edges, div.current, false);
-			}
-		}
-	}, [view])
-	/*
+  useEffect(() => {
+    if (view === "graph") {
+      if (div.current !== null) {
+        getNetwork(dag.nodes, dag.edges, div.current, false);
+      }
+    }
+  }, [view]);
+  /*
   useEffect(() => {
     socket.send(JSON.stringify({ type: "get_summary", data: "" }));
     socket.onmessage = (msg) => {
@@ -127,6 +134,7 @@ const Config = ({ experimentId, experiment }: { experimentId: string, experiment
             nodes={new Map(dag.nodes)}
             edges={dag.edges.slice()}
             bombilla={Object.assign({}, bombilla)}
+						setBackExplorer={setBackExplorer}
           />
         ) : (
           <div
@@ -142,8 +150,18 @@ const Config = ({ experimentId, experiment }: { experimentId: string, experiment
         style={{ backgroundColor: "rgba(255, 255, 255, 0.14)", zIndex: 10000 }}
       >
         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+          <div
+            className={
+              "btn btn-" + (view === "explorer" ? "secondary" : "disabled")
+            }
+            key={"ciao"}
+            style={{ marginLeft: "10px" }}
+						onClick={backExplorer !== null ? backExplorer : () => {}}
+          >
+            <img height={"30vh"} src="back-arrow.png"></img>
+          </div>
           {views.map((viewItem, i) => (
-            <button
+            <div
               onClick={() => setView(viewItem)}
               key={i.toString()}
               className={
@@ -152,7 +170,7 @@ const Config = ({ experimentId, experiment }: { experimentId: string, experiment
               style={{ marginLeft: "10px" }}
             >
               {viewItem}
-            </button>
+            </div>
           ))}
         </ul>
       </nav>

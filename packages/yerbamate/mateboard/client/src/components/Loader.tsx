@@ -1,8 +1,16 @@
-import "./Loader.css"
+import "./Loader.css";
 
-export default ({show}:{show: boolean}) =>
+export default ({ show }: { show: boolean }) =>
   show ? (
-    <div className="scene" style={{height:"100%", width:"100%", paddingTop:"15vh", transform:"scale(0.5)"}}>
+    <div
+      className="scene"
+      style={{
+        height: "100%",
+        width: "100%",
+        paddingTop: "15vh",
+        transform: "scale(0.5)",
+      }}
+    >
       <div className="plane">
         <div className="cube cube--0">
           <div className="cube__side"></div>

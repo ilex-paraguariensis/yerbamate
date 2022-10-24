@@ -48,7 +48,7 @@ const App = () => {
 
   socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
-		console.log("Got message", message)
+    console.log("Got message", message);
     if (message.type === "get_summary") {
       const data = message.data;
       setMateSummary(() => {

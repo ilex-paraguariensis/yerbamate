@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Module = {
   object_key: string;
@@ -54,31 +54,42 @@ const render = (value: any, indent = 20): any => {
   }
 };
 const Card = ({
-  key,
+  listKey,
   module,
   selectNode,
 }: {
-  key: number;
+  listKey: number;
   module: Module;
   selectNode: (node: Record<string, any>) => void;
 }) => {
-	const capitalizeFirstLetter = (val: string) => {
-		return val.charAt(0).toUpperCase() + val.slice(1);
-	}
-	const toSingular = (val: string) => {
-		return val.at(-1) === "s" ? val.slice(0, -1) : val;
+  const capitalizeFirstLetter = (val: string) => {
+    return val.charAt(0).toUpperCase() + val.slice(1);
+  };
+  const toSingular = (val: string) => {
+    return val.at(-1) === "s" ? val.slice(0, -1) : val;
+  };
+	const folders = ["data", "trainers", "models"]
+	type Folder = "data" | "trainers" | "models"
+	const rootModule = module.module.split(".")[0]
+	const isInternalModule = folders.includes(rootModule)
+	const renderingColor = {
+		"data": "bg-primary",
+		"trainers": "bg-success",
+		"models": "bg-warning",
 	}
   return (
     <a
-      key={key}
+      key={listKey}
       href="#"
-      className="list-group-item list-group-item-action flex-column align-items-start"
+      className={"list-group-item list-group-item-action flex-column align-items-start" + (isInternalModule ? " " + renderingColor[rootModule as Folder] : " bg-danger")}
       onClick={() => selectNode(module)}
       style={{ zIndex: 0 }}
     >
       <div className="d-flex w-100 justify-content-between">
-				{/*<h5 className="mb-1">Name: {module.object_key}</h5>*/}
-				<h5 className="mb-1">{toSingular(capitalizeFirstLetter(module.module.split(".")[0]))}</h5>
+        {/*<h5 className="mb-1">Name: {module.object_key}</h5>*/}
+        <h5 className="mb-1">
+          {isInternalModule ? toSingular(capitalizeFirstLetter(module.module.split(".")[0])) : ""}
+        </h5>
         <small>edit</small>
       </div>
       <p className="mb-1">
@@ -121,19 +132,35 @@ const BombillaExplorer = ({
   nodes,
   edges,
   bombilla,
+	setBackExplorer,
 }: {
   nodes: Map<string, Record<string, any>>;
   edges: [string, string, string[]][];
   bombilla: any;
+	setBackExplorer:(c:()=>void)=>void;
 }) => {
   const minPath = Array.from(nodes.values()).reduce((min, node) => {
     return node._path.length < min ? node._path.length : min;
   }, Infinity);
+	const [lastSelectedNode, setLastSelectedNode] = useState<Record<string, any> | null>(null);
+  // const rootNodes = Array.from(nodes.values()).filter(
+  //   (n) => n._path.length === minPath
+  // );
+  const folders = ["trainers", "models", "data"];
   const rootNodes = Array.from(nodes.values()).filter(
-    (n) => n._path.length === minPath
+    (n) => folders.indexOf(n.module.split(".")[0]) !== -1
   );
   const [selectedNodes, setSelectedNodes] = useState(rootNodes);
+	useEffect(()=>{
+		setBackExplorer(()=>()=>{
+			console.log("back");
+			if(lastSelectedNode){
+				selectNode(lastSelectedNode);
+			}
+		});
+	},[]);
   const selectNode = (node: Record<string, any>) => {
+		setLastSelectedNode(()=>node);
     // selects the node and all its children using the edges
     const selected = [
       node,
@@ -149,8 +176,14 @@ const BombillaExplorer = ({
   return (
     <div
       className="list-group w-50"
-			style={{ marginLeft: "auto", marginRight: "auto", marginTop: "7vh", height: "85vh", overflowY: "scroll" }}
-			/*
+      style={{
+        marginLeft: "auto",
+        marginRight: "auto",
+        marginTop: "7vh",
+        height: "85vh",
+        overflowY: "scroll",
+      }}
+      /*
       style={{
         marginLeft: "auto",
         marginRight: "auto",
@@ -176,7 +209,7 @@ const BombillaExplorer = ({
 			}
 			*/
         console.log(node);
-        return <Card key={i} module={node as Module} selectNode={selectNode} />;
+        return <Card key={i} listKey={i} module={node as Module} selectNode={selectNode} />;
       })}
     </div>
   );

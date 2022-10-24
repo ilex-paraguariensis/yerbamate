@@ -28,12 +28,9 @@ export default ({ experimentId }: { experimentId: string }) => {
 	*/
   const defaultSections = {
     default: (
-      <ExperimentControl
-        experiment={experiment}
-        experimentId={experimentId}
-      />
+      <ExperimentControl experiment={experiment} experimentId={experimentId} />
     ),
-    Config: <Config experimentId={experimentId} experiment={experiment}/>,
+    Config: <Config experimentId={experimentId} experiment={experiment} />,
   } as Record<View, JSX.Element>;
   return (
     <div>
