@@ -68,27 +68,34 @@ const Card = ({
   const toSingular = (val: string) => {
     return val.at(-1) === "s" ? val.slice(0, -1) : val;
   };
-	const folders = ["data", "trainers", "models"]
-	type Folder = "data" | "trainers" | "models"
-	const rootModule = module.module.split(".")[0]
-	const isInternalModule = folders.includes(rootModule)
-	const renderingColor = {
-		"data": "bg-primary",
-		"trainers": "bg-success",
-		"models": "bg-warning",
-	}
+  const folders = ["data", "trainers", "models"];
+  type Folder = "data" | "trainers" | "models";
+  const rootModule = module.module.split(".")[0];
+  const isInternalModule = folders.includes(rootModule);
+  const renderingColor = {
+    data: "bg-primary",
+    trainers: "bg-success",
+    models: "bg-warning",
+  };
   return (
     <a
       key={listKey}
       href="#"
-      className={"list-group-item list-group-item-action flex-column align-items-start" + (isInternalModule ? " " + renderingColor[rootModule as Folder] : " bg-danger")}
+      className={
+        "list-group-item list-group-item-action flex-column align-items-start" +
+        (isInternalModule
+          ? " " + renderingColor[rootModule as Folder]
+          : " bg-danger")
+      }
       onClick={() => selectNode(module)}
       style={{ zIndex: 0 }}
     >
       <div className="d-flex w-100 justify-content-between">
         {/*<h5 className="mb-1">Name: {module.object_key}</h5>*/}
         <h5 className="mb-1">
-          {isInternalModule ? toSingular(capitalizeFirstLetter(module.module.split(".")[0])) : ""}
+          {isInternalModule
+            ? toSingular(capitalizeFirstLetter(module.module.split(".")[0]))
+            : ""}
         </h5>
         <small>edit</small>
       </div>
@@ -132,17 +139,20 @@ const BombillaExplorer = ({
   nodes,
   edges,
   bombilla,
-	setBackExplorer,
+  setBackExplorer,
 }: {
   nodes: Map<string, Record<string, any>>;
   edges: [string, string, string[]][];
   bombilla: any;
-	setBackExplorer:(c:()=>void)=>void;
+  setBackExplorer: (c: () => void) => void;
 }) => {
   const minPath = Array.from(nodes.values()).reduce((min, node) => {
     return node._path.length < min ? node._path.length : min;
   }, Infinity);
-	const [lastSelectedNode, setLastSelectedNode] = useState<Record<string, any> | null>(null);
+  const [lastSelectedNode, setLastSelectedNode] = useState<Record<
+    string,
+    any
+  > | null>(null);
   // const rootNodes = Array.from(nodes.values()).filter(
   //   (n) => n._path.length === minPath
   // );
@@ -151,16 +161,16 @@ const BombillaExplorer = ({
     (n) => folders.indexOf(n.module.split(".")[0]) !== -1
   );
   const [selectedNodes, setSelectedNodes] = useState(rootNodes);
-	useEffect(()=>{
-		setBackExplorer(()=>()=>{
-			console.log("back");
-			if(lastSelectedNode){
-				selectNode(lastSelectedNode);
-			}
-		});
-	},[]);
+  useEffect(() => {
+    setBackExplorer(() => () => {
+      console.log("back");
+      if (lastSelectedNode) {
+        selectNode(lastSelectedNode);
+      }
+    });
+  }, []);
   const selectNode = (node: Record<string, any>) => {
-		setLastSelectedNode(()=>node);
+    setLastSelectedNode(() => node);
     // selects the node and all its children using the edges
     const selected = [
       node,
@@ -209,7 +219,14 @@ const BombillaExplorer = ({
 			}
 			*/
         console.log(node);
-        return <Card key={i} listKey={i} module={node as Module} selectNode={selectNode} />;
+        return (
+          <Card
+            key={i}
+            listKey={i}
+            module={node as Module}
+            selectNode={selectNode}
+          />
+        );
       })}
     </div>
   );

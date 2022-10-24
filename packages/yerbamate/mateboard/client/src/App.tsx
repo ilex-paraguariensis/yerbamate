@@ -7,14 +7,9 @@ import Trainers from "./Trainers";
 import Data from "./Data";
 import ExperimentsOverview from "./ExperimentsOverview";
 import { MateSummary } from "./Interfaces";
-import useWebSocket, { ReadyState } from "react-use-websocket";
+import ModulesList from "./components/ModulesList";
 import socket from "./socket";
-type View =
-  | "default"
-  | "Tracker"
-  | "Models"
-  | "Trainers"
-  | "Data";
+type View = "default" | "Tracker" | "Models" | "Trainers" | "Data";
 
 enum ConnectionStatus {
   connecting = "connecting",
@@ -37,11 +32,13 @@ const App = () => {
     setConnectionStatus(ConnectionStatus.disconnected);
   };
   const [view, setView] = useState("" as View);
-  const defaultSections = {
+  let defaultSections = {
     Tracker: <ExperimentsTracker />,
-    Models: <Models models={mateSummary !== null ? mateSummary.models : []} />,
-    Trainers: <Trainers trainers={mateSummary !== null ? mateSummary.trainers : []}/>,
-    Data: <Data data={mateSummary !== null ? mateSummary.data : []}/>,
+    Models: <ModulesList name="models" modules={mateSummary !== null ? mateSummary.models : []} />,
+    Trainers: (
+      <ModulesList name="trainers" modules={mateSummary !== null ? mateSummary.trainers : []} />
+    ),
+    Data: <ModulesList name="data" modules={mateSummary !== null ? mateSummary.data : []} />,
   } as Record<View, JSX.Element>;
   const [sections, setSections] = useState(defaultSections);
   const [section, setSection] = useState("default");
@@ -52,7 +49,14 @@ const App = () => {
     if (message.type === "get_summary") {
       const data = message.data;
       setMateSummary(() => {
-        defaultSections["Models"] = <Models models={message.models} />;
+			 setSections(() => {return {
+					Tracker: <ExperimentsTracker />,
+					Models: <ModulesList name="models" modules={data !== null ? data.models : []} />,
+					Trainers: (
+						<ModulesList name="trainers" modules={data !== null ? data.trainers : []} />
+					),
+					Data: <ModulesList name="data" modules={data !== null ? data.data : []} />,
+				} as Record<View, JSX.Element>})
         return data;
       });
     }

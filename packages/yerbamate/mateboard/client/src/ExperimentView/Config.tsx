@@ -92,7 +92,7 @@ const Config = ({
 }) => {
   const [bombilla, setBombilla] = useState<Record<string, any>>(experiment);
   const [view, setView] = useState<string>("explorer");
-	const [backExplorer, setBackExplorer] = useState<(()=>void) | null>(null);
+  const [backExplorer, setBackExplorer] = useState<(() => void) | null>(null);
   const [dag, setDag] = useState<{
     nodes: Map<string, Record<string, any>>;
     edges: [string, string, string[]][];
@@ -134,7 +134,7 @@ const Config = ({
             nodes={new Map(dag.nodes)}
             edges={dag.edges.slice()}
             bombilla={Object.assign({}, bombilla)}
-						setBackExplorer={setBackExplorer}
+            setBackExplorer={setBackExplorer}
           />
         ) : (
           <div
@@ -156,7 +156,7 @@ const Config = ({
             }
             key={"ciao"}
             style={{ marginLeft: "10px" }}
-						onClick={backExplorer !== null ? backExplorer : () => {}}
+            onClick={backExplorer !== null ? backExplorer : () => {}}
           >
             <img height={"30vh"} src="back-arrow.png"></img>
           </div>

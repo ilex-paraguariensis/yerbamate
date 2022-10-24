@@ -95,57 +95,54 @@ export default function ({
   //lastMessage: MessageEvent | null;
   //sendJsonMessage: (message: MessageEvent) => void;
 }) {
-	const install = () =>{
-		//@ts-ignore
-		const Swal = window.Swal
-		Swal.fire({
-			title: "Install Experiment",
-			text: "Enter the URL of the experiment you want to install",
-			content: "input",
-			inputAttributes: {
-				autocapitalize: "off"
-			},
-			showCancelButton: true,
-			inputValue: "",
-			input: "url",
-			inputValidator: (value:string) => {
-				try {
-					new URL(value);
-				}
-				catch {
-					return "Please enter a valid URL";
-				}
-			},
-			button: {
-				text: "Install",
-				closeModal: false,
-			},
-		}).then((result:Record<string, any>) => {
-			if (result.isConfirmed) {
-				socket.onmessage = (message:MessageEvent) => {
-					const data = JSON.parse(message.data);
-					if (data.type === "install") {
-						if (data.data === "success") {
-							Swal.fire({
-								title: "Success",
-								text: "Experiment installed successfully",
-								icon: "success",
-							});
-						}
-						else {
-							Swal.fire({
-								title: "Error",
-								text: "Failed to install experiment",
-								icon: "error",
-							});
-						}
-					}
-				};
-				socket.send(JSON.stringify({type: "install", data: result.value}));
-			}
-		});
-		
-	}
+  const install = () => {
+    //@ts-ignore
+    const Swal = window.Swal;
+    Swal.fire({
+      title: "Install Experiment",
+      text: "Enter the URL of the experiment you want to install",
+      content: "input",
+      inputAttributes: {
+        autocapitalize: "off",
+      },
+      showCancelButton: true,
+      inputValue: "",
+      input: "url",
+      inputValidator: (value: string) => {
+        try {
+          new URL(value);
+        } catch {
+          return "Please enter a valid URL";
+        }
+      },
+      button: {
+        text: "Install",
+        closeModal: false,
+      },
+    }).then((result: Record<string, any>) => {
+      if (result.isConfirmed) {
+        socket.onmessage = (message: MessageEvent) => {
+          const data = JSON.parse(message.data);
+          if (data.type === "install") {
+            if (data.data === "success") {
+              Swal.fire({
+                title: "Success",
+                text: "Experiment installed successfully",
+                icon: "success",
+              });
+            } else {
+              Swal.fire({
+                title: "Error",
+                text: "Failed to install experiment",
+                icon: "error",
+              });
+            }
+          }
+        };
+        socket.send(JSON.stringify({ type: "install", data: result.value }));
+      }
+    });
+  };
   return (
     <div style={{ textAlign: "center", marginTop: "22vh" }}>
       <nav
@@ -158,9 +155,9 @@ export default function ({
         >
           New Experiment
         </div>
-				<div onClick={install} className="btn btn-secondary">
-					Install
-				</div>
+        <div onClick={install} className="btn btn-secondary">
+          Install
+        </div>
       </nav>
       <Loader show={Object.entries(experiments).length === 0} />
       <div className="list-group" style={{ marginTop: "3vh" }}>

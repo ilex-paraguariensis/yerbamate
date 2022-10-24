@@ -40,10 +40,11 @@ export default ({
       termComponent.current &&
       (termComponent.current as HTMLElement).innerHTML === ""
     ) {
+			const rows = Math.round((window.innerHeight * 0.7)/15)
       const term = new Terminal({
         cursorBlink: true,
         cols: 200,
-				rows: 55,
+        rows: rows,
         convertEol: true,
         theme: { background: "black" },
       });
@@ -66,6 +67,7 @@ export default ({
       setViewState(ExperimentPageState.Training);
     },
     [MessageType.train_logs]: (data: CustomMessageEvent) => {
+			setViewState(ExperimentPageState.Training);
       console.log(data.data);
       if (termView) {
         termView.write(data.data);
@@ -122,48 +124,50 @@ export default ({
           marginTop: "7vh",
           marginLeft: "auto",
           marginRight: "auto",
-          maxWidth: "98vw",
-					height: "80vh",
+          maxWidth: "98%",
+          height: "80%",
         }}
       ></div>
-			<nav
+      <nav
         className="navbar fixed-bottom navbar-expand-lg"
         style={{ backgroundColor: "rgba(255, 255, 255, 0.14)" }}
       >
-					<div
-            className={`btn btn-${viewState !== ExperimentPageState.Training ? "outline-" : ""}danger btn-block`}
-            //disabled={viewState !== ExperimentPageState.Training}
-            onClick={() => {
-              socket.send(
-                JSON.stringify({
-                  type: "stop_training",
-                  experiment_id: experimentId,
-                })
-              );
-            }}
-            style={{ marginLeft: "10px" }}
-          >
-            Stop
-          </div>
-          <div
-            className="btn btn-success btn-block"
-            onClick={() => startTraining()}
-            style={{ marginLeft: "10px" }}
-          >
-            Train
-          </div>
-          <div
-            className="btn btn-success btn-block"
-            //disabled={
-            //  experiment.status === "running" ||
-            //  experiment.status === "never-run"
-            //}
-            style={{ marginLeft: "10px" }}
-          >
-            Test
-          </div>
-        </nav>
-
+        <div key="0"
+          className={`btn btn-${
+            viewState !== ExperimentPageState.Training ? "outline-" : ""
+          }danger btn-block`}
+          //disabled={viewState !== ExperimentPageState.Training}
+          onClick={() => {
+            socket.send(
+              JSON.stringify({
+                type: "stop_training",
+                experiment_id: experimentId,
+              })
+            );
+						setViewState(ExperimentPageState.Connected)
+          }}
+          style={{ marginLeft: "10px" }}
+        >
+          Stop
+        </div>
+        <div key="1"
+          className="btn btn-success btn-block"
+          onClick={() => startTraining()}
+          style={{ marginLeft: "10px" }}
+        >
+          Train
+        </div>
+        <div key="2"
+          className="btn btn-success btn-block"
+          //disabled={
+          //  experiment.status === "running" ||
+          //  experiment.status === "never-run"
+          //}
+          style={{ marginLeft: "10px" }}
+        >
+          Test
+        </div>
+      </nav>
     </div>
   );
 };
