@@ -4,17 +4,17 @@ import NavBar from "./components/NavBar";
 import ExperimentsTracker from "./ExperimentsTracker";
 import Models from "./Models";
 import Trainers from "./Trainers";
-import Datasets from "./Datasets";
+import Data from "./Data";
 import ExperimentsOverview from "./ExperimentsOverview";
 import { MateSummary } from "./Interfaces";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import socket from "./socket";
 type View =
   | "default"
-  | "Experiments Tracker"
+  | "Tracker"
   | "Models"
   | "Trainers"
-  | "Datasets";
+  | "Data";
 
 enum ConnectionStatus {
   connecting = "connecting",
@@ -38,10 +38,10 @@ const App = () => {
   };
   const [view, setView] = useState("" as View);
   const defaultSections = {
-    "Experiments Tracker": <ExperimentsTracker />,
+    Tracker: <ExperimentsTracker />,
     Models: <Models models={mateSummary !== null ? mateSummary.models : []} />,
-    Trainers: <Trainers />,
-    Datasets: <Datasets />,
+    Trainers: <Trainers trainers={mateSummary !== null ? mateSummary.trainers : []}/>,
+    Data: <Data data={mateSummary !== null ? mateSummary.data : []}/>,
   } as Record<View, JSX.Element>;
   const [sections, setSections] = useState(defaultSections);
   const [section, setSection] = useState("default");
