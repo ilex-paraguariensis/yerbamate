@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { JSONEditor } from 'vanilla-jsoneditor'
 
 type Module = {
   object_key: string;
@@ -68,6 +69,23 @@ const Card = ({
   const toSingular = (val: string) => {
     return val.at(-1) === "s" ? val.slice(0, -1) : val;
   };
+	const jsonEditor = useRef(null);
+	const [editing, setEditing] = useState(true);
+	const [editor, setEditor] = useState(null);
+	let setEditorAlready = false;
+	useEffect(() => {
+		if (jsonEditor.current && editing && editor === null && (!setEditorAlready)) {
+			const newEditor = new JSONEditor({
+				target:jsonEditor.current, 
+				props:{
+					content: {json:module.params}
+				}
+			});
+			setEditorAlready = true;
+			// @ts-ignore
+			setEditor(() => newEditor);
+		}
+	}, [jsonEditor]);
   const folders = ["data", "trainers", "models"];
   type Folder = "data" | "trainers" | "models";
   const rootModule = module.module.split(".")[0];
@@ -97,14 +115,12 @@ const Card = ({
             ? toSingular(capitalizeFirstLetter(module.module.split(".")[0]))
             : ""}
         </h5>
-        <small>edit</small>
       </div>
       <p className="mb-1">
         <small>{module.module}</small>
         <h5>{module.class_name}</h5>
       </p>
-      <div>
-        {module.params &&
+        {(!editing) && module.params &&
           Object.entries(module.params).map(([key, value], i) => (
             <div key={i.toString()} className="input-group mb-3">
               <div className="input-group-prepend">
@@ -122,7 +138,7 @@ const Card = ({
               </div>
             </div>
           ))}
-      </div>
+				{editing && module.params && (<div ref={jsonEditor}></div>)}
     </a>
   );
 };
