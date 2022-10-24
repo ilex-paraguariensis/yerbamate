@@ -89,7 +89,7 @@ const Config = ({ experimentId, experiment }: { experimentId: string, experiment
   const [dag, setDag] = useState<{
     nodes: Map<string, Record<string, any>>;
     edges: [string, string, string[]][];
-  }>(getDAG(experiment));
+  }>(getDAG(JSON.parse(JSON.stringify(experiment))));
   // loads bombilla which is a json file
 	//@ts-ignore
   if (typeof vis !== "undefined") {
