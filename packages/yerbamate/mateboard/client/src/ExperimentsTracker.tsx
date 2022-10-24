@@ -6,7 +6,7 @@ export default () => {
   return (
     <div style={{ marginTop: marginTop + "px" }}>
       <Iframe
-        url="http://127.0.0.1:8000/"
+        url="http://127.0.0.1:8000/runs"
         width="100%"
         height={height + "px"}
       />

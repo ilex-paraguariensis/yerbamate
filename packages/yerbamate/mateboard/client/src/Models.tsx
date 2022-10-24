@@ -40,8 +40,6 @@ export default function ({ models }: { models: Package[] }) {
       </div>
       {Object.entries(models).map((entry) => {
         const [localName, model] = entry;
-        console.log(`hey ${localName}:${model}`);
-        console.log(model.url);
         return (
           <div
             className="card"
