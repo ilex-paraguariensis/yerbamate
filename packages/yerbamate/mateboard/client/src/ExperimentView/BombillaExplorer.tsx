@@ -62,17 +62,24 @@ const Card = ({
   module: Module;
   selectNode: (node: Record<string, any>) => void;
 }) => {
+	const capitalizeFirstLetter = (val: string) => {
+		return val.charAt(0).toUpperCase() + val.slice(1);
+	}
+	const toSingular = (val: string) => {
+		return val.at(-1) === "s" ? val.slice(0, -1) : val;
+	}
   return (
     <a
       key={key}
       href="#"
       className="list-group-item list-group-item-action flex-column align-items-start"
       onClick={() => selectNode(module)}
-      style={{ zIndex: 1000 }}
+      style={{ zIndex: 0 }}
     >
       <div className="d-flex w-100 justify-content-between">
-        <h5 className="mb-1">Name: {module.object_key}</h5>
-        <small>3 days ago</small>
+				{/*<h5 className="mb-1">Name: {module.object_key}</h5>*/}
+				<h5 className="mb-1">{toSingular(capitalizeFirstLetter(module.module.split(".")[0]))}</h5>
+        <small>edit</small>
       </div>
       <p className="mb-1">
         <small>{module.module}</small>
@@ -123,7 +130,7 @@ const BombillaExplorer = ({
     return node._path.length < min ? node._path.length : min;
   }, Infinity);
   const rootNodes = Array.from(nodes.values()).filter(
-    (node) => node._path.length === minPath
+    (n) => n._path.length === minPath
   );
   const [selectedNodes, setSelectedNodes] = useState(rootNodes);
   const selectNode = (node: Record<string, any>) => {
@@ -135,21 +142,25 @@ const BombillaExplorer = ({
         .map((edge) => nodes.get(edge[0])),
     ] as Record<string, any>[];
     const uniqueSelected = Array.from(
-      new Set(selected.map((node) => node.object_key)).values()
+      new Set(selected.map((n) => n.object_key)).values()
     ).map((key) => nodes.get(key)) as Record<string, any>[];
     setSelectedNodes(uniqueSelected);
   };
   return (
     <div
       className="list-group w-50"
+			style={{ marginLeft: "auto", marginRight: "auto", marginTop: "7vh", height: "85vh", overflowY: "scroll" }}
+			/*
       style={{
         marginLeft: "auto",
         marginRight: "auto",
-        marginTop: "7vh",
-        maxHeight: "70vh",
+        // marginTop: "7vh",
+        // maxHeight: "70vh",
         textAlign: "center",
-        zIndex: 1000,
+        // zIndex: 1000,
+				zIndex: 0,
       }}
+			*/
     >
       {selectedNodes.map((node, i) => {
         const edgesToNode = edges.filter((edge) => edge[1] === node.object_key);

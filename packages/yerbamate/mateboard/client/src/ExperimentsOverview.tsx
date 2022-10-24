@@ -95,7 +95,7 @@ export default function ({
   //sendJsonMessage: (message: MessageEvent) => void;
 }) {
   return (
-    <div style={{ textAlign: "center", marginTop: "9vh" }}>
+    <div style={{ textAlign: "center", marginTop: "22vh" }}>
       <nav
         className="navbar fixed-bottom navbar-expand-lg"
         style={{ backgroundColor: "rgba(255, 255, 255, 0.14)" }}
