@@ -37,14 +37,15 @@ class PackageRepository:
     def generate_metadata(self, rewrite: bool = False):
 
         self.__generate_metadata()
-        if self.config.metadata == None or self.config.metadata == {}:
-            # ipdb.set_trace()
-            base_meta = self.config.metadata.base_metadata()
-            base_meta["exports"] = self.__export_metadata()
-            base_meta["dependencies"] = self.__generate_pip_requirements()
-            base_meta["experiments"] = self.local.list("experiments")
-            self.config.metadata = base_meta
-            self.config.save()
+    
+        base_meta = self.config.metadata.base_metadata()
+        base_meta["exports"] = self.__export_metadata()
+        base_meta["dependencies"] = self.__generate_pip_requirements()
+        base_meta["experiments"] = self.local.list("experiments")
+        self.config.metadata = base_meta
+        self.config.save()
+
+        
 
     def __export_metadata(self):
         assert self.metadata is not None, "Metadata shuldn't be None"

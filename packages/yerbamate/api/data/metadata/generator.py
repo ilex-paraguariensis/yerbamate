@@ -7,6 +7,7 @@ from ..package import Package
 import os
 import ipdb
 from .module_metadata_generator import ModuleMetadataGenerator
+from .experiment_metadata_generator import ExperimentMetadataGenerator
 
 
 class MetadataGenerator:
@@ -34,8 +35,19 @@ class MetadataGenerator:
         gen = {
             module: self.generate_module_metadata(module, rewrite) for module in modules
         }
+
+        exps = self.local_ds.list("experiments")
+        gen["experiments"] = {
+            exp: self.generate_experiment_metadata(exp) for exp in exps
+        }
+
         self.cached_metadata = gen
         return self.cached_metadata
+
+    def generate_experiment_metadata(self, experiment: str) -> dict:
+        return ExperimentMetadataGenerator(
+            experiment, self.root_module, self.root_meta, self.local_ds
+        ).generate()
 
     def generate_module_metadata(self, module: str, rewrite: bool = False) -> dict:
         result = {}
