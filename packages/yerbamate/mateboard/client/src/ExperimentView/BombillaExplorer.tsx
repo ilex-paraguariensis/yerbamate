@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from "react";
-import { JSONEditor } from 'vanilla-jsoneditor'
+import { JSONEditor, MenuItem } from 'vanilla-jsoneditor'
+//import 'vanilla-jsoneditor/themes/jse-theme-default.css'
+
 
 type Module = {
   object_key: string;
@@ -54,6 +56,15 @@ const render = (value: any, indent = 20): any => {
     );
   }
 };
+const setElementFontSizeRecursive = (element: HTMLElement, fontSize: number) => {
+	element.style.fontSize = fontSize + "px";
+	element.style.lineHeight = fontSize + "px";
+	// sets the font size also for its children
+	for (let i = 0; i < element.children.length; i++) {
+		setElementFontSizeRecursive(element.children[i] as HTMLElement, fontSize);
+	}
+};
+	
 const Card = ({
   listKey,
   module,
@@ -71,19 +82,70 @@ const Card = ({
   };
 	const jsonEditor = useRef(null);
 	const [editing, setEditing] = useState(true);
-	const [editor, setEditor] = useState(null);
+	const [editor, setEditor] = useState<JSONEditor | null>(null);
 	let setEditorAlready = false;
+	const save = () => {
+		const value = bohEditor!.get();
+		console.log(value)
+		//@ts-ignore
+		const Swal = window.Swal;
+		Swal.fire({
+			title: "Are you sure?",
+			text: "You won't be able to revert this!",
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#3085d6",
+			cancelButtonColor: "#d33",
+			confirmButtonText: "Yes, save it!",
+		}).then((result:{isConfirmed:boolean}) => {
+			if (result.isConfirmed) {
+				Swal.fire("Saved!", "Your file has been saved.", "success");
+			}
+		})
+	}
+	const onRenderMenu = (mode:string, menu:MenuItem[]) => {
+		menu = menu.filter(m=>{
+			const item = m as Record<string,any>;
+			if ((item.text !== undefined) && (item.text === "text")){return false;}
+			return true;
+		})
+		const last = menu.at(-1);
+		const removedLast = menu.slice(0,-1);
+		const newMenu = [...removedLast, {
+			text: "Save ",
+			title: "Save",
+			onClick: save,
+		}, last];
+		return newMenu as MenuItem[];
+	}
+	let bohEditor : null | JSONEditor = null;
+	const onClassName = (path:Array<string>, value:string) => {
+		const re = RegExp("{(.*?)}");
+		if (re.test(value)){
+			//return "badge rounded-pill bg-success"
+		}	
+	}	
 	useEffect(() => {
 		if (jsonEditor.current && editing && editor === null && (!setEditorAlready)) {
+
+			// selects only some menu items
 			const newEditor = new JSONEditor({
 				target:jsonEditor.current, 
 				props:{
-					content: {json:module.params}
-				}
-			});
+					content: {
+						json:module.params
+					},
+					onRenderMenu:onRenderMenu,
+					//@ts-ignore
+					onClassName:onClassName,
+			}});
+			setElementFontSizeRecursive(jsonEditor.current, 20);
+			// newEditor.onRenderMenu((m:any, i:any)=>i)
+			// changes the editor font size
 			setEditorAlready = true;
 			// @ts-ignore
-			setEditor(() => newEditor);
+			//setEditor(() => newEditor);
+			bohEditor = newEditor;
 		}
 	}, [jsonEditor]);
   const folders = ["data", "trainers", "models"];
@@ -105,12 +167,11 @@ const Card = ({
           ? " " + renderingColor[rootModule as Folder]
           : " bg-danger")
       }
-      onClick={() => selectNode(module)}
       style={{ zIndex: 0 }}
     >
       <div className="d-flex w-100 justify-content-between">
         {/*<h5 className="mb-1">Name: {module.object_key}</h5>*/}
-        <h5 className="mb-1">
+        <h5 className="mb-1" onClick={() => selectNode(module)}>
           {isInternalModule
             ? toSingular(capitalizeFirstLetter(module.module.split(".")[0]))
             : ""}
