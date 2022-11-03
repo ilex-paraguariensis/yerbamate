@@ -40,6 +40,14 @@ class LocalDataSource(DataSource):
     def assert_experiment_exists(self, experiment):
         assert experiment in self.experiments, f"Experiment {experiment} does not exist"
 
+    def load_metadata(self, experiment):
+
+        exp = io.read_json(
+            os.path.join(self.root_folder, "experiments", experiment, f"metadata.json")
+        )
+
+        return exp
+
     def load_experiment(self, experiment: str):
 
         exp = io.read_experiments(self.config, self.root_folder, experiment)
@@ -51,8 +59,15 @@ class LocalDataSource(DataSource):
     def load_mate_config_and_root(self):
         return self.__findroot()
 
-    def save_experiment(self, experiment, name):
-        save_path = os.path.join(self.config.project, "experiments", name)
+    def save_toml(self, toml, experiment_name):
+        io.save_toml(self.root_folder, experiment_name, toml)
+
+    def save_metadata(self, experiment, metadata):
+
+        io.save_metadata(self.root_folder, experiment, metadata)
+
+    def save_experiment(self, experiment):
+        save_path = io.get_experiment_path(self.root_folder, experiment)
         with open(save_path, "w") as f:
             f.write(json.dumps(experiment, indent=4))
 
@@ -66,10 +81,11 @@ class LocalDataSource(DataSource):
         self.data_loaders = self.__filter_regular_folders(
             os.listdir(os.path.join(root_dir, "data"))
         )
+
         self.experiments = [
-            os.path.splitext(exp_name)[0]
-            for exp_name in os.listdir(os.path.join(root_dir, "experiments"))
-            if ".json" in exp_name
+            dir
+            for dir in os.listdir(os.path.join(root_dir, "experiments"))
+            if os.path.isdir(os.path.join(root_dir, "experiments", dir))
         ]
 
         self.map = {

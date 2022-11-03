@@ -59,26 +59,33 @@ def override_params(config: MateConfig, params: Bunch):
     return params
 
 
-def __get_experiment_path(root_folder: str, experiment_name: str):
-    """
-    if experiment == "default":
-        # firt check if second level default exists
-        path = os.path.join(
-            root_folder, "models", model_name, "experiments", "default.json"
-        )
-        if os.path.exists(path):
-            return path
-
-        # if not, check if first level default exists
-        path = os.path.join(root_folder, "experiments", f"{model_name}.json")
-        if os.path.exists(path):
-            return path
-
+def __get_experiment_path(root_folder: str, experiment_name: str, type: str = "json"):
     path = os.path.join(
-        root_folder, "models", model_name, "experiments", f"{experiment}.json"
+        root_folder, "experiments", experiment_name, f"experiment.{type}"
     )
-    """
-    path = os.path.join(root_folder, "experiments", f"{experiment_name}.json")
+    return path
+
+
+def get_metadata_path(root_folder: str, experiment: str):
+    path = os.path.join(root_folder, "experiments", experiment, "metadata.json")
+    # os.makedirs(os.path.dirname(path), exist_ok=True)
+    return path
+
+
+def save_metadata(root_folder: str, experiment: str, metadata: dict):
+    path = get_metadata_path(root_folder, experiment)
+    with open(path, "w") as f:
+        json.dump(metadata, f, indent=4)
+
+
+def save_toml(root_folder: str, experiment: str, toml: str):
+    path = os.path.join(root_folder, "experiments", experiment, "experiment.toml")
+    with open(path, "w") as f:
+        f.write(toml)
+
+
+def get_experiment_path(root_folder: str, experiment_name: str, type: str = "json"):
+    path = __get_experiment_path(root_folder, experiment_name, type)
     return path
 
 
@@ -140,15 +147,24 @@ def apply_env(root_folder: str, hparams: Bunch):
         # print(json.dumps(env, indent=4))
 
 
+def read_json(path):
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except:
+        return None
+
+
 def read_experiments(
     conf: MateConfig,
     root_folder: str,
-    hparams_name: str = "default",
+    experiment: str = "default",
+    type: str = "json",
     run_params: dict = None,
 ):
 
-    hparams_path = __get_experiment_path(root_folder, hparams_name)
-    assert hparams_path != None, f"Could not find the experiment {hparams_name}"
+    hparams_path = __get_experiment_path(root_folder, experiment, type)
+    assert hparams_path != None, f"Could not find the experiment {experiment}"
 
     with open(hparams_path) as f:
         hparams = json.load(f)

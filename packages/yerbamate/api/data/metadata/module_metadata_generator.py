@@ -166,7 +166,7 @@ class ModuleMetadataGenerator:
 
         # ipdb.set_trace()
         args, errors = get_function_args(klass[1].__init__, {})
-        docs = parse_docs(klass[1].__init__)
+        # docs = parse_docs(klass[1].__init__)
 
         args = self.format_modules(args)
 
@@ -178,7 +178,7 @@ class ModuleMetadataGenerator:
             "params": args,
             "samples": defualts,
             "errors": errors,
-            "docs": docs,
+            # "docs": docs,
         }
 
         # remove non and empty values
@@ -188,7 +188,7 @@ class ModuleMetadataGenerator:
 
     def generate_function_metadata(self, function):
         args, errors = get_function_args(function[1], {})
-        docs = parse_docs(function[1])
+        # docs = parse_docs(function[1])
         args = self.format_modules(args)
 
         defualts = self.search_experiments_for_defaults(function[1], function[0])
@@ -199,7 +199,7 @@ class ModuleMetadataGenerator:
             "params": args,
             "samples": defualts,
             "errors": errors,
-            "docs": docs,
+            # "docs": docs,
         }
 
         # remove non and empty values

@@ -4,14 +4,14 @@ from ..sources.local import LocalDataSource
 from .metadata import BaseMetadata, Metadata
 from bombilla import Bombilla
 from bombilla.node import Node, load_node
+import ipdb
 
 
 class ExperimentMetadataGenerator(object):
     """Generates experiment metadata.
 
     This class is responsible for generating experiment metadata for a given
-    experiment. It is used by the generator to generate the metadata for the
-    whole project.
+    experiment. It is used by the generator to generate the metadata for the a module.
 
     Attributes:
         experiment (str): The name of the experiment.
@@ -55,15 +55,26 @@ class ExperimentMetadataGenerator(object):
         node.__load__()
 
         full_experiment = node.generate_full_dict()
-        base_meta = self.root_meta.base_metadata()
+
+        prev_meta = self.local_ds.load_metadata(self.experiment)
+
+        if prev_meta != None:
+            prev_meta["experiment"] = None
+            base_meta = Metadata(**prev_meta).base_metadata()
+        else:
+            base_meta = self.root_meta.base_metadata()
 
         result = {
             **base_meta,
-            "experiment_name": self.experiment,
+            "type": "experiment",
             "experiment": full_experiment,
         }
 
-        if rewrite:
-            self.local_ds.save_experiment(result, f"{self.experiment}.metadata")
+        if rewrite or prev_meta == None:
+            # ipdb.set_trace()
+            self.local_ds.save_metadata(self.experiment, result)
+
+        # ipdb.set_trace()
+        # toml = node.to_toml()
 
         return result
