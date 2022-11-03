@@ -83,7 +83,7 @@ class MateAPI:
 
             sys.exit(1)
 
-        self.repository.local.save_experiment(full, f"{self.exp_name}.metadata")
+        # self.repository.local.save_experiment(full, f"{self.exp_name}.metadata")
         # ipdb.set_trace()
         # io.save_train_experiments(self.save_path, full, self.config)
 
