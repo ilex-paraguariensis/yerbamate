@@ -79,7 +79,7 @@ class MateAPI:
 
             # save the full dict
             full["errors"] = err
-            self.repository.local.save_experiment(full, f"{self.exp_name}.json")
+            self.repository.local.save_experiment(full, self.exp_name)
 
             sys.exit(1)
 

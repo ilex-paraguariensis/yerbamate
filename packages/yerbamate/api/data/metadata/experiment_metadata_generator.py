@@ -53,6 +53,7 @@ class ExperimentMetadataGenerator(object):
 
         node = load_node(experiment)
         node.__load__()
+        toml = node.to_toml()
 
         full_experiment = node.generate_full_dict()
 
@@ -73,6 +74,8 @@ class ExperimentMetadataGenerator(object):
         if rewrite or prev_meta == None:
             # ipdb.set_trace()
             self.local_ds.save_metadata(self.experiment, result)
+
+        self.local_ds.save_toml(toml, self.experiment)
 
         # ipdb.set_trace()
         # toml = node.to_toml()
