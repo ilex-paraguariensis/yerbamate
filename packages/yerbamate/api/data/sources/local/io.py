@@ -6,7 +6,6 @@ from typing import Optional
 import ipdb
 
 from .....mate_config import MateConfig
-
 from .....utils.bunch import Bunch
 from .....utils.utils import once
 
@@ -59,11 +58,25 @@ def override_params(config: MateConfig, params: Bunch):
     return params
 
 
-def __get_experiment_path(root_folder: str, experiment_name: str, type: str = "json"):
-    path = os.path.join(
-        root_folder, "experiments", experiment_name, f"experiment.{type}"
-    )
-    return path
+def __get_experiment_path(
+    root_folder: str,
+    experiment_name: str,
+    path_types: tuple[str, ...] = ("json", "toml", "py"),
+):
+    paths = [
+        os.path.join(
+            root_folder, "experiments", experiment_name, f"experiment.{path_type}"
+        )
+        for path_type in path_types
+    ]
+    priority = {"json": 0, "toml": 2, "py": 1}
+    valid_paths = [path for path in paths if os.path.exists(path)]
+    if len(valid_paths) == 0:
+        raise FileNotFoundError(
+            f"Could not find experiment {experiment_name} in {root_folder} (looked for {paths})"
+        )
+    valid_paths.sort(key=lambda path: priority[path.split(".")[-1]])
+    return valid_paths[0]
 
 
 def get_metadata_path(root_folder: str, experiment: str):
@@ -159,15 +172,20 @@ def read_experiments(
     conf: MateConfig,
     root_folder: str,
     experiment: str = "default",
-    type: str = "json",
-    run_params: dict = None,
+    config_types: tuple[str, ...] = ("json", "toml", "py"),
+    run_params: dict | None = None,
 ):
+    experiment_path = __get_experiment_path(root_folder, experiment, config_types)
+    assert experiment_path != None, f"Could not find the experiment {experiment}"
 
-    hparams_path = __get_experiment_path(root_folder, experiment, type)
-    assert hparams_path != None, f"Could not find the experiment {experiment}"
-
-    with open(hparams_path) as f:
-        hparams = json.load(f)
+    from bombilla.bombilla_dag.bombilla_dag import BombillaDAG
+    if experiment_path.endswith(".py"):
+        hparams = BombillaDAG.python_file_to_dict(experiment_path)
+    elif experiment_path.endswith(".toml"):
+        raise NotImplementedError("Toml not implemented yet")
+    else:
+        with open(experiment_path) as f:
+            hparams = json.load(f)
 
     hparams = Bunch(hparams)
     hparams = override_params(conf, hparams)

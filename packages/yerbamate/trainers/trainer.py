@@ -20,11 +20,10 @@ class Trainer:
 
     @staticmethod
     def create(params: Bunch, root_module, map_key_values, *kwargs):
-
         return GenericBombillaTrainer(
             dict(params), root_module, map_key_values, *kwargs
         )
-
+        """
         if "train_function" in params:
             from .function_trainer import FunctionTrainer
 
@@ -42,6 +41,7 @@ class Trainer:
             )  # importing it here avoids memory overload
 
             return KerasTrainer(params, root_module, map_key_values)
+        """
 
     def generate_full_dict(self) -> tuple:
 
