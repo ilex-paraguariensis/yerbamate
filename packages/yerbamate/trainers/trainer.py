@@ -3,8 +3,11 @@ from ..utils.bunch import Bunch
 
 from typing import Optional, Union, Sequence, Type, Any
 
-
+from bombilla import Bombilla
 import ipdb
+
+
+# TODO refactor this class to be more generic
 
 
 class Trainer:
@@ -12,8 +15,15 @@ class Trainer:
         super().__init__()
         self.params = params
 
+        # Todo we dont need this
+        # TODO remove bunch
+
     @staticmethod
     def create(params: Bunch, root_module, map_key_values, *kwargs):
+
+        return GenericBombillaTrainer(
+            dict(params), root_module, map_key_values, *kwargs
+        )
 
         if "train_function" in params:
             from .function_trainer import FunctionTrainer
@@ -61,6 +71,20 @@ class Trainer:
         pass
 
 
+class GenericBombillaTrainer(Trainer):
+    def __init__(
+        self, bombilla_dict: dict, root_module: str, map_key_values: dict, *args
+    ) -> None:
+        self.bombilla_dict = bombilla_dict
+        self.bombilla = Bombilla(bombilla_dict, root_module, map_key_values)
+
+    def install(self):
+        self.bombilla.load()
+
+    def execute(self, type: str):
+        self.bombilla.execute(type)
+
+
 """    
     def test(
         self,
@@ -97,20 +121,3 @@ keras package structure
 │   ├── fit.py
 │   ├── test.py
 """
-
-
-def get_trainer_from_package(backbone: str, dirname: str) -> Trainer:
-    if backbone == "keras":
-        return KerasTrainer(dirname)
-    elif backbone == "ligntning":
-        return LightningTrainer(dirname)
-
-
-def get_trainer_from_config(config: Bunch, *args, **kawrg) -> Trainer:
-    if "pytorch_lightning_module" in config:
-        return LightningTrainer(config, *args, **kawrg)
-    elif "keras_model" in config:
-        return KerasTrainer(config, *args, **kawrg)
-    else:
-        raise ValueError("No trainer specified in config")
-    pass

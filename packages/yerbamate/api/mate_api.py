@@ -96,15 +96,21 @@ class MateAPI:
         # ipdb.set_trace()
         self.validate_params()
         assert self.trainer is not None
-        self.trainer.fit()
+        self.trainer.execute("train")
 
     def restart(self):
         # TODO, this should be in the trainer
+
         pass
 
     def test(self):
         # TODO, this should be in the trainer
-        pass
+        self.init_trainer()
+        self.validate_params()
+        assert self.trainer is not None
+        self.trainer.execute("test")
+
+        
 
     def sample(self):
         # TODO, this should be in the trainer if its a generative model
