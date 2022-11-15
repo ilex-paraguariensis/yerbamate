@@ -72,11 +72,11 @@ This is how folders in a 🧉 project are organized:
 
 ## Comparison to familiar tools
 
-- *Weights & Biases* wandb is a logger and allows model weights sharing as well
-- *Tensorboard* This is a logger and can be integrated into mate
-- *[Monai](https://github.com/Project-MONAI/MONAI)*
-- *[Ivy](https://github.com/unifyai/ivy)*
-- *[THINGSvision](https://github.com/ViCCo-Group/thingsvision)*
+- **Weights & Biases** wandb is a logger and allows model weights sharing as well
+- **Tensorboard** This is a logger and can be integrated into mate
+- **[Monai](https://github.com/Project-MONAI/MONAI)**
+- **[Ivy](https://github.com/unifyai/ivy)**
+- **[THINGSvision](https://github.com/ViCCo-Group/thingsvision)**
 
 
 ### For Coders
