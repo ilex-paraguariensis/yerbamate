@@ -63,13 +63,21 @@ def __get_experiment_path(
     experiment_name: str,
     path_types: tuple[str, ...] = ("json", "toml", "py"),
 ):
+    assert os.path.exists(
+        os.path.join(root_folder, "experiments", experiment_name)
+    ), f"Could not find experiment {experiment_name} in {root_folder}"
     paths = [
         os.path.join(
             root_folder, "experiments", experiment_name, f"experiment.{path_type}"
         )
         for path_type in path_types
     ]
-    priority = {"json": 0, "toml": 2, "py": 1}
+    # toml must be 2 because it gets generated every time in all experiments
+    priority = {
+        "json": 0,
+        "toml": 2,
+        "py": 1,
+    }
     valid_paths = [path for path in paths if os.path.exists(path)]
     if len(valid_paths) == 0:
         raise FileNotFoundError(
@@ -179,6 +187,7 @@ def read_experiments(
     assert experiment_path != None, f"Could not find the experiment {experiment}"
 
     from bombilla.bombilla_dag.bombilla_dag import BombillaDAG
+
     if experiment_path.endswith(".py"):
         hparams = BombillaDAG.python_file_to_dict(experiment_path)
     elif experiment_path.endswith(".toml"):

@@ -110,8 +110,6 @@ class MateAPI:
         assert self.trainer is not None
         self.trainer.execute("test")
 
-        
-
     def sample(self):
         # TODO, this should be in the trainer if its a generative model
         pass
