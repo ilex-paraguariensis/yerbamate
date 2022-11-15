@@ -72,11 +72,27 @@ This is how folders in a 🧉 project are organized:
 
 ## Comparison to familiar tools
 
-- **Weights & Biases** wandb is a logger and allows model weights sharing as well
-- **Tensorboard** This is a logger and can be integrated into mate
-- **[Monai](https://github.com/Project-MONAI/MONAI)**
-- **[Ivy](https://github.com/unifyai/ivy)**
-- **[THINGSvision](https://github.com/ViCCo-Group/thingsvision)**
+### [Monai](https://github.com/Project-MONAI/MONAI)
+Monai focuses on providing tools for medical imaging. Such as:
+
+- preprocessing transformations
+- pretrained models
+
+Moreover with MONAI deploy one can easily deploy their models to third party systems.
+
+
+### [Ivy](https://github.com/unifyai/ivy)
+Ivy creates an abstraction layer between the python code and the deep learning framework (TensorFlow, Pytorch, and JAX). It creates a set of tensors that can work on different backends (the frameworks).
+Mate targets the reproducibility issue differently: by formatting and the project structure, making it modular and its component recyclable.
+
+### [THINGSvision](https://github.com/ViCCo-Group/thingsvision)
+THINGSvision makes it easier to fine-tune and analyze the activation of pretrained models for computer vision. 
+Mate has a different aim: to improve reproducibility in deep learning.
+
+### [Weights & Biases](https://github.com/wandb)
+
+Wandb is a logger that allows you to keep track of experiment results and allows model weight sharing. You can easily integrate wandb in a mate project, the default logger used in our examples repo. Mate always delegates the logging of results and runs to some logger, but its key feature is that it also keeps track of all experiment's hyperparameters.
+
 
 
 ### For Coders
