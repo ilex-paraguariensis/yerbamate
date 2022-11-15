@@ -70,6 +70,14 @@ This is how folders in a 🧉 project are organized:
 
 ```
 
+## Comparison to familiar tools
+
+- *Weights & Biases* wandb is a logger and allows model weights sharing as well
+- *Tensorboard* This is a logger and can be integrated into mate
+- *[Monai](https://github.com/Project-MONAI/MONAI)*
+- *[Ivy](https://github.com/unifyai/ivy)*
+- *[THINGSvision](https://github.com/ViCCo-Group/thingsvision)*
+
 
 ### For Coders
 Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any maté class to your projects. Maté simply parses the configuration. To make your project maté compatible, you need to move a few files and make a Bombilla configuration file. 
