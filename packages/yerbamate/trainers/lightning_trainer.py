@@ -30,7 +30,6 @@ class LightningTrainer(Trainer):
         # ipdb.set_trace()
         self.bombilla.execute()
 
-
         if self.bombilla.has_method("fit", "trainer"):
             self.bombilla.execute_method("fit", "trainer", *args, **kwargs)
 

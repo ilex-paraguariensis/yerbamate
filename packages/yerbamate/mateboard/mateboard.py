@@ -4,6 +4,7 @@ import subprocess
 import webbrowser
 from typing import Optional
 
+
 class MateBoard:
     def __init__(self):
         pass
@@ -27,6 +28,7 @@ class MateBoard:
         if deno_installed:
             os.system("killall node")
             import ipdb
+
             ipdb.set_trace()
             self._p = subprocess.run(
                 "npm start".split(),

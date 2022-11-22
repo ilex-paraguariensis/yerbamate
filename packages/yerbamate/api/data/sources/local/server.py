@@ -20,6 +20,7 @@ class LocalServer:
     def run_server(self):
         app = Flask(__name__)
         CORS(app)
+
         @app.route("/list_<query>")
         def list(query):
             # query = request.args["query"]
@@ -28,7 +29,6 @@ class LocalServer:
                 return jsonify(self.metadata.generate()[query])
             else:
                 return jsonify(self.local_ds.list(query))
-
 
         @app.route("/experiment_<experiment>")
         def experiment(experiment: str):

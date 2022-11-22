@@ -95,7 +95,7 @@ class LocalDataSource(DataSource):
             "data_loaders": self.data_loaders,
             "experiments": self.experiments,
         }
-        self.map = {k: v for k, v in self.map.items() if len(v) > 0}
+        self.map = {k: v for k, v in self.map.items()}
 
     def __filter_regular_folders(self, names: list[str]):
         return [fn for fn in names if not fn.startswith("__")]

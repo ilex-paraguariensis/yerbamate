@@ -52,11 +52,14 @@ class ProjectParser:
                             if "module" in folder_template:
                                 # first check that its a module
                                 assert (
-                                    os.path.isdir(subdir_path) or sub_key == "__init__.py"
+                                    os.path.isdir(subdir_path)
+                                    or sub_key == "__init__.py"
                                 ), f"{sub_key} is not a folder"
             os.chdir("..")
         except AssertionError as e:
-            print(f"The project didn't pass the validation. Please check the following:\n\t{e}")
+            print(
+                f"The project didn't pass the validation. Please check the following:\n\t{e}"
+            )
 
     @staticmethod
     def _check_template_syntax(template: Bunch):

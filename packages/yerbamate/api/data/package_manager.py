@@ -62,8 +62,6 @@ class PackageManager:
         # just git url
         base_git_url = "/".join(url.split("/")[:7])
 
-        # ipdb.set_trace()
-
         url_hash = hashlib.sha1(base_git_url.encode("utf-8")).hexdigest()
 
         output_path = self.get_path(url_hash)
@@ -74,18 +72,18 @@ class PackageManager:
         output_dir = os.path.join(os.getcwd(), output_path)
 
         download(url, output_dir=output_dir)
-
-        module_path_from_git = url.split("/")[7:-1]
-        # ipdb.set_trace()
+        module_path_from_git = url.split("/")[7:8]
 
         metadata_path = os.path.join(output_dir, *module_path_from_git, "metadata.json")
 
-        assert os.path.exists(metadata_path), "No metadata.json found in {}".format(
-            metadata_path
-        )
+        if os.path.exists(metadata_path):
+            print(f"No metadata.json found in {metadata_path}")
 
-        with open(metadata_path, "r") as f:
-            metadata = Metadata(**json.load(f))
+            with open(metadata_path, "r") as f:
+                metadata = Metadata(**json.load(f))
+        else:
+            print("No metadata.json found.")
+            metadata = Metadata(module_path=url.split("/")[8:])
 
         self.__copy_package(metadata, output_dir, module_path_from_git)
 
@@ -110,9 +108,8 @@ class PackageManager:
 
         dest_path = self.__get_destination_path(metadata)
         src_path = os.path.join(
-            output_dir, *module_path_from_git[:1], *metadata.module_path
+            output_dir, *module_path_from_git, *metadata.module_path
         )
-
         while os.path.exists(dest_path):
             cmd = input(
                 "Package already exists, options: [o]verwrite, [c]ancel, [r]ename: "
@@ -169,7 +166,6 @@ class PackageManager:
                 with open(init_path, "w") as f:
                     f.write("")
 
-        # ipdb.set_trace()
         #
         #
 
@@ -185,7 +181,6 @@ class PackageManager:
         path = self.__find_save_metadata_path(metadata)
 
         # assert os.path.exists(path), "metadata.json not found"
-        # ipdb.set_trace()
         with open(path, "w") as f:
             json.dump(metadata.to_dict(), f, indent=4)
 
