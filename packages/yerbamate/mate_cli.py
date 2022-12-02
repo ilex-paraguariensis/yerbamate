@@ -46,8 +46,8 @@ def prettify_method(method_name, annotation, in_depth: bool = False):
 
 
 def print_help(methods):
-    for method_name, annotation in methods.keys():
-        print(prettify_method(method_name, annotation) + "\n")
+    for method_name, annotation in methods.items():
+        print(prettify_method(method_name, annotation))
 
 
 def convert_str_to_data(input):
@@ -103,7 +103,6 @@ def main():
                     method_args_types, method_args_defaults, raw_method_args
                 )
             )
-
             if action == "init":
                 Mate.init(*method_args)
             else:

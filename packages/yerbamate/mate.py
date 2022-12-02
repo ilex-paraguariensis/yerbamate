@@ -1,41 +1,25 @@
 import os
-from yerbamate.api.data.sources.local import io
 import json
-from yerbamate.api.mate_api import MateAPI
-
-import sys
-
-from .trainers.trainer import Trainer
-import ipdb
+from .mate_api import MateAPI
 from .utils import utils
-
-
 from typing import Optional
-
 from .mate_config import MateConfig
 from .mateboard.mateboard import MateBoard
 
 
 class Mate:
-    @staticmethod
-    def init(project_name: str):
-        # should actually be a package install
-        pass
-
-    def __init__(self, init=False):
-        self.root_folder = ""
+    def __init__(self):
         self.save_path = ""
         self.current_folder = os.path.dirname(__file__)
-        self.config: Optional[MateConfig] = None
-        self.__findroot()
-        self.models = self.__list_packages("models")
+        self.api = MateAPI()
+        # self.models = self.__list_packages("models")
         self.is_restart = False
         self.run_params = None
         self.custom_save_path = None
-        self.trainer: Optional[Trainer] = None
-        assert self.config is not None
-        self.api = MateAPI(self.config)
-        # ipdb.set_trace()
+
+    @staticmethod
+    def init(project_name: str):
+        MateAPI.init(project_name)
 
     def create(self, path: str):
         pass
@@ -46,11 +30,7 @@ class Mate:
     def list(
         self, module_name: str, query: Optional[str] = None, output_json: bool = True
     ):
-        li = self.api.list(module_name, query)
-        if output_json:
-            print(json.dumps(li, indent=4))
-        else:
-            print(li)
+        print(self.api.project[module_name])
 
     def summary(self, output_json: bool = True):
         print(json.dumps(self.api.summary(), indent=4))
@@ -62,9 +42,7 @@ class Mate:
         pass
 
     def train(self, experiment_name: str = "default"):
-
-        self.api.select_experiment(experiment_name)
-        self.api.train()
+        self.api.train(experiment_name=experiment_name)
 
     def metadata(
         self,
@@ -129,44 +107,14 @@ class Mate:
 
         self.api.start_mateboard()
 
-    def __list_packages(self, folder: str):
-        return io.list_packages(self.root_folder, folder)
+    # def __list_packages(self, folder: str):
+    #     return io.list_packages(self.root_folder, folder)
 
-    def __update_mate_version(self):
-        utils.migrate_mate_version(self.config, self.root_folder)
+    # def __update_mate_version(self):
+    #     utils.migrate_mate_version(self.config, self.root_folder)
 
-    def __findroot(self):
-        """
-        Method in charge of finding the root folder of the project and reading the content of mate.json
-        """
-        self.root_folder, self.config = io.find_root()
-        self.root_save_folder = self.config.results_folder
-
-    def __get_trainer(self, params: str):
-        if self.trainer is None:
-
-            conf, save_path = self.package_manager.load_experiment(params)
-
-            print(conf)
-
-            map_key_value = {
-                "save_path": self.save_path,
-                "save_dir": self.save_path,
-            }
-            root_module = f"{self.root_folder}"
-
-            self.trainer = Trainer.create(conf, root_module, map_key_value)
-
-        return self.trainer
-
-    def __fit(self, params: str):
-
-        trainer = self.__get_trainer(params)
-
-        self.__parse_and_validate_params(params)
-
-        if self.is_restart:
-            checkpoint_path = os.path.join(self.save_path, "checkpoints", "last.ckpt")
-            trainer.fit(ckpt_path=checkpoint_path)
-        else:
-            trainer.fit()
+    # def __findroot(self):
+    #     """
+    #     Method in charge of finding the root folder of the project and reading the content of mate.json
+    #     """
+    #     self.root_save_folder = self.config.results_folder

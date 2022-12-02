@@ -2,11 +2,10 @@ import os
 import ipdb
 from ...utils.bunch import Bunch
 import json
-from ...backbone_type import BackboneType
 
 
 class ProjectParser:
-    def __init__(self, backbone: BackboneType):
+    def __init__(self, backbone):
         self.backbone = backbone
         # loads the correct template (which is in json format) from the backbone_templates folder
 

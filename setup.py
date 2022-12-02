@@ -1,19 +1,5 @@
 from setuptools import setup, find_packages
 
-"""
-setup(
-    name="yerbamate",
-    version="0.3.2",
-    license="MIT",
-    author="Giulio Zani, Ali Rahimi",
-    author_email="giulio.zani@gmail.com",
-    scripts=["src/run.py"],
-    packages=["src/yerbamate", "mate"],
-    url="https://github.com/giuliozani/mate",
-    keywords="deep_learning machine_learning package_manager",
-    install_requires=["torch", "pytorch_lightning", "numpy",],
-)
-"""
 setup(
     name="yerbamate",
     description="A cowsay clone for python in one file.",

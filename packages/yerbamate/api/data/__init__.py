@@ -1,1 +1,1 @@
-from .package import Package
+from .local import LocalDataSource

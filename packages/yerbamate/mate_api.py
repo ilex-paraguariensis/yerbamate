@@ -1,0 +1,114 @@
+import os
+import sys
+import json
+from yerbamate.mate_config import MateConfig
+from .runtime import MateRuntime
+from yerbamate.utils.bunch import Bunch
+
+# from .data.package_repository import PackageRepository
+from typing import Optional, Union
+import ipdb
+from . import io
+from .project import MateProject
+
+"""
+MATE API
+
+"""
+
+
+class MateAPI:
+    def __init__(self):
+        root, config = io.find_root()
+        self.project = MateProject(root)
+        self.config: MateConfig = config
+        self.save_dir: str = root
+        self.checkpoint_path: Optional[str] = None
+        self.mate_dir: str = ".mate"
+        if not os.path.exists(self.mate_dir):
+            os.makedirs(".mate")
+
+    @staticmethod
+    def init(project_name: str):
+        assert not os.path.exists(project_name), "Project directory exists"
+        if os.path.exists(".mate"):
+            os.system("rm -rf .mate")
+            os.makedirs(".mate")
+        os.system(
+            f"git clone https://github.com/ilex-paraguariensis/deeplearning-project-template .mate"
+        )
+        os.system(f"mv {os.path.join('.mate', 'my-project')} {project_name}")
+        os.system(f"mv {os.path.join('.mate', 'mate.json')} .")
+        os.system(f"rm -rf .mate")
+        with open("mate.json", "r") as f:
+            config = json.load(f)
+        config["project"] = project_name
+        with open("mate.json", "w") as f:
+            json.dump(config, f, indent=4)
+
+    def generate_metadata(self, rewrite: bool = False):
+        return self.repository.metadata_generator.generate(rewrite)
+
+    def init_project(self, project_name: str):
+        self.project.init(project_name)
+
+    def install_url(self, url: str):
+        self.repository.install_url(url)
+
+    def train(self, experiment_name: str = "default"):
+        assert (
+            experiment_name in self.project.experiments
+        ), f"Experiment:{experiment_name} not found"
+        runtime = MateRuntime(
+            command="train",
+            runtime_save_path=os.path.join(self.mate_dir, "runtime.json"),
+        )
+        runtime.save()
+        os.system(f"python -m {self.project.experiments[experiment_name]}")
+
+    def restart(self):
+        # TODO, this should be in the trainer
+
+        pass
+
+    def test(self):
+        # TODO, this should be in the trainer
+        self.init_trainer()
+        self.validate_params()
+        assert self.trainer is not None
+        self.trainer.execute("test")
+
+    def sample(self):
+        # TODO, this should be in the trainer if its a generative model
+        pass
+
+        """
+    These probably should be in the trainer
+    """
+
+    def set_checkpoint_path(self):
+        assert self.exp and self.save_dir, "You must select an experiment first"
+        checkpoint_path = os.path.join(self.save_dir, "checkpoints")
+        if not os.path.exists(checkpoint_path):
+            os.makedirs(checkpoint_path)
+        self.checkpoint_path = checkpoint_path
+
+    def delete_checkpoints(self):
+        assert self.checkpoint_path is not None
+        checkpoints = [
+            os.path.join(self.checkpoint_path, p)
+            for p in os.listdir(self.checkpoint_path)
+        ]
+
+        action = "go"
+        if len(checkpoints) > 0:
+            while action not in ("y", "n", ""):
+                action = input(
+                    "Checkpiont file exists. Re-training will erase it. Continue? ([y]/n)\n"
+                )
+            if action in ("y", "", "Y"):
+                for checkpoint in checkpoints:
+                    os.remove(checkpoint)  # remove all checkpoint files
+            else:
+                print("Ok, exiting.")
+                return

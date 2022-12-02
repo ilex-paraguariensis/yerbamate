@@ -1,6 +1,4 @@
-from .api.data.metadata.metadata import BaseMetadata, Metadata
-from .utils.bunch import Bunch
-from .backbone_type import BackboneType
+# from .api.data.metadata.metadata import BaseMetadata, Metadata
 from enum import Enum
 from typing import Any
 import json
@@ -8,13 +6,21 @@ import ipdb
 
 
 class Config:
-    def __init__(self, config: Bunch):
-
-        if "metadata" in config:
-            config["metadata"] = Metadata(
-                **config["metadata"], root_module=config.get("project", "")
-            )
-
+    def __init__(self, config: dict | str | None = None):
+        if isinstance(config, str):
+            try:
+                with open(config, "r") as f:
+                    config = json.load(f)
+            except Exception as e:
+                print(f"Could not parse config: {config}")
+                raise e
+        elif config is None:
+            config = {}
+        # if "metadata" in config:
+        #     config["metadata"] = Metadata(
+        #         **config["metadata"], root_module=config.get("project", "")
+        #     )
+        assert isinstance(config, dict)
         for key, value in self.__dict__.items():
             if value != None and value != {}:
                 # Why assert when we can just set the default value?
@@ -72,9 +78,9 @@ class MateConfig(Config):
         # self.backbone: BackboneType = BackboneType.lightning
         self.override_params: dict[str, Any] = {}
         self.restarting = False
-        self.metadata: BaseMetadata = BaseMetadata(
-            root_module=config.get("project", "")
-        )
+        # self.metadata: BaseMetadata = BaseMetadata(
+        #     root_module=config.get("project", "")
+        # )
         super().__init__(config)
 
     def save(self, path="mate.json"):

@@ -1,0 +1,2 @@
+- metadata not in mate.json
+- smallerr codebase

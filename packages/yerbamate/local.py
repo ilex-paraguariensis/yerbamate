@@ -2,17 +2,18 @@ import json
 import sys
 from yerbamate.mate_config import MateConfig
 from yerbamate.utils.bunch import Bunch
-from ..source import DataSource
+
+# from ..source import DataSource
 from glob import glob
 import os
 from typing import Optional
 import ipdb
-from ....project_parser.project_parser import ProjectParser
-from ..local import io
+from ..project_parser.project_parser import ProjectParser
+from . import io
 from typing import Any
 
 
-class LocalDataSource(DataSource):
+class LocalDataSource:
     def __init__(
         self,
         config: MateConfig,

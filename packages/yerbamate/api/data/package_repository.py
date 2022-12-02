@@ -21,14 +21,14 @@ class PackageRepository:
         self.package_manager = PackageManager(config)
         self.remote = RemoteDataSource()
         self.local = LocalDataSource(config)
-        self.metadata_generator = MetadataGenerator(
-            config.project, config.metadata, self.local
-        )
-        if run_local_api_server:
-            self.local_server = LocalServer(self.metadata_generator, self.local)
-
+        # self.metadata_generator = MetadataGenerator(
+        #     config.project, config.metadata, self.local
+        # )
+        # if run_local_api_server:
+        #     self.local_server = LocalServer(self.metadata_generator, self.local)
+        #
         # TODO: we should refresh the metadata every time we run a command
-        self.generate_metadata()
+        # self.generate_metadata()
         self.metadata: Optional[dict] = None
 
     def install_url(self, url: str):
@@ -42,7 +42,7 @@ class PackageRepository:
         base_meta["exports"] = self.__export_metadata()
         base_meta["dependencies"] = self.__generate_pip_requirements()
         base_meta["experiments"] = self.local.list("experiments")
-        self.config.metadata = base_meta
+        # self.config.metadata = base_meta
         self.config.save()
 
     def __export_metadata(self):
