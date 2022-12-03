@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+from texttable import Texttable
 from yerbamate.mate_config import MateConfig
 from .runtime import MateRuntime
 from yerbamate.utils.bunch import Bunch
@@ -58,11 +59,30 @@ class MateAPI:
         ]
         all_results = []
         for folder in results_folders:
-            results = glob.glob(os.path.join(folder, "results.json"))
+            results = glob.glob(os.path.join(folder, "result.json"))
             if len(results) > 0:
                 with open(results[0], "r") as f:
-                    all_results.append(json.load(f))
-        print(json.dumps(all_results, indent=4))
+                    all_results.append(
+                        json.load(f) | {"experiment": folder.split(os.sep)[-1]}
+                    )
+        # collect all the keys contained in all_results dictionaries
+        keys = set()
+        for result in all_results:
+            keys.update(result.keys())
+        keys = list(keys)
+        keys.remove("experiment")
+        keys = ["experiment"] + keys
+        # create a table with the keys as columns
+        table = []
+        for result in all_results:
+            row = []
+            for key in keys:
+                row.append(result.get(key, ""))
+            table.append(row)
+        t = Texttable()
+        t.add_rows([keys] + table)
+        print(t.draw())
+        # print(json.dumps(all_results, indent=4))
 
     def generate_metadata(self, rewrite: bool = False):
         return self.repository.metadata_generator.generate(rewrite)
@@ -110,7 +130,6 @@ class MateAPI:
     def sample(self):
         # TODO, this should be in the trainer if its a generative model
         pass
-
 
     def set_checkpoint_path(self):
         assert self.exp and self.save_dir, "You must select an experiment first"

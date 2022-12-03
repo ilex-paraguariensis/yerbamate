@@ -7,8 +7,7 @@ is_test: bool = False
 is_restart: bool = False
 checkpoint_path: str = ""
 default_checkpoint_location = ""
-results_folder: str = ""
-
+save_dir: str = ""
 
 
 def __main():
@@ -18,6 +17,7 @@ def __main():
         __runtime = __json.load(f)
     for key, val in __runtime.items():
         print(f"Setting {key} to {val}")
+        assert key in globals(), f"Key '{key}' not found in globals"
         globals()[key] = val
 
 
@@ -27,8 +27,9 @@ is_train = command == "train"
 is_test = command == "test"
 is_restart = command == "restart"
 
+
 def result(values: dict[str, float | int]):
-    result_path = __os.path.join(results_folder, "result.json")
+    result_path = __os.path.join(save_dir, "result.json")
     result = {}
     if __os.path.exists(result_path):
         with open(result_path, "r") as f:
@@ -38,5 +39,3 @@ def result(values: dict[str, float | int]):
         __json.dump(result, f)
     print(f"Result: {__json.dumps(result, indent=4)}")
     print(f"Result saved to {result_path}")
-
-
