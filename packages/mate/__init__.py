@@ -7,11 +7,11 @@ is_test: bool = False
 is_restart: bool = False
 checkpoint_path: str = ""
 default_checkpoint_location = ""
-save_path: str = ""
+results_folder: str = ""
 
 
 def result(values: dict[str, float | int]):
-    result_path = __os.path.join(save_path, "result.json")
+    result_path = __os.path.join(results_folder, "result.json")
     result = {}
     if __os.path.exists(result_path):
         with open(result_path, "r") as f:
