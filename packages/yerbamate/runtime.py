@@ -5,7 +5,7 @@ import ipdb
 
 class MateRuntime:
     def to_dict(self):
-        return {k: v for k, v in self.__dict__.items() if not k.startswith("__")}
+        return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
 
     def save(self):
         with open(self.__runtime_save_path, "w") as f:
