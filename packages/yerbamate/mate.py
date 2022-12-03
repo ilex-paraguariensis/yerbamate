@@ -22,13 +22,13 @@ class Mate:
     def remove(self, target: str):
         self.api.remove(target)
 
+    def summary(self):
+        self.api.summary()
+
     def list(
         self, module_name: str, query: Optional[str] = None, output_json: bool = True
     ):
         print(self.api.project[module_name])
-
-    def summary(self, output_json: bool = True):
-        print(json.dumps(self.api.summary(), indent=4))
 
     def clone(self, source_model: str, target_model: str):
         self.api.clone(source_model, target_model)
