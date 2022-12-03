@@ -48,6 +48,7 @@ class MateAPI:
             json.dump(config, f, indent=4)
 
     def summary(self):
+
         import glob
 
         results_folders = [
@@ -110,9 +111,6 @@ class MateAPI:
         # TODO, this should be in the trainer if its a generative model
         pass
 
-        """
-    These probably should be in the trainer
-    """
 
     def set_checkpoint_path(self):
         assert self.exp and self.save_dir, "You must select an experiment first"
