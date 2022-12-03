@@ -72,6 +72,12 @@ class MateConfig(Config):
         self.verbose = False
         super().__init__(config)
 
+    def __str__(self):
+        return "MateConfig:" + super().__str__()
+
+    def __repr__(self):
+        return self.__str__()
+
     def save(self, path="mate.json"):
 
         with open(path, "w") as f:

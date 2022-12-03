@@ -12,7 +12,7 @@ class MateRuntime:
             json.dump(self.to_dict(), f)
 
     def __str__(self):
-        return json.dumps(self.to_dict(), indent=4)
+        return "MateRuntime:" + json.dumps(self.to_dict(), indent=4)
 
     def __repr__(self):
         return self.__str__()
