@@ -19,6 +19,7 @@ def result(values: dict[str, float | int]):
     result = result | values
     with open(result_path, "w") as f:
         __json.dump(result, f)
+    print(f"Result: {__json.dumps(result,index=4)}")
 
 
 def __main():

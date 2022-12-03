@@ -44,6 +44,22 @@ class MateAPI:
         with open("mate.json", "w") as f:
             json.dump(config, f, indent=4)
 
+    def summary(self):
+        import glob
+
+        results_folders = [
+            folder
+            for folder in glob.glob(os.path.join(self.config.results_folder, "*"))
+            if os.path.isdir(folder)
+        ]
+        all_results = []
+        for folder in results_folders:
+            results = glob.glob(os.path.join(folder, "results.json"))
+            if len(results) > 0:
+                with open(results[0], "r") as f:
+                    all_results.append(json.load(f))
+        print(json.dumps(all_results, indent=4))
+
     def generate_metadata(self, rewrite: bool = False):
         return self.repository.metadata_generator.generate(rewrite)
 
@@ -102,6 +118,9 @@ class MateAPI:
         if not os.path.exists(checkpoint_path):
             os.makedirs(checkpoint_path)
         self.checkpoint_path = checkpoint_path
+
+    def remove(self, target: str):
+        self.project.remove(target)
 
     def delete_checkpoints(self):
         assert self.checkpoint_path is not None

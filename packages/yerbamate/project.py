@@ -140,6 +140,16 @@ class MateProject(Module):
         ), f"Path {full_target_path} already exists. Try with a different name?"
         os.system(f"cp -r {full_source_path} {full_target_path}")
 
+    def remove(self, target:str):
+        assert isinstance(target, str)
+        full_target_path = os.path.join(self._root_dir, target.replace(".", os.sep))
+        if target.startswith("experiments"):
+            full_target_path += ".py"
+        assert os.path.exists(
+            full_target_path
+        ), f"Invalid path {target} (full path: {full_target_path})"
+        os.system(f"rm -r {full_target_path}")
+
     def create(self, path: str, name: str):
         assert isinstance(path, str)
         assert isinstance(name, str)
