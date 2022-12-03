@@ -26,6 +26,9 @@ class MateAPI:
         if not os.path.exists(self.mate_dir):
             os.makedirs(".mate")
 
+        if self.config.verbose:
+            print(self.config)
+
     @staticmethod
     def init(project_name: str):
         assert not os.path.exists(project_name), "Project directory exists"
@@ -63,9 +66,6 @@ class MateAPI:
     def generate_metadata(self, rewrite: bool = False):
         return self.repository.metadata_generator.generate(rewrite)
 
-    def init_project(self, project_name: str):
-        self.project.init(project_name)
-
     def install_url(self, url: str):
         self.repository.install_url(url)
 
@@ -87,6 +87,8 @@ class MateAPI:
             runtime_save_path=os.path.join(self.mate_dir, "runtime.json"),
         )
         runtime.save()
+        if self.config.verbose:
+            print(runtime)
         os.system(f"python -m {self.project.experiments[experiment_name]}")
 
     def clone(self, source: str, destination: str):

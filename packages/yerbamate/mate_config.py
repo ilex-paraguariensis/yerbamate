@@ -22,10 +22,8 @@ class Config:
         #     )
         assert isinstance(config, dict)
         for key, value in self.__dict__.items():
-            if value != None and value != {}:
-                # Why assert when we can just set the default value?
-                setattr(self, key, value)
-                # assert key in config, f"Missing key {key} in config"
+            if value is not None and value != {} and value != False:
+                assert key in config, f"Missing key:'{key}' in config"
             if isinstance(value, Enum):
                 enum_type = type(value)
                 assert (
@@ -36,16 +34,12 @@ class Config:
                 assert isinstance(config[key], type(value)), f"Wrong type for key {key}"
                 setattr(self, key, config[key])
 
-        # Disable this for now as its changing the config
-        # for key in config.keys():
-        #     assert key in self.__dict__.keys(), f"Unknown key {key} in config."
+        for key in config.keys():
+            assert key in self.__dict__.keys(), f"Unknown key {key} in config."
 
     def __str__(self):
         return json.dumps(
-            {
-                key: (val if not isinstance(val, Metadata) else val.to_dict())
-                for key, val in self.__dict__.items()
-            },
+            {key: val for key, val in self.__dict__.items()},
             indent=4,
         )
 
@@ -75,12 +69,8 @@ class MateConfig(Config):
         self.project = ""
         self.mate_version = ""
         self.results_folder = ""
-        # self.backbone: BackboneType = BackboneType.lightning
         self.override_params: dict[str, Any] = {}
-        self.restarting = False
-        # self.metadata: BaseMetadata = BaseMetadata(
-        #     root_module=config.get("project", "")
-        # )
+        self.verbose = False
         super().__init__(config)
 
     def save(self, path="mate.json"):

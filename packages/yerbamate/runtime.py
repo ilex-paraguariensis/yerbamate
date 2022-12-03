@@ -4,10 +4,18 @@ import ipdb
 
 
 class MateRuntime:
+    def to_dict(self):
+        return {k: v for k, v in self.__dict__.items() if not k.startswith("__")}
+
     def save(self):
-        data = {k: v for k, v in self.__dict__.items() if not k.startswith("__")}
         with open(self.__runtime_save_path, "w") as f:
-            json.dump(data, f)
+            json.dump(self.to_dict(), f)
+
+    def __str__(self):
+        return json.dumps(self.to_dict(), indent=4)
+
+    def __repr__(self):
+        return self.__str__()
 
     def __init__(
         self,
@@ -20,5 +28,7 @@ class MateRuntime:
         self.command = command
         self.checkpoint_path = checkpoint_path
         self.save_dir = save_dir
-        self.default_checkpoint_location = os.path.join(checkpoint_path, "checkpoint.ckpt")
+        self.default_checkpoint_location = os.path.join(
+            checkpoint_path, "checkpoint.ckpt"
+        )
         self.__runtime_save_path = runtime_save_path
