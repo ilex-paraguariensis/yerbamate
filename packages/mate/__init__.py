@@ -20,6 +20,7 @@ def result(values: dict[str, float | int]):
     with open(result_path, "w") as f:
         __json.dump(result, f)
     print(f"Result: {__json.dumps(result, indent=4)}")
+    print(f"Result saved to {result_path}")
 
 
 def __main():
