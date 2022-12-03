@@ -69,7 +69,6 @@ class MateConfig(Config):
         self.project = ""
         self.mate_version = ""
         self.results_folder = ""
-        self.override_params: dict[str, Any] = {}
         self.verbose = False
         super().__init__(config)
 
