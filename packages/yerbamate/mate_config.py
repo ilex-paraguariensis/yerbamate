@@ -28,7 +28,7 @@ class Config:
                 enum_type = type(value)
                 assert (
                     config[key] in enum_type.__members__.keys()
-                ), "Invalid value for key {key}, must be one of {enum_type.__members__.keys()}"
+                ), f"Invalid value for key {key}, must be one of {enum_type.__members__.keys()}"
                 config[key] = type(value)(config[key])
             if key in config:
                 assert isinstance(config[key], type(value)), f"Wrong type for key {key}"
