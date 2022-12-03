@@ -5,6 +5,20 @@ command: str = ""
 is_train: bool = False
 is_test: bool = False
 is_restart: bool = False
+checkpoint_path: str = ""
+default_checkpoint_location = ""
+save_path: str = ""
+
+
+def result(values: dict[str, float | int]):
+    result_path = __os.path.join(save_path, "result.json")
+    result = {}
+    if __os.path.exists(result_path):
+        with open(result_path, "r") as f:
+            result = __json.load(f)
+    result = result | values
+    with open(result_path, "w") as f:
+        __json.dump(result, f)
 
 
 def __main():
@@ -15,12 +29,9 @@ def __main():
     for key, val in __runtime.items():
         globals()[key] = val
 
+
 __main()
-if command == "train":
-    is_train = True
-elif command == "test":
-    is_test = True
-elif command == "restart":
-    is_restart = True
 
-
+is_train = command == "train"
+is_test = command == "test"
+is_restart = command == "restart"

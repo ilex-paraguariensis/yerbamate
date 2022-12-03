@@ -22,8 +22,6 @@ class MateAPI:
         root, config = io.find_root()
         self.project = MateProject(root)
         self.config: MateConfig = config
-        self.save_dir: str = root
-        self.checkpoint_path: Optional[str] = None
         self.mate_dir: str = ".mate"
         if not os.path.exists(self.mate_dir):
             os.makedirs(".mate")
@@ -55,16 +53,28 @@ class MateAPI:
     def install_url(self, url: str):
         self.repository.install_url(url)
 
+    def create(self, path: str, name: str):
+        self.project.create(path, name)
+
     def train(self, experiment_name: str = "default"):
         assert (
             experiment_name in self.project.experiments
         ), f"Experiment:{experiment_name} not found"
+        save_dir = os.path.join(self.config.results_folder, experiment_name)
+        checkpoint_path = os.path.join(save_dir, "checkpoints")
+        if not os.path.exists(checkpoint_path):
+            os.makedirs(checkpoint_path)
         runtime = MateRuntime(
             command="train",
+            save_dir=save_dir,
+            checkpoint_path=checkpoint_path,
             runtime_save_path=os.path.join(self.mate_dir, "runtime.json"),
         )
         runtime.save()
         os.system(f"python -m {self.project.experiments[experiment_name]}")
+
+    def clone(self, source: str, destination: str):
+        self.project.clone(source, destination)
 
     def restart(self):
         # TODO, this should be in the trainer

@@ -9,23 +9,18 @@ from .mateboard.mateboard import MateBoard
 
 class Mate:
     def __init__(self):
-        self.save_path = ""
         self.current_folder = os.path.dirname(__file__)
         self.api = MateAPI()
         # self.models = self.__list_packages("models")
         self.is_restart = False
         self.run_params = None
-        self.custom_save_path = None
 
     @staticmethod
     def init(project_name: str):
         MateAPI.init(project_name)
 
-    def create(self, path: str):
-        pass
-
-    def remove(self, model_name: str):
-        pass
+    def remove(self, target: str):
+        self.api.remove(target)
 
     def list(
         self, module_name: str, query: Optional[str] = None, output_json: bool = True
@@ -36,7 +31,10 @@ class Mate:
         print(json.dumps(self.api.summary(), indent=4))
 
     def clone(self, source_model: str, target_model: str):
-        pass
+        self.api.clone(source_model, target_model)
+
+    def create(self, path: str, name: str):
+        self.api.create(path, name)
 
     def snapshot(self, model_name: str):
         pass

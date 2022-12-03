@@ -120,6 +120,41 @@ class MateProject(Module):
         self.experiments = ExperimentsModule(os.path.join(root_dir, "experiments"))
         super().__init__(root_dir)
 
+    def clone(self, path: str, name: str):
+        assert isinstance(path, str)
+        assert isinstance(name, str)
+        assert "." in path, "path must be a valid python path (e.g. models.resnet)"
+        full_source_path = os.path.join(self._root_dir, path.replace(".", os.sep))
+        full_target_path = os.path.join(
+            self._root_dir, *path.split(".")[:-1], name.replace(".", os.sep)
+        )
+        if path.startswith("experiments"):
+            full_source_path += ".py"
+            full_target_path += ".py"
+
+        assert os.path.exists(
+            full_source_path
+        ), f"Invalid path {path} (full path: {full_source_path})"
+        assert not os.path.exists(
+            full_target_path
+        ), f"Path {full_target_path} already exists. Try with a different name?"
+        os.system(f"cp -r {full_source_path} {full_target_path}")
+
+    def create(self, path: str, name: str):
+        assert isinstance(path, str)
+        assert isinstance(name, str)
+        full_target_path = os.path.join(
+            self._root_dir, path.replace(".", os.sep), name.replace(".", os.sep)
+        )
+        assert not os.path.exists(
+            full_target_path
+        ), f"Path {full_target_path} already exists. Try with a different name?"
+        if not path == "experiments":
+            os.system(f"mkdir -p {full_target_path}")
+            os.system(f"touch {full_target_path}/__init__.py")
+        else:
+            os.system(f"touch {full_target_path}.py")
+
     def __getitem__(self, item):
         assert isinstance(item, str)
         assert item in self.__dict__, f"Invalid submodule {item}"
