@@ -54,35 +54,6 @@ def override_params(config: MateConfig, params: dict[str, Any]):
     return params
 
 
-def __get_experiment_path(
-    root_folder: str,
-    experiment_name: str,
-    path_types: tuple[str, ...] = ("json", "toml", "py"),
-):
-    assert os.path.exists(
-        os.path.join(root_folder, "experiments", experiment_name)
-    ), f"Could not find experiment {experiment_name} in {root_folder}"
-    paths = [
-        os.path.join(
-            root_folder, "experiments", experiment_name, f"experiment.{path_type}"
-        )
-        for path_type in path_types
-    ]
-    # toml must be 2 because it gets generated every time in all experiments
-    priority = {
-        "json": 0,
-        "toml": 2,
-        "py": 1,
-    }
-    valid_paths = [path for path in paths if os.path.exists(path)]
-    if len(valid_paths) == 0:
-        raise FileNotFoundError(
-            f"Could not find experiment {experiment_name} in {root_folder} (looked for {paths})"
-        )
-    valid_paths.sort(key=lambda path: priority[path.split(".")[-1]])
-    return valid_paths[0]
-
-
 def get_metadata_path(root_folder: str, experiment: str):
     path = os.path.join(root_folder, "experiments", experiment, "metadata.json")
     # os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -99,12 +70,6 @@ def save_toml(root_folder: str, experiment: str, toml: str):
     path = os.path.join(root_folder, "experiments", experiment, "experiment.toml")
     with open(path, "w") as f:
         f.write(toml)
-
-
-# def get_experiment_path(root_folder: str, experiment_name: str, type: str = "json"):
-#     path = __get_experiment_path(root_folder, experiment_name, type)
-#     return path
-#
 
 
 def get_experiment_base_module(root_folder: str, model_name: str, experiment: str):
@@ -165,42 +130,6 @@ def apply_env(root_folder: str, hparams: dict[str, Any]):
         # print(json.dumps(env, indent=4))
 
 
-def read_json(path):
-    try:
-        with open(path) as f:
-            return json.load(f)
-    except:
-        return None
-
-
-def read_experiments(
-    conf: MateConfig,
-    root_folder: str,
-    experiment: str = "default",
-    config_types: tuple[str, ...] = ("json", "toml", "py"),
-    run_params: dict | None = None,
-):
-    experiment_path = __get_experiment_path(root_folder, experiment, config_types)
-    assert experiment_path != None, f"Could not find the experiment {experiment}"
-
-    # from bombilla.bombilla_dag.bombilla_dag import BombillaDAG
-
-    if experiment_path.endswith(".py"):
-        hparams = BombillaDAG.python_file_to_dict(experiment_path)
-    elif experiment_path.endswith(".toml"):
-        raise NotImplementedError("Toml not implemented yet")
-    else:
-        with open(experiment_path) as f:
-            hparams = json.load(f)
-
-    hparams = override_params(conf, hparams)
-    hparams = override_run_params(hparams, run_params)
-
-    hparams = json.loads(json.dumps(hparams))
-
-    return hparams
-
-
 def override_run_params(hparams: dict[str, Any], run_params: dict):
 
     # parsed from mate {command} --param1=value1 --param2=value2
@@ -239,14 +168,15 @@ def find_root() -> tuple[str, MateConfig]:
     i = 0
     root_folder = ""
     config: Optional[MateConfig] = None
-    while not found and i < 6:
+    while not found:
 
         if os.path.exists(os.path.join(current_path, "mate.json")):
             conf_path = os.path.join(current_path, "mate.json")
             config = MateConfig(conf_path)
             assert config is not None, f"Error initializing mate config {conf_path}"
-            root_folder = config.project
+            root_folder = current_path
             found = True
+            os.chdir("..")
         else:
             os.chdir("..")
             current_path = os.getcwd()
@@ -256,6 +186,7 @@ def find_root() -> tuple[str, MateConfig]:
                     "Could not find mate.json. Please make sure you are in the root folder of the project."
                 )
     sys.path.insert(0, os.getcwd())
+    assert config is not None
     return root_folder, config
 
 

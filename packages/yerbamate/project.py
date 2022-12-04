@@ -2,11 +2,16 @@ import os
 import ipdb
 from rich import print
 
+
 class Module:
     def __init__(self, root_dir: str, optional=False):
         assert isinstance(root_dir, str)
         self._root_dir = root_dir
         self._name = os.path.basename(root_dir)
+        # checks that the name is python-friendly
+        assert (
+            self._name.isidentifier()
+        ), f"Module name {self._name} is not a valid python identifier. Please rename the module folder to something python friendly (no spaces, '-' or strange characters)"
         if os.path.exists(root_dir):
             assert os.path.isdir(root_dir), "root_dir must be a directory"
             assert os.path.isfile(
@@ -53,7 +58,7 @@ class ModulesDict(Module, dict):
                 self[os.path.basename(d)] = Module(d)
         else:
             if not optional:
-                print(f"WARNING: {root_dir} does not exist", 'yellow')
+                print(f"WARNING: {root_dir} does not exist", "yellow")
                 os.makedirs(root_dir)
                 with open(os.path.join(root_dir, "__init__.py"), "w") as f:
                     f.write("")
@@ -97,7 +102,9 @@ class ExperimentsModule(Module, dict):
     def __init__(self, root_dir: str):
         super().__init__(root_dir)
         for name in self.__list_experiments():
-            self[os.path.basename(name)[:-3]] = ".".join(name.split(os.sep))[:-3]
+            local_path = ".".join(name[:-3].split(os.sep)[-3:])
+            self[os.path.basename(name)[:-3]] = local_path
+
 
     def __list_experiments(self):
         assert all(
@@ -139,13 +146,19 @@ class MateProject(Module):
         # )
         self.experiments = ExperimentsModule(os.path.join(root_dir, "experiments"))
         super().__init__(root_dir)
+        self.__white_list = ["mate.json", ".mate"]
         self.check_no_additional_dirs()
-
 
     def check_no_additional_dirs(self):
         for name in os.listdir(self._root_dir):
-            if not name.startswith('__') and name not in self.__dict__:
-                raise ValueError(f"Found additional directory '{name}' in {self._root_dir}. Please remove it.")
+            if (
+                not name.startswith("__")
+                and (name not in self.__dict__)
+                and (name not in self.__white_list)
+            ):
+                raise ValueError(
+                    f"Found additional file or directory '{name}' in {self._root_dir}. Please remove it."
+                )
 
     def to_dict(self):
         return {
@@ -185,6 +198,9 @@ class MateProject(Module):
     def create(self, path: str, name: str):
         assert isinstance(path, str)
         assert isinstance(name, str)
+        assert (
+            name.isidentifier()
+        ), "name must be a valid python identifier. Please use snake_case"
         full_target_path = os.path.join(
             self._root_dir, path.replace(".", os.sep), name.replace(".", os.sep)
         )

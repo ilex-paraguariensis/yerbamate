@@ -4,6 +4,7 @@ import json
 from yerbamate.mate_config import MateConfig
 from .runtime import MateRuntime
 from yerbamate.utils.bunch import Bunch
+from .git_manager import GitManager
 
 # from .data.package_repository import PackageRepository
 from typing import Optional, Union
@@ -65,9 +66,9 @@ class MateAPI:
             experiment_name = folder.split(os.sep)[-1]
             if len(results) > 0:
                 with open(results[0], "r") as f:
-                    all_results[experiment_name] = (
-                        json.load(f) | {"experiment": experiment_name}
-                    )
+                    all_results[experiment_name] = json.load(f) | {
+                        "experiment": experiment_name
+                    }
         return all_results
 
     def to_tree(self) -> Tree:
@@ -89,7 +90,7 @@ class MateAPI:
                 text = Text(k2)
                 if k == "experiments":
                     if k2 in results:
-                        text += Text(f"☑", 'bold #00FF00')
+                        text += Text(f"☑", "bold #00FF00")
                 node.add(text)
 
         return tree
@@ -125,7 +126,7 @@ class MateAPI:
             for key in keys:
                 row.append(result.get(key, ""))
             table.append(row)
-        t = Table(title='Results', show_header=True, header_style="bold #00FF00")
+        t = Table(title="Results", show_header=True, header_style="bold #00FF00")
         for key in keys:
             t.add_column(key)
         for row in table:
@@ -135,8 +136,11 @@ class MateAPI:
     def generate_metadata(self, rewrite: bool = False):
         return self.repository.metadata_generator.generate(rewrite)
 
-    def install_url(self, url: str):
-        self.repository.install_url(url)
+    def install(self, url: str):
+        git = GitManager.from_url(self.project._name, url)
+        git.clone(os.path.join(self.mate_dir, "tmp"))
+        print(git)
+        ipdb.set_trace()
 
     def create(self, path: str, name: str):
         self.project.create(path, name)

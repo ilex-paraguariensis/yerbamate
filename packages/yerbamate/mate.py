@@ -98,7 +98,7 @@ class Mate:
         """
         Adds a dependency to a model.
         """
-        self.api.install_url(url)
+        self.api.install(url)
 
     def exec(self, model: str, params: str, exec_file: str):
         params = "parameters" if params == "" or params == "None" else params

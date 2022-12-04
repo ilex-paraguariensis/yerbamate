@@ -66,7 +66,6 @@ class Config:
 
 class MateConfig(Config):
     def __init__(self, config):
-        self.project = ""
         self.mate_version = ""
         self.results_folder = ""
         self.verbose = False
