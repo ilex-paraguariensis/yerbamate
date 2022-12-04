@@ -1,13 +1,16 @@
 import os
 import sys
 import json
-from texttable import Texttable
 from yerbamate.mate_config import MateConfig
 from .runtime import MateRuntime
 from yerbamate.utils.bunch import Bunch
 
 # from .data.package_repository import PackageRepository
 from typing import Optional, Union
+from rich import print
+from rich.tree import Tree
+from rich.text import Text
+from rich.table import Table
 import ipdb
 from . import io
 from .project import MateProject
@@ -48,7 +51,50 @@ class MateAPI:
         with open("mate.json", "w") as f:
             json.dump(config, f, indent=4)
 
-    def summary(self):
+    def __get_results_dict(self):
+        import glob
+
+        results_folders = [
+            folder
+            for folder in glob.glob(os.path.join(self.config.results_folder, "*"))
+            if os.path.isdir(folder)
+        ]
+        all_results = {}
+        for folder in results_folders:
+            results = glob.glob(os.path.join(folder, "result.json"))
+            experiment_name = folder.split(os.sep)[-1]
+            if len(results) > 0:
+                with open(results[0], "r") as f:
+                    all_results[experiment_name] = (
+                        json.load(f) | {"experiment": experiment_name}
+                    )
+        return all_results
+
+    def to_tree(self) -> Tree:
+        vals = self.project.to_dict()
+        # turns this nested dict into a rich tree
+        tree = Tree(Text(self.project._name, "underline"), style="bold #f00a36")
+        colours = {
+            "models": "#598c14",
+            "data_loaders": "#4a8594",
+            "trainers": "yellow",
+            "experiments": "#ff6908",
+        }
+        results = self.__get_results_dict()
+        for k, v in vals.items():
+            # add a node for the key using the funciton .add() removes the underline style
+            # and adds the matching color
+            node = tree.add(k, style=f"bold {colours[k]}")
+            for k2, _ in v.items():
+                text = Text(k2)
+                if k == "experiments":
+                    if k2 in results:
+                        text += Text(f"☑", 'bold #00FF00')
+                node.add(text)
+
+        return tree
+
+    def results(self):
 
         import glob
 
@@ -79,10 +125,12 @@ class MateAPI:
             for key in keys:
                 row.append(result.get(key, ""))
             table.append(row)
-        t = Texttable()
-        t.add_rows([keys] + table)
-        print(t.draw())
-        # print(json.dumps(all_results, indent=4))
+        t = Table(title='Results', show_header=True, header_style="bold #00FF00")
+        for key in keys:
+            t.add_column(key)
+        for row in table:
+            t.add_row(*[str(x) for x in row])
+        return t
 
     def generate_metadata(self, rewrite: bool = False):
         return self.repository.metadata_generator.generate(rewrite)

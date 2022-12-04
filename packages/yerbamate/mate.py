@@ -5,6 +5,7 @@ from .utils import utils
 from typing import Optional
 from .mate_config import MateConfig
 from .mateboard.mateboard import MateBoard
+from rich import print
 
 
 class Mate:
@@ -23,7 +24,12 @@ class Mate:
         self.api.remove(target)
 
     def summary(self):
-        self.api.summary()
+        #self.api.summary()
+        #print(self.api)
+        print(self.api.to_tree())
+
+    def results(self):
+        print(self.api.results())
 
     def list(
         self, module_name: str, query: Optional[str] = None, output_json: bool = True

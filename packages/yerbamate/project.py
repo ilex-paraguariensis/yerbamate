@@ -1,16 +1,19 @@
 import os
 import ipdb
-
+from rich import print
 
 class Module:
-    def __init__(self, root_dir: str):
+    def __init__(self, root_dir: str, optional=False):
         assert isinstance(root_dir, str)
         self._root_dir = root_dir
         self._name = os.path.basename(root_dir)
-        assert os.path.isdir(root_dir), "root_dir must be a directory"
-        assert os.path.isfile(
-            os.path.join(root_dir, "__init__.py")
-        ), "root_dir must be a python module"
+        if os.path.exists(root_dir):
+            assert os.path.isdir(root_dir), "root_dir must be a directory"
+            assert os.path.isfile(
+                os.path.join(root_dir, "__init__.py")
+            ), "root_dir must be a python module"
+        else:
+            assert optional, f"root_dir {root_dir} does not exist"
 
     def __eq__(self, other):
         assert isinstance(other, Module) or isinstance(other, str)
@@ -27,28 +30,34 @@ class Module:
 
 
 class ModulesDict(Module, dict):
-    def __init__(self, root_dir: str):
+    def __init__(self, root_dir: str, optional=False):
         # lists all the subdirectories and asserts that they are python modules
-        subdirs = [
-            os.path.join(root_dir, d)
-            for d in os.listdir(root_dir)
-            if os.path.isdir(os.path.join(root_dir, d)) and not d.startswith("_")
-        ]
-        assert all(
-            os.path.isfile(os.path.join(d, "__init__.py")) for d in subdirs
-        ), "root_dir must be a python module"
-        # checks that there are no files in the root directory (except __init__.py)
-        # prints an error message if there is one (containing the name of the file)
-        files = [
-            os.path.join(root_dir, f)
-            for f in os.listdir(root_dir)
-            if os.path.isfile(os.path.join(root_dir, f)) and f != "__init__.py"
-        ]
-        if len(files) > 0:
-            print(f"ERROR: found file in {root_dir}: {files}")
+        if os.path.exists(root_dir):
+            subdirs = [
+                os.path.join(root_dir, d)
+                for d in os.listdir(root_dir)
+                if os.path.isdir(os.path.join(root_dir, d)) and not d.startswith("_")
+            ]
+            assert all(
+                os.path.isfile(os.path.join(d, "__init__.py")) for d in subdirs
+            ), "root_dir must be a python module"
+            files = [
+                os.path.join(root_dir, f)
+                for f in os.listdir(root_dir)
+                if os.path.isfile(os.path.join(root_dir, f)) and f != "__init__.py"
+            ]
+            if len(files) > 0:
+                print(f"ERROR: found file in {root_dir}: {files}")
 
-        for d in subdirs:
-            self[os.path.basename(d)] = Module(d)
+            for d in subdirs:
+                self[os.path.basename(d)] = Module(d)
+        else:
+            if not optional:
+                print(f"WARNING: {root_dir} does not exist", 'yellow')
+                os.makedirs(root_dir)
+                with open(os.path.join(root_dir, "__init__.py"), "w") as f:
+                    f.write("")
+                print(f"Created {root_dir}")
         super().__init__(root_dir)
 
     def __str__(self):
@@ -56,6 +65,12 @@ class ModulesDict(Module, dict):
 
     def __repr__(self):
         return self.__str__()
+
+    def to_dict(self):
+        return {
+            k: v.to_dict() if isinstance(v, ModulesDict) else v._name
+            for k, v in self.items()
+        }
 
 
 class NestedModule(ModulesDict):
@@ -107,18 +122,35 @@ class ExperimentsModule(Module, dict):
     def __repr__(self):
         return self.__str__()
 
+    def to_dict(self):
+        return {k: "" for k, _ in self.items()}
+
 
 class MateProject(Module):
     def __init__(self, root_dir: str):
         self.models = ModulesDict(os.path.join(root_dir, "models"))
-        self.trainers = NestedModule(
-            os.path.join(root_dir, "trainers"), ("trainers", "metrics")
-        )
-        self.data = NestedModule(
-            os.path.join(root_dir, "data"), ("loaders", "preprocessing")
-        )
+        self.data_loaders = ModulesDict(os.path.join(root_dir, "data_loaders"))
+        self.trainers = ModulesDict(os.path.join(root_dir, "trainers"), optional=True)
+        # self.trainers = NestedModule(
+        #     os.path.join(root_dir, "trainers"), ("trainers", "metrics")
+        # )
+        # self.data = NestedModule(
+        #     os.path.join(root_dir, "data"), ("loaders", "preprocessing")
+        # )
         self.experiments = ExperimentsModule(os.path.join(root_dir, "experiments"))
         super().__init__(root_dir)
+        self.check_no_additional_dirs()
+
+
+    def check_no_additional_dirs(self):
+        for name in os.listdir(self._root_dir):
+            if not name.startswith('__') and name not in self.__dict__:
+                raise ValueError(f"Found additional directory '{name}' in {self._root_dir}. Please remove it.")
+
+    def to_dict(self):
+        return {
+            k: v.to_dict() for k, v in self.__dict__.items() if not k.startswith("_")
+        }
 
     def clone(self, path: str, name: str):
         assert isinstance(path, str)
@@ -140,7 +172,7 @@ class MateProject(Module):
         ), f"Path {full_target_path} already exists. Try with a different name?"
         os.system(f"cp -r {full_source_path} {full_target_path}")
 
-    def remove(self, target:str):
+    def remove(self, target: str):
         assert isinstance(target, str)
         full_target_path = os.path.join(self._root_dir, target.replace(".", os.sep))
         if target.startswith("experiments"):
