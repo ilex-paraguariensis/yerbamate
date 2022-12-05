@@ -105,7 +105,6 @@ class ExperimentsModule(Module, dict):
             local_path = ".".join(name[:-3].split(os.sep)[-3:])
             self[os.path.basename(name)[:-3]] = local_path
 
-
     def __list_experiments(self):
         assert all(
             os.path.isfile(os.path.join(self._root_dir, name))
@@ -194,6 +193,28 @@ class MateProject(Module):
             full_target_path
         ), f"Invalid path {target} (full path: {full_target_path})"
         os.system(f"rm -r {full_target_path}")
+
+    def rename(self, source: str, destination: str):
+        assert isinstance(source, str)
+        assert isinstance(destination, str)
+        assert (
+            "." in source
+        ), "source must be a valid python path (e.g. models.resnet) and cannot be a root directory"
+        full_source_path = os.path.join(self._root_dir, source.replace(".", os.sep))
+        full_destination_path = os.path.join(
+            self._root_dir, *source.split(".")[:-1], destination.replace(".", os.sep)
+        )
+        if source.startswith("experiments"):
+            full_source_path += ".py"
+            full_destination_path += ".py"
+
+        assert os.path.exists(
+            full_source_path
+        ), f"Invalid path {source} (full path: {full_source_path})"
+        assert not os.path.exists(
+            full_destination_path
+        ), f"Path {full_destination_path} already exists. Try with a different name?"
+        os.system(f"mv {full_source_path} {full_destination_path}")
 
     def create(self, path: str, name: str):
         assert isinstance(path, str)

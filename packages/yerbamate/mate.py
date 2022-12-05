@@ -24,8 +24,8 @@ class Mate:
         self.api.remove(target)
 
     def summary(self):
-        #self.api.summary()
-        #print(self.api)
+        # self.api.summary()
+        # print(self.api)
         print(self.api.to_tree())
 
     def results(self):
@@ -47,6 +47,9 @@ class Mate:
 
     def train(self, experiment_name: str = "default"):
         self.api.train(experiment_name=experiment_name)
+
+    def rename(self, path: str, name: str):
+        self.api.rename(path, name)
 
     def metadata(
         self,

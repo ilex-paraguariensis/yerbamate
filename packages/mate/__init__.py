@@ -16,7 +16,6 @@ def __main():
     with open(runtime_filename, "r") as f:
         __runtime = __json.load(f)
     for key, val in __runtime.items():
-        print(f"Setting {key} to {val}")
         assert key in globals(), f"Key '{key}' not found in globals"
         globals()[key] = val
 

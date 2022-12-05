@@ -136,11 +136,13 @@ class MateAPI:
     def generate_metadata(self, rewrite: bool = False):
         return self.repository.metadata_generator.generate(rewrite)
 
+    def rename(self, target: str, destination: str):
+        self.project.rename(target, destination)
+
     def install(self, url: str):
         git = GitManager.from_url(self.project._name, url)
         git.clone(os.path.join(self.mate_dir, "tmp"))
         print(git)
-        ipdb.set_trace()
 
     def create(self, path: str, name: str):
         self.project.create(path, name)

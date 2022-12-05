@@ -48,7 +48,8 @@ class GitManager:
 
     def clone(self, tmp_destination: str, destination: str | None = None):
         """Clone the repository"""
-
+        if os.path.exists(tmp_destination):
+            os.system(f"rm -rf {tmp_destination}")
         os.system(f"git clone {self.repo} -b {self.branch} {tmp_destination}")
         # look for mate.json inside the cloned repository
         mate_path = self.__look_for_mate(tmp_destination)
