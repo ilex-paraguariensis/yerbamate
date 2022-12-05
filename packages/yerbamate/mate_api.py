@@ -44,13 +44,7 @@ class MateAPI:
             f"git clone https://github.com/ilex-paraguariensis/deeplearning-project-template .mate"
         )
         os.system(f"mv {os.path.join('.mate', 'my-project')} {project_name}")
-        os.system(f"mv {os.path.join('.mate', 'mate.json')} .")
         os.system(f"rm -rf .mate")
-        with open("mate.json", "r") as f:
-            config = json.load(f)
-        config["project"] = project_name
-        with open("mate.json", "w") as f:
-            json.dump(config, f, indent=4)
 
     def __get_results_dict(self):
         import glob
