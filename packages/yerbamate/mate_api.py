@@ -174,12 +174,24 @@ class MateAPI:
 
         pass
 
-    def test(self):
-        # TODO, this should be in the trainer
-        self.init_trainer()
-        self.validate_params()
-        assert self.trainer is not None
-        self.trainer.execute("test")
+    def test(self, experiment_name: str):
+        assert (
+            experiment_name in self.project.experiments
+        ), f"Experiment:{experiment_name} not found"
+        save_dir = os.path.join(self.config.results_folder, experiment_name)
+        checkpoint_path = os.path.join(save_dir, "checkpoints")
+        if not os.path.exists(checkpoint_path):
+            os.makedirs(checkpoint_path)
+        runtime = MateRuntime(
+            command="test",
+            save_dir=save_dir,
+            checkpoint_path=checkpoint_path,
+            runtime_save_path=os.path.join(self.mate_dir, "runtime.json"),
+        )
+        runtime.save()
+        if self.config.verbose:
+            print(runtime)
+        os.system(f"python -m {self.project.experiments[experiment_name]}")
 
     def sample(self):
         # TODO, this should be in the trainer if its a generative model
