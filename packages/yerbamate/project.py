@@ -1,10 +1,13 @@
 import os
 import ipdb
 from rich import print
+from .console import console
+from .check_experiment import check_experiment
+import ast
 
 
 class Module:
-    def __init__(self, root_dir: str, optional=False):
+    def __init__(self, root_dir: str, optional=False, check_exports=False):
         assert isinstance(root_dir, str)
         self._root_dir = root_dir
         self._name = os.path.basename(root_dir)
@@ -16,9 +19,31 @@ class Module:
             assert os.path.isdir(root_dir), "root_dir must be a directory"
             assert os.path.isfile(
                 os.path.join(root_dir, "__init__.py")
-            ), "root_dir must be a python module"
+            ), f"{self.relative_path()} must be a python module.\n You should add an __init__.py and import the functions/classes you want to export from there."
         else:
             assert optional, f"root_dir {root_dir} does not exist"
+
+        self._exports = self.__collect_exports()
+        if check_exports and len(self._exports) == 0:
+            console.print(
+                f"[red]WARNING:[/red] [yellow]No exports found in {self.relative_path()}. Consider exporting with 'mate export <module>'[/yellow]"
+            )
+
+    def __collect_exports(self):
+        with open(os.path.join(self._root_dir, "__init__.py"), "r") as f:
+            tree = ast.parse(f.read())
+        exports = []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom):
+                assert (
+                    node.level == 1
+                ), f"Only relative imports are allowed in {self.relative_path()} (for shearability)."
+                exports.append(node.names[0].name)
+
+        return exports
+
+    def relative_path(self):
+        return ".".join(self._root_dir.replace(os.getcwd(), "").split(os.sep)[2:])
 
     def __eq__(self, other):
         assert isinstance(other, Module) or isinstance(other, str)
@@ -43,9 +68,9 @@ class ModulesDict(Module, dict):
                 for d in os.listdir(root_dir)
                 if os.path.isdir(os.path.join(root_dir, d)) and not d.startswith("_")
             ]
-            assert all(
-                os.path.isfile(os.path.join(d, "__init__.py")) for d in subdirs
-            ), "root_dir must be a python module"
+            # assert all(
+            #     os.path.isfile(os.path.join(d, "__init__.py")) for d in subdirs
+            # ), f"{d} must be a python module"
             files = [
                 os.path.join(root_dir, f)
                 for f in os.listdir(root_dir)
@@ -55,7 +80,7 @@ class ModulesDict(Module, dict):
                 print(f"ERROR: found file in {root_dir}: {files}")
 
             for d in subdirs:
-                self[os.path.basename(d)] = Module(d)
+                self[os.path.basename(d)] = Module(d, check_exports=True)
         else:
             if not optional:
                 print(f"WARNING: {root_dir} does not exist", "yellow")
@@ -104,6 +129,7 @@ class ExperimentsModule(Module, dict):
         for name in self.__list_experiments():
             local_path = ".".join(name[:-3].split(os.sep)[-3:])
             self[os.path.basename(name)[:-3]] = local_path
+            check_experiment(name)
 
     def __list_experiments(self):
         assert all(

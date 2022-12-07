@@ -51,6 +51,9 @@ class Mate:
     def rename(self, path: str, name: str):
         self.api.rename(path, name)
 
+    def export(self, source: str):
+        self.api.export(source)
+
     def metadata(
         self,
     ):

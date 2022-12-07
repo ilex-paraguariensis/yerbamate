@@ -3,15 +3,14 @@ import sys
 import json
 from yerbamate.mate_config import MateConfig
 from .runtime import MateRuntime
-from yerbamate.utils.bunch import Bunch
 from .git_manager import GitManager
 
 # from .data.package_repository import PackageRepository
-from typing import Optional, Union
 from rich import print
 from rich.tree import Tree
 from rich.text import Text
 from rich.table import Table
+from .console import console
 import ipdb
 from . import io
 from .project import MateProject
@@ -89,6 +88,30 @@ class MateAPI:
 
         return tree
 
+    def export(self, source: str):
+        assert isinstance(source, str), "Source must be a string"
+        assert "." in source, "Source must be a path"
+        module_root = os.path.join(
+            self.project._name, os.sep.join(source.split(".")[:2])
+        )
+        assert os.path.exists(
+            module_root
+        ), f"Module {module_root.replace(os.sep, '.')} does not exist"
+        target_file = os.path.join(module_root, "__init__.py")
+        relative_path = ".".join(source.split(".")[2:])
+        to_export = source.split(".")[-1]
+        import_statement = f"from .{relative_path} import {to_export}\n"
+        # checks that the import statement is not already in the file
+        with open(target_file, "r") as f:
+            if import_statement not in f.read():
+                with open(target_file, "a") as f:
+                    f.write(import_statement)
+                console.print(
+                    f"  ✅[green]Exported {to_export} from {source} to {target_file}[/green], ('{import_statement}')"
+                )
+            else:
+                print(f"{to_export} already exported, skipping.")
+
     def results(self):
 
         import glob
@@ -164,8 +187,6 @@ class MateAPI:
         self.project.clone(source, destination)
 
     def restart(self):
-        # TODO, this should be in the trainer
-
         pass
 
     def test(self, experiment_name: str):
