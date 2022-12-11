@@ -1,8 +1,10 @@
 import os
 import ipdb
 from rich import print
+from rich.tree import Tree
 from .console import console
-from .check_experiment import check_experiment
+from .experiment import Experiment
+from .mate_modules import colors, modules
 import ast
 
 
@@ -12,6 +14,7 @@ class Module:
         self._root_dir = root_dir
         self._name = os.path.basename(root_dir)
         # checks that the name is python-friendly
+        self.__errors = []
         assert (
             self._name.isidentifier()
         ), f"Module name {self._name} is not a valid python identifier. Please rename the module folder to something python friendly (no spaces, '-' or strange characters)"
@@ -25,20 +28,35 @@ class Module:
 
         self._exports = self.__collect_exports()
         if check_exports and len(self._exports) == 0:
-            console.print(
-                f"[red]WARNING:[/red] [yellow]No exports found in {self.relative_path()}. Consider exporting with 'mate export <module>'[/yellow]"
+            self.__errors.append(
+                f"No exports found in {self.relative_path()}. Consider exporting with 'mate export <module>'"
             )
 
-    def __collect_exports(self):
+    @property
+    def errors(self):
+        return self.__errors
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def exports(self):
+        return self._exports
+
+    def __collect_exports(self) -> dict[str, ast.ImportFrom]:
         with open(os.path.join(self._root_dir, "__init__.py"), "r") as f:
             tree = ast.parse(f.read())
-        exports = []
+        exports = {}
         for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom):
-                assert (
-                    node.level == 1
-                ), f"Only relative imports are allowed in {self.relative_path()} (for shearability)."
-                exports.append(node.names[0].name)
+                if not (node.level == 1):
+                    self.__errors.append(
+                        f"Only relative imports are allowed in {self.relative_path()} (for shearability)."
+                    )
+                # the module name is the key
+                # the value is the import node
+                exports[node.module] = node
 
         return exports
 
@@ -57,6 +75,24 @@ class Module:
 
     def __repr__(self):
         return f"Module(name={self._name})"
+
+    def __contains__(self, item):
+        return item in self.exports.keys()
+
+    def __getitem__(self, item):
+        assert isinstance(item, str)
+        assert not "." in item, ipdb.set_trace()  # "Cannot access submodules"
+        assert item in self, f"{item} not found in {self.relative_path()}"
+        return self._exports[item]
+
+    def to_tree(self):
+        parent = self.relative_path().split(".")[0]
+        tree = Tree(parent, style=f"bold underline {modules[parent].color}")
+        node = tree.add(self.name)
+        val = self.exports
+        for v in val.values():
+            node.add(v.names[0].name)
+        return tree
 
 
 class ModulesDict(Module, dict):
@@ -77,7 +113,10 @@ class ModulesDict(Module, dict):
                 if os.path.isfile(os.path.join(root_dir, f)) and f != "__init__.py"
             ]
             if len(files) > 0:
-                print(f"ERROR: found file in {root_dir}: {files}")
+                console.print(
+                    f"[{colors.error} bold]ERROR[/{colors.error} bold]: [yellow]found file(s) in {root_dir}: \n\t{files}[yellow]\nPlease move them to a subfolder or delete them."
+                )
+                exit(1)
 
             for d in subdirs:
                 self[os.path.basename(d)] = Module(d, check_exports=True)
@@ -97,12 +136,20 @@ class ModulesDict(Module, dict):
         return self.__str__()
 
     def to_dict(self):
-        return {
-            k: v.to_dict() if isinstance(v, ModulesDict) else v._name
-            for k, v in self.items()
-        }
+        return {k: v for k, v in self.items()}
+
+    def __contains__(self, item: str):
+        return item in self.keys()
+
+    def __getitem__(self, item):
+        assert isinstance(item, str)
+        cur, *path = item.split(".")
+        assert cur in self, ipdb.set_trace()  # f"Invalid submodule '{self.name}.{cur}'"
+        selected = tuple((k, v) for k, v in self.items() if k == cur)[0][1]
+        return selected if (len(path) == 0) else selected[".".join(path)]
 
 
+"""
 class NestedModule(ModulesDict):
     def __init__(self, root_dir: str, submodule_names: tuple[str, ...]):
         super().__init__(root_dir)
@@ -121,15 +168,16 @@ class NestedModule(ModulesDict):
 
     def __repr__(self):
         return self.__str__()
+"""
 
 
 class ExperimentsModule(Module, dict):
     def __init__(self, root_dir: str):
         super().__init__(root_dir)
-        for name in self.__list_experiments():
-            local_path = ".".join(name[:-3].split(os.sep)[-3:])
-            self[os.path.basename(name)[:-3]] = local_path
-            check_experiment(name)
+        for path in self.__list_experiments():
+            # local_path = ".".join(name[:-3].split(os.sep)[-3:])
+            self[os.path.basename(path)[:-3]] = Experiment(path)  # local_path
+            # check_experiment(name)
 
     def __list_experiments(self):
         assert all(
@@ -155,7 +203,14 @@ class ExperimentsModule(Module, dict):
         return self.__str__()
 
     def to_dict(self):
-        return {k: "" for k, _ in self.items()}
+        return {k: e for k, e in self.items()}
+
+    def __getitem__(self, path: str):
+        assert isinstance(path, str)
+        assert not "." in path, "Experiments don't have submodules"
+        assert path in self.keys()
+        selected = tuple((k, v) for k, v in self.items() if k == path)[0][1]
+        return selected
 
 
 class MateProject(Module):
@@ -260,14 +315,18 @@ class MateProject(Module):
         else:
             os.system(f"touch {full_target_path}.py")
 
-    def __getitem__(self, item):
-        assert isinstance(item, str)
-        assert item in self.__dict__, f"Invalid submodule {item}"
-        return getattr(self, item)
-
     def __str__(self):
         dict_str = set(tuple(k for k in self.__dict__.keys() if not k.startswith("_")))
         return f"MateProject(name={self._name}, submodules={dict_str})"
 
     def __repr__(self):
         return self.__str__()
+
+    def __getitem__(self, item: str):
+        assert isinstance(item, str)
+        cur, *rest = item.split(".")
+        assert cur in self.__dict__, f"Invalid key {cur}"
+        if len(rest) == 0:
+            return self.__dict__[cur]
+        else:
+            return self.__dict__[cur][".".join(rest)]

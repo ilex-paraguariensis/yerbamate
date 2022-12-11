@@ -1,10 +1,6 @@
 import os
-import json
 from .mate_api import MateAPI
-from .utils import utils
 from typing import Optional
-from .mate_config import MateConfig
-from .mateboard.mateboard import MateBoard
 from rich import print
 
 
@@ -23,13 +19,20 @@ class Mate:
     def remove(self, target: str):
         self.api.remove(target)
 
+    def show(self, path: str):
+        self.api.show(path)
+
     def summary(self):
         # self.api.summary()
         # print(self.api)
         print(self.api.to_tree())
 
     def results(self):
-        print(self.api.results())
+        results_table = self.api.results()
+        if results_table is not None:
+            print(results_table)
+        else:
+            print("No results found.")
 
     def list(
         self, module_name: str, query: Optional[str] = None, output_json: bool = True
