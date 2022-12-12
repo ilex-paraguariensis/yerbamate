@@ -2,7 +2,9 @@
 
 Maté is a deep learning framework compatible with pytorch(lightning), tensorflow(keras), and jax(flax). It is a package and experiment manager for deep learning. As a package manager you can add AI models, trainers and data loaders to your projects. As a project manager, Maté evaluates, trains, and keeps track of your experiments. Maté adds the source code of the dependencies to your project, making it fully customizable and reproducible.
 
+<div style="width:100vw; text-align:center">
 ![mate summary](./imgs/mate_summary.png)
+</div>
 
 
 ## Installation 🔌
