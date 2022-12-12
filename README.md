@@ -2,22 +2,8 @@
 
 Maté is a deep learning framework compatible with pytorch(lightning), tensorflow(keras), and jax(flax). It is a package and experiment manager for deep learning. As a package manager you can add AI models, trainers and data loaders to your projects. As a project manager, Maté evaluates, trains, and keeps track of your experiments. Maté adds the source code of the dependencies to your project, making it fully customizable and reproducible.
 
-<pre style="background:#000">
-<b><span>🧉  my_project</span></b><span style="color:#fff">                                                                                                                                                          </span>
-<span style="color:#fff">├── </span><b><span>models</span></b><span style="color:#fff">                                                                                                                                                             </span>
-<span style="color:#fff">│   ├── </span><b><span>googlenet</span></b><span style="color:#fff">                                                                                                                                                      </span>
-<span style="color:#fff">│   ├── </span><b><span>resnet</span></b><span style="color:#fff">                                                                                                                                                         </span>
-<span style="color:#fff">│   └── </span><b><span>densenet</span></b><span style="color:#fff">                                                                                                                                                       </span>
-<span style="color:#fff">├── </span><b><span>data_loaders</span></b><span style="color:#fff">                                                                                                                                                       </span>
-<span style="color:#fff">│   └── </span><b><span>cifar10</span></b><span style="color:#fff">                                                                                                                                                        </span>
-<span style="color:#fff">├── </span><b><span style="color:#FFFA72">trainers</span></b><span style="color:#fff">                                                                                                                                                           </span>
-<span style="color:#fff">│   └── </span><b><span style="color:#FFFA72">classification_trainer</span></b><span style="color:#fff">                                                                                                                                         </span>
-<span style="color:#fff">└── </span><b><span>experiments</span></b><span style="color:#fff">                                                                                                                                                        </span>
-<span style="color:#fff">    ├── </span><b><span>densenet</span></b><span style="color:#fff">                                                                                                                                                       </span>
-<span style="color:#fff">    ├── </span><b><span>resnet</span></b><span style="color:#fff">                                                                                                                                                         </span>
-<span style="color:#fff">    ├── </span><b><span>dummy</span></b><b><span>☑</span></b><span style="color:#fff">                                                                                                                                                         </span>
-<span style="color:#fff">    └── </span><b><span>googlenet</span></b><span style="color:#fff">  </span>
-</pre>
+![mate summary]("./imgs/mate_summary.png")
+
 
 ## Installation 🔌
 
