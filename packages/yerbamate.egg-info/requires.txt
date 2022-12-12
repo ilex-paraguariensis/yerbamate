@@ -1,0 +1,8 @@
+bomba
+flask
+ipdb
+websockets
+flask_cors
+pipreqs
+dirhash
+docstring-parser

@@ -1,12 +1,7 @@
-## Maté 🧉
+<h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 
-Maté is a deep learning template project and framework compatible with [PyTorch](https://pytorch.org/) ([Lightning](https://www.pytorchlightning.ai/)), [TensorFlow](https://www.tensorflow.org/) ([Keras](https://keras.io/)), and [Jax](https://github.com/google/jax) ([Flax](https://github.com/google/flax)). Maté is a package and experiment manager for deep learning. 
+Maté is a deep learning framework compatible with pytorch(lightning), tensorflow(keras), and jax(flax). It is a package and experiment manager for deep learning. As a package manager you can add AI models, trainers and data loaders to your projects. As a project manager, Maté evaluates, trains, and keeps track of your experiments. Maté adds the source code of the dependencies to your project, making it fully customizable and reproducible.
 
-
-As a package manager, you can add AI models, trainers/training loops, and data loaders to your projects as dependencies. (coming soon!)
-
-
-As a project manager, Maté evaluates, trains, and keeps track of your experiments. In addition, Maté adds the source code of the dependencies to your project, making it fully customizable and reproducible.
 
 ## Installation 🔌
 
@@ -16,33 +11,50 @@ pip install yerbamate
 
 ## Examples
 
-Please check out the [examples repo](https://github.com/ilex-paraguariensis/examples/) for examples of PyTorch Lightning, Keras and Jax.
+Please check out the [examples repo](https://github.com/ilex-paraguariensis/examples/) for examples of pytorch lightning, keras and jax.
 
-## Core Principles
+## Quick Start ⚡
 
-- **Modularity**: Divide your project into re-usable/sharable (python) modules.
-- **Single Source of Truth**: Maté uses a single JSON configuration file to define an experiment with all the hyperparameters defined there.
-- **Don't Get in Developers Way**: Maté tries its best to not get in your way and in fact, you do not have to integrate or import any maté class to your projects. Maté do not enforce any coding style, and only has a loose modular project structure.
+**Train a model**
 
-## What does Maté offer?
+```bash
+mate train my_experiment
+```
 
-- **Reproducibility**: Out-of-the-box Maté projects are fully reproducible. You can share your project with anyone and they can run the same experiments as you did.
-- **Reusability and Shareability**: Maté offers reusability/shareability of any modules (e.g., trainers, models and data loaders) between Maté projets.
-- **Customizability**: Maté is fully compatible with any framework. For example in case you use pytorch-lightning, out of the box you can use W&B, Tensorboard, or any other pytorch-lightning logger.
+**Evaluate a model**
+
+```bash
+mate test my_experiment
+```
+
+**Run a model**
+
+```bash
+mate run feature_extraction my_experiment
+```
+
+**Clone a model**
+
+```bash
+mate clone resnet my_resnet
+```
+
+More features coming soon!
+
+## Comparison to familiar tools
+
+- *Weights & Biases* wandb is a logger and allows model weights sharing as well
+- *Tensorboard* This is a logger and can be integrated into mate
+- *[Monai](https://github.com/Project-MONAI/MONAI)*
+- *[Ivy](https://github.com/unifyai/ivy)*
+- *[THINGSvision](https://github.com/ViCCo-Group/thingsvision)*
 
 
-### What is the Maté standard?
 
-Maté enforces modularity and separation of three essential components of a deep learning project:
+## What is the Maté standard?
+Mate enforces modularity and seperation of three basic components of a deep learning project: models, trainers, and data loaders. Each model, data loader, and trainer. Each model, data loader and trainer should be a module inside its respective folder. This allows for out-of-the-box sharing of models, data loaders, and trainers. 
 
-- models,
-- trainers (optional),
-- data loaders
-
-Each model, data loader, and trainer must be a python module inside its folder.
-This guarantees out-of-the-box sharing of models, data loaders, and trainers between Maté projects.
-
-This is how folders in a 🧉 project are organized:
+An example of a the foolder structure of a mate project is shown below:
 
 ```
 ├── root_project_folder
@@ -70,65 +82,91 @@ This is how folders in a 🧉 project are organized:
 
 ```
 
-## Comparison to familiar tools
-
-### [Monai](https://github.com/Project-MONAI/MONAI)
-Monai focuses on providing tools for medical imaging. Such as:
-
-- preprocessing transformations
-- pretrained models
-
-Moreover with MONAI deploy one can easily deploy their models to third party systems.
-
-
-### [Ivy](https://github.com/unifyai/ivy)
-Ivy creates an abstraction layer between the python code and the deep learning framework (TensorFlow, Pytorch, and JAX). It creates a set of tensors that can work on different backends (the frameworks).
-Mate targets the reproducibility issue differently: by formatting and the project structure, making it modular and its component recyclable.
-
-### [THINGSvision](https://github.com/ViCCo-Group/thingsvision)
-THINGSvision makes it easier to fine-tune and analyze the activation of pretrained models for computer vision. 
-Mate has a different aim: to improve reproducibility in deep learning.
-
-### [Weights & Biases](https://github.com/wandb)
-
-Wandb is a logger that allows you to keep track of experiment results and allows model weight sharing. You can easily integrate wandb in a mate project, the default logger used in our examples repo. Mate always delegates the logging of results and runs to some logger, but its key feature is that it also keeps track of all experiment's hyperparameters.
 
 
 
-### For Coders
-Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any maté class to your projects. Maté simply parses the configuration. To make your project maté compatible, you need to move a few files and make a Bombilla configuration file. 
 
-### Maté configuration (AKA [Bombilla](https://github.com/ilex-paraguariensis/bombilla)🧉)
-Maté defines an experiment with a configuration file, aka [Bombilla](https://github.com/ilex-paraguariensis/bombilla), that is a ordered dictionary describing arguments and python objects in plain json. [Bombilla](https://github.com/ilex-paraguariensis/bombilla) supports any python module; including all the local project level modules and installed py packages (eg., tensorflow, pytorch, x_transformers, torchvision, vit_pytorch). 
+## For Coders
+Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any mate class to your projects. Mate simply parses the configuration. To make your project mate compatible, you need to move a few files and make a Bombilla configuration file. 
+
+### Mate configuration (AKA Bombilla 🧉)
+Mate defines an experiment with a configuration file, aka Bombilla, that is a ordered dictionary describing arguments and python objects in plain json. Bombilla supports any python module; including all the local project level modules and installed py packages (eg., tensorflow, pytorch, x_transformers, torchvision, vit_pytorch). Mate generates objects in a Bombilla with DFS search. 
+
+**Note that all the arguments are directly passed to the object constructor, so you can use any argument that is accepted by the fucntion call.**
+
+Here you can see some examples of objects in Bombilla format:
+* custom neural network that fine tunes a pretrained resnet:
+```
+            "classifier": {
+                "module": "modules.resnet.fine_tune",
+                "class": "ResNetTuneModel",
+                "object_key": "classifier",
+                "params": {
+                    "num_classes": 10,
+                    "resnet": {
+                        "module": "torchvision.models",
+                        "class": "resnet18",
+                        "params": {
+                            "pretrained": true
+                        }
+                    }
+                }
+            },
 
 
-## Quick Start ⚡
+```
+* **Pytorch lightning trainer**
 
-**Run an experiment/train your model**
-
-```bash
-maté train my_experiment
+```
+    "trainer": {
+        "module": "pytorch_lightning",
+        "class": "Trainer",
+        "params": {
+            "gpus": 1,
+            "max_epochs": 100,
+            "precision": 16,
+            "gradient_clip_val": 0.5,
+            "enable_checkpointing": true,
+            "callbacks": [
+                {
+                    "module": "pytorch_lightning.callbacks",
+                    "class": "EarlyStopping",
+                    "params": {
+                        "monitor": "val_loss",
+                        "patience": 10,
+                        "mode": "min"
+                    }
+                },
+                {
+                    "module": "pytorch_lightning.callbacks",
+                    "class": "ModelCheckpoint",
+                    "params": {
+                        "dirpath": "{save_dir}/checkpoints",
+                        "monitor": "val_loss",
+                        "save_top_k": 1,
+                        "verbose": true,
+                        "save_last": true,
+                        "mode": "min"
+                    }
+                }
+            ],
+            "logger": {
+                "module": "pytorch_lightning.loggers",
+                "class": "WandbLogger",
+                "params": {
+                    "project": "cifar10",
+                    "name": "vit_vanilla",
+                    "save_dir": "./logs",
+                    "log_model": false
+                }
+            }
+        }
+    
 ```
 
-**Evaluate a model**
 
-```bash
-maté test my_experiment
-```
+**More tutorials and examples will be added soon!!**
 
-**Run a model**
-
-```bash
-maté run feature_extraction my_experiment
-```
-
-**Clone a model**
-
-```bash
-maté clone resnet my_resnet
-```
-
-**More tutorials, features and examples will be added soon!!**
 
 
 ## FAQ
@@ -136,21 +174,8 @@ maté clone resnet my_resnet
 
 **A**: Yes! Maté works with colab as any Maté project is exportable to a juypter notebook.
 
----
-
-**Q: But I like wandb! Does this try to replac it?**
-
-**A**: No! 🧉 supports wandb. Just just choose it as a logger.
-
-## Test with Docker
-
-```bash
-cd docker
-bash run-test.sh
-```
-
 ## Contact 🤝 
 
-- yerba.maté.dl(at)proton.me
-- [@mate_dl](https://twitter.com/mate_dl)
+For questions please contact:
 
+yerba.mate.dl(at)proton.me

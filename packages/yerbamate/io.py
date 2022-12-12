@@ -4,48 +4,27 @@ import shutil
 import sys
 from typing import Optional
 import ipdb
-
 from .mate_config import MateConfig
-
-from .utils.bunch import Bunch
 from .utils.utils import once
+from typing import Any
 
 
-def load_json(path):
-    with open(path) as f:
-        return Bunch(json.load(f))
-
-
-def set_save_path(
-    root_save_folder: str, root_folder: str, model_name: str, params: str
-):
-    # exp_path = __get_experiment_path(root_folder, model_name, params)
-    exp_module = get_experiment_base_module(root_folder, model_name, params)
-
-    if exp_module == root_folder:
-        # model name is actually the experiment name
-        save_path = os.path.join(
-            root_save_folder, root_folder, "experiments", model_name
-        )
-
-    else:
-        save_path = os.path.join(
-            root_save_folder, root_folder, "models", model_name, "experiments", params
-        )
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
+def set_save_path(root_save_folder: str, root_folder: str, params: str):
+    save_path = os.path.join(root_save_folder, root_folder, params)
 
     return save_path
 
 
-def save_train_experiments(save_path, hparams: Bunch, conf: MateConfig):
+def save_train_experiments(save_path, hparams: dict[str, Any], conf: MateConfig):
     params = hparams.copy()
     params["mate"] = conf.copy()
     with open(os.path.join(save_path, "train.json"), "w") as f:
         json.dump(params, f, indent=4)
 
 
-def update_experiments(root_folder: str, model_name: str, params: str, hparams: Bunch):
+def update_experiments(
+    root_folder: str, model_name: str, params: str, hparams: dict[str, Any]
+):
     path = __get_experiment_path(root_folder, model_name, params)
     with open(
         os.path.join(
@@ -60,7 +39,7 @@ def update_experiments(root_folder: str, model_name: str, params: str, hparams: 
         json.dump(hparams, f, indent=4)
 
 
-def override_params(config: MateConfig, params: Bunch):
+def override_params(config: MateConfig, params: dict[str, Any]):
 
     # ipdb.set_trace()
     if (
@@ -75,27 +54,22 @@ def override_params(config: MateConfig, params: Bunch):
     return params
 
 
-def __get_experiment_path(root_folder: str, model_name: str, experiment_name: str):
-    """
-    if experiment == "default":
-        # firt check if second level default exists
-        path = os.path.join(
-            root_folder, "models", model_name, "experiments", "default.json"
-        )
-        if os.path.exists(path):
-            return path
-
-        # if not, check if first level default exists
-        path = os.path.join(root_folder, "experiments", f"{model_name}.json")
-        if os.path.exists(path):
-            return path
-
-    path = os.path.join(
-        root_folder, "models", model_name, "experiments", f"{experiment}.json"
-    )
-    """
-    path = os.path.join(root_folder, "experiments", f"{experiment_name}.json")
+def get_metadata_path(root_folder: str, experiment: str):
+    path = os.path.join(root_folder, "experiments", experiment, "metadata.json")
+    # os.makedirs(os.path.dirname(path), exist_ok=True)
     return path
+
+
+def save_metadata(root_folder: str, experiment: str, metadata: dict):
+    path = get_metadata_path(root_folder, experiment)
+    with open(path, "w") as f:
+        json.dump(metadata, f, indent=4)
+
+
+def save_toml(root_folder: str, experiment: str, toml: str):
+    path = os.path.join(root_folder, "experiments", experiment, "experiment.toml")
+    with open(path, "w") as f:
+        f.write(toml)
 
 
 def get_experiment_base_module(root_folder: str, model_name: str, experiment: str):
@@ -124,7 +98,7 @@ def get_experiment_base_module(root_folder: str, model_name: str, experiment: st
 print_once = once(print)
 
 
-def apply_env(root_folder: str, hparams: Bunch):
+def apply_env(root_folder: str, hparams: dict[str, Any]):
     env_location = os.path.join(
         root_folder,
         "env.json",
@@ -156,34 +130,7 @@ def apply_env(root_folder: str, hparams: Bunch):
         # print(json.dumps(env, indent=4))
 
 
-def read_experiments(
-    conf: MateConfig,
-    root_folder: str,
-    model_name: str,
-    hparams_name: str = "default",
-    run_params: dict = None,
-):
-
-    hparams_path = __get_experiment_path(root_folder, model_name, hparams_name)
-    assert hparams_path != None, f"Could not find the experiment {model_name}"
-
-    # exp = get_experiment_description(root_folder, model_name, hparams_name)
-    # print_once(f"{exp[2]}: {exp[0]}/{exp[1]}.json")
-
-    with open(hparams_path) as f:
-        hparams = json.load(f)
-
-    hparams = Bunch(hparams)
-    hparams = override_params(conf, hparams)
-    hparams = override_run_params(hparams, run_params)
-
-    # trick to save parameters, otherwise changes are not saved after return!
-    hparams = Bunch(json.loads(json.dumps(hparams)))
-
-    return hparams
-
-
-def override_run_params(hparams: Bunch, run_params: dict):
+def override_run_params(hparams: dict[str, Any], run_params: dict):
 
     # parsed from mate {command} --param1=value1 --param2=value2
     # run params is a key value pair of parameters to override
@@ -211,7 +158,7 @@ def override_run_params(hparams: Bunch, run_params: dict):
     return hparams
 
 
-def find_root():
+def find_root() -> tuple[str, MateConfig]:
     """
     Method in charge of finding the root folder of the project and reading the content of mate.json
     """
@@ -220,15 +167,16 @@ def find_root():
     found = False
     i = 0
     root_folder = ""
-    config : Optional[MateConfig] = None
-    while not found and i < 6:
+    config: Optional[MateConfig] = None
+    while not found:
 
         if os.path.exists(os.path.join(current_path, "mate.json")):
             conf_path = os.path.join(current_path, "mate.json")
-            config = load_mate_config(conf_path)
-            root_folder = config.project
-            # self.__import_submodules(self.root_folder)
+            config = MateConfig(conf_path)
+            assert config is not None, f"Error initializing mate config {conf_path}"
+            root_folder = current_path
             found = True
+            os.chdir("..")
         else:
             os.chdir("..")
             current_path = os.getcwd()
@@ -237,9 +185,8 @@ def find_root():
                 raise Exception(
                     "Could not find mate.json. Please make sure you are in the root folder of the project."
                 )
-
-    # self.root_save_folder = self.root_folder
     sys.path.insert(0, os.getcwd())
+    assert config is not None
     return root_folder, config
 
 
@@ -319,16 +266,6 @@ def assert_experiment_exists(root_folder: str, model_name: str, experiment_name:
     exp_path = __get_experiment_path(root_folder, model_name, experiment_name)
 
     assert os.path.exists(exp_path), f"Experiment {exp_path} does not exist"
-
-
-def load_mate_config(path):
-    with open(path) as f:
-        config = MateConfig(json.load(f))
-        # assert (
-        #    "results_folder" in config
-        # ), 'Please add "results_folder":<path> in mate.json'
-        # assert "project" in config, 'Please add "project":<project name> in mate.json'
-    return config
 
 
 def remove(root_folder: str, model_name: str):
