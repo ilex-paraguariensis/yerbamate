@@ -43,21 +43,27 @@ class PackageManager:
 
         assert validators.url(url), "Invalid url"
 
-        self.__install_package(url)
+        package_install_dst = self.__install_package(url)
+
+        # check for requirements.txt
+        if package_install_dst:
+            requirements_path = os.path.join(package_install_dst, "requirements.txt")
+            if os.path.exists(requirements_path):
+                cmd = input(
+                    "Requirements found. Do you want to install them with pip? [y/conda/n]: "
+                )
+                if cmd == "y":
+                    os.system(f"pip install -r {requirements_path}")
+                elif cmd == "conda":
+                    os.system(f"conda install --file {requirements_path}")
+                else:
+                    print("Skipping requirements installation")
+            else:
+                print("No requirements found. Manually check and install dependencies.")
+
+        print(f"Package installed at {package_install_dst}")
 
     def __install_package(self, url):
-
-        self.__download_package(url)
-
-    def __update_downloaded_metadata(self, metadata: Metadata, path: str):
-
-        assert os.path.exists(path), "metadta path does not exist"
-        metadata_path = os.path.join(path, "metadata.json")
-
-        with open(metadata_path, "w") as f:
-            json.dump(metadata, f)
-
-    def __download_package(self, url):
 
         # just git url
         base_git_url = "/".join(url.split("/")[:7])
@@ -65,22 +71,13 @@ class PackageManager:
         url_hash = hashlib.sha1(base_git_url.encode("utf-8")).hexdigest()
 
         output_path = self.get_path(url_hash)
-
-        # ipdb.set_trace()
+        output_dir = output_path
 
         if not os.path.exists(output_path):
             os.makedirs(output_path, exist_ok=True)
 
-        output_dir = output_path
-
-        print(f"Downloading {url}")
-        
-        download(url, output_dir=output_dir)
-        # ipdb.set_trace()
         root_module = url.split("/")[-2]
         module_name = url.split("/")[-1]
-
-        # ipdb.set_trace()
 
         if root_module in ["models", "data", "experiments", "trainers"]:
             dest_path = os.path.join(
@@ -118,7 +115,9 @@ class PackageManager:
                 return
 
             elif cmd == "r":
-                dest_path = input("Please specify the correct path: (e.g. models.my_model) ")
+                dest_path = input(
+                    "Please specify the correct path: (e.g. models.my_model) "
+                )
                 while dest_path.count(".") < 0:
                     dest_path = input(
                         "Please specify the correct path: (e.g. models.my_model) "
@@ -128,12 +127,16 @@ class PackageManager:
                 dest_path = os.path.join(os.getcwd(), self.conf.project, *dest_path)
                 break
 
-        # ipdb.set_trace()
+        print(f"Downloading {url}")
+
+        download(url, output_dir=output_dir)
+
         src_module = url.split("tree")[1].split("/")[2:]
         src_module = os.path.join(output_dir, *src_module)
+
         copytree(src_module, dest_path)
         rmtree(output_dir)
-        print(f"Package installed at {dest_path}")
+        return dest_path
 
     def __get_destination_path(self, metadata: Metadata):
 
