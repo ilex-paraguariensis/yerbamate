@@ -1,21 +1,18 @@
-from distutils.command.config import config
 import json
 import os
 import sys
-import threading
-from sympy import re
-from yerbamate.api.data.metadata.metadata import Metadata
-from yerbamate.api.data.package_manager import PackageManager
-from yerbamate.mate_config import MateConfig
+
+from ...api.data.package_manager import PackageManager
+from ...api.data.utils.exp_util import get_relative_imports
+from ...api.data.utils.git_util import parse_url_from_git
+from ...mate_config import MateConfig
 from .sources.remote import RemoteDataSource
 from .sources.local.local import LocalDataSource
-from .sources.local.server import LocalServer
 from pipreqs import pipreqs
 
 from .package import Package
 from typing import Optional
 import ipdb
-from .metadata.generator import MetadataGenerator
 
 
 class PackageRepository:
@@ -147,11 +144,41 @@ class PackageRepository:
                         self.__generate_pip_requirements(subpath)
                 # self.__generate_pip_requirements(path)
 
+    def __generate_mate_dependencies(self, path):
+        # ipdb.set_trace()
+
+        files = [f for f in os.listdir(path) if f.endswith(".py") and "__" not in f]
+        relative_imports = [get_relative_imports(os.path.join(path, f)) for f in files]
+        # flatten array to unique set
+        relative_imports = set(
+            [item for sublist in relative_imports for item in sublist]
+        )
+
+        url_git = parse_url_from_git()
+
+        deps = set()
+        for module in relative_imports:
+            url = self.config.project + "/" + module.replace(".", "/")
+            if url_git:
+                url = url_git + url
+            deps.add(url)
+
+        if len(deps) == 0:
+            return
+
+        with open(os.path.join(path, "dependencies.mate"), "w") as f:
+            deps = {"dependencies": list(deps)}
+            json.dump(deps, f, indent=4)
+            print(f"Generated dependencies.mate for {path}")
+
     def __generate_pip_requirements(self, path):
 
         imports = pipreqs.get_all_imports(path)
         # import_info_remote = pipreqs.get_imports_info(imports)
         import_info_local = pipreqs.get_import_local(imports)
+
+        if "experiments" in path:
+            self.__generate_mate_dependencies(path)
 
         import_info = []
 

@@ -41,6 +41,12 @@ class PackageManager:
 
     def install_package(self, url):
 
+        if url.count("/") > 3 and "github.com" not in url:
+        
+            url = url.split("/")
+            # oalee/deep-vision/deepnet/models/resnet to https://github.com/oalee/deep-vision/tree/main/deepnet/models/resnet
+            url = f"https://github.com/{url[0]}/{url[1]}/tree/main/{'/'.join(url[2:])}"
+
         assert validators.url(url), "Invalid url"
 
         package_install_dst = self.__install_package(url)
@@ -61,7 +67,7 @@ class PackageManager:
             else:
                 print("No requirements found. Manually check and install dependencies.")
 
-        print(f"Package installed at {package_install_dst}")
+        print(f"Module installed at {package_install_dst}")
 
     def __install_package(self, url):
 

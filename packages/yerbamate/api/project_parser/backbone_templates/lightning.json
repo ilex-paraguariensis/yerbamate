@@ -1,8 +1,0 @@
-{
-  "trainers": [{ "module": "pytorch_lightning", "class_name": "Trainer" }],
-  "data": [
-    { "module": "pytorch_lightning", "class_name": "LightningDataModule" }
-  ],
-  "models": [{ "module": "torch.nn", "class_name": "Module" }],
-  "experiments": ["*.json"]
-}

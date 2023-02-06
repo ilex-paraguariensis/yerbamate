@@ -7,7 +7,6 @@ from glob import glob
 import os
 from typing import Optional
 import ipdb
-from ....project_parser.project_parser import ProjectParser
 from ..local import io
 from typing import Any
 
