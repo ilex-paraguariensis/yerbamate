@@ -111,7 +111,3 @@ def get_function_args(
     # parse_docs(function)
 
     return params, errors
-
-
-
-

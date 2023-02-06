@@ -41,6 +41,15 @@ mate clone resnet my_resnet
 
 More features coming soon!
 
+## Comparison to familiar tools
+
+- *Weights & Biases* wandb is a logger and allows model weights sharing as well
+- *Tensorboard* This is a logger and can be integrated into mate
+- *[Monai](https://github.com/Project-MONAI/MONAI)*
+- *[Ivy](https://github.com/unifyai/ivy)*
+- *[THINGSvision](https://github.com/ViCCo-Group/thingsvision)*
+
+
 
 ## What is the Maté standard?
 Mate enforces modularity and seperation of three basic components of a deep learning project: models, trainers, and data loaders. Each model, data loader, and trainer. Each model, data loader and trainer should be a module inside its respective folder. This allows for out-of-the-box sharing of models, data loaders, and trainers. 

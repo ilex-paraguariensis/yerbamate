@@ -3,6 +3,7 @@ import sys
 from yerbamate.mate_config import MateConfig
 from yerbamate.utils.bunch import Bunch
 from ..source import DataSource
+from glob import glob
 import os
 from typing import Optional
 import ipdb
@@ -100,10 +101,10 @@ class LocalDataSource(DataSource):
             "data_loaders": self.data_loaders,
             "experiments": self.experiments,
         }
-        self.map = {k: v for k, v in self.map.items() if len(v) > 0}
+        self.map = {k: v for k, v in self.map.items()}
 
     def __filter_regular_folders(self, names: list[str]):
-        return [fn for fn in names if not fn in ["__pycache__", "__init__.py"]]
+        return [fn for fn in names if not fn.startswith("__")]
 
     def __filter_names(self, query: Optional[str], names: list[str]):
         return names if query is None else [name for name in names if query == name]
@@ -113,7 +114,6 @@ class LocalDataSource(DataSource):
         # if module is None, return all modules
         if module is None:
             return self.map
-
         assert module in self.map.keys(), f"Folder {module} not found"
         return self.__filter_names(query, self.map[module])
 

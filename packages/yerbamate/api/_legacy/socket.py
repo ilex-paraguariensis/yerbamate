@@ -12,8 +12,6 @@ import ipdb
 import queue
 
 
-
-
 class WebSocketServer:
     def __init__(self, port: int = 8765, on_train_request: Callable = None):
 
@@ -93,4 +91,3 @@ class WebSocketServer:
             return json.dumps(request)
         except:
             return request
-

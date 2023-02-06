@@ -73,11 +73,10 @@ class Mate:
     ):
         self.api.generate_metadata(True)
 
-    def test(self, model_name: str, params: str):
+    def test(self, experiment_name: str):
         """
         TODO: Implement test in trainer
         """
-        pass
         # assert model_name in self.models, f'Model "{model_name}" does not exist.'
         # params = "parameters" if params == "" or params == "None" else params
         # print(f"Testing model {model_name} with hyperparameters: {params}.json")
@@ -87,6 +86,8 @@ class Mate:
         # checkpoint_path = os.path.join(self.save_path, "checkpoint", "best.ckpt")
 
         # trainer.test(ckpt_path=checkpoint_path)
+        self.api.select_experiment(experiment_name)
+        self.api.test()
 
     def restart(self, model_name: str, params: str = "default"):
         """
