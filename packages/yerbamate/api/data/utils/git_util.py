@@ -1,6 +1,6 @@
 from git import Repo
 import os
-
+import ipdb
 
 def parse_url_from_git():
 
@@ -36,7 +36,11 @@ def __parse_repo(repo):
 
     # transform url to https
     if url.startswith("git@"):
-        url = url.replace("git@", "https:/").replace(":", "/")
+        # url = url.replace("git@", "https:/")
+        # change git@github.com:oalee/deep-vision.git to https://github.com/oalee/deep-vision
+        url = url.replace("git@", "https:/").replace(":", "/").replace("//", "://")
+
+
 
     # remove .git
     if url.endswith(".git"):
@@ -44,4 +48,5 @@ def __parse_repo(repo):
 
     branch = repo.active_branch.name
     url = f"{url}/tree/{branch}/"
+    # ipdb.set_trace()
     return url

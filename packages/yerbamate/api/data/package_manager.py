@@ -42,7 +42,7 @@ class PackageManager:
     def install_package(self, url):
 
         if url.count("/") > 3 and "github.com" not in url:
-        
+
             url = url.split("/")
             # oalee/deep-vision/deepnet/models/resnet to https://github.com/oalee/deep-vision/tree/main/deepnet/models/resnet
             url = f"https://github.com/{url[0]}/{url[1]}/tree/main/{'/'.join(url[2:])}"
@@ -66,6 +66,16 @@ class PackageManager:
                     print("Skipping requirements installation")
             else:
                 print("No requirements found. Manually check and install dependencies.")
+            # read dependencies.json
+            dependencies_path = os.path.join(package_install_dst, "dependencies.json")
+            if os.path.exists(dependencies_path):
+                with open(dependencies_path, "r") as f:
+                    dependencies = json.load(f)
+                for dependency in dependencies["dependencies"]:
+                    # ipdb.set_trace()
+                    self.install_package(dependency)
+
+        # update history
 
         print(f"Module installed at {package_install_dst}")
 

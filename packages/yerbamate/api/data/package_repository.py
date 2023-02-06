@@ -166,10 +166,10 @@ class PackageRepository:
         if len(deps) == 0:
             return
 
-        with open(os.path.join(path, "dependencies.mate"), "w") as f:
+        with open(os.path.join(path, "dependencies.json"), "w") as f:
             deps = {"dependencies": list(deps)}
             json.dump(deps, f, indent=4)
-            print(f"Generated dependencies.mate for {path}")
+            print(f"Generated dependencies.json for {path}")
 
     def __generate_pip_requirements(self, path):
 
@@ -190,7 +190,7 @@ class PackageRepository:
             pipreqs.generate_requirements_file(
                 os.path.join(path, "requirements.txt"), import_info_local, "=="
             )
-            print(f"Generated requirements.txt in {path} folder")
+            print(f"Generated requirements.txt for {path}")
 
         for im in import_info_local:
 
@@ -201,11 +201,6 @@ class PackageRepository:
                 "name": name,
                 "version": version,
             }
-
-            # for remote in import_info_remote:
-            #     if remote["name"] == name:
-            #         lastVersion = remote["version"]
-            #         res["last_version"] = lastVersion
 
             import_info.append(res)
 
