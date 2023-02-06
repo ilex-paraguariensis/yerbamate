@@ -23,7 +23,7 @@ class LocalDataSource(DataSource):
         self.root_folder = root_dir
         self.config = config
 
-        ProjectParser.check_project_structure(root_dir)
+        # ProjectParser.check_project_structure(root_dir)
 
         self.__load_data(root_dir)
 
@@ -71,6 +71,10 @@ class LocalDataSource(DataSource):
         with open(save_path, "w") as f:
             f.write(json.dumps(experiment, indent=4))
 
+    def summary(self):
+        self.__load_data(self.root_folder)
+        return self.map
+
     def __load_data(self, root_dir: str):
         self.models = self.__filter_regular_folders(
             os.listdir(os.path.join(root_dir, "models"))
@@ -86,6 +90,8 @@ class LocalDataSource(DataSource):
             dir
             for dir in os.listdir(os.path.join(root_dir, "experiments"))
             if os.path.isdir(os.path.join(root_dir, "experiments", dir))
+            and dir != "__pycache__"
+            or (".py" in dir and dir != "__init__.py")
         ]
 
         self.map = {

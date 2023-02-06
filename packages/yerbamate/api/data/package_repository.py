@@ -21,15 +21,15 @@ class PackageRepository:
         self.package_manager = PackageManager(config)
         self.remote = RemoteDataSource()
         self.local = LocalDataSource(config)
-        self.metadata_generator = MetadataGenerator(
-            config.project, config.metadata, self.local
-        )
-        if run_local_api_server:
-            self.local_server = LocalServer(self.metadata_generator, self.local)
+        # self.metadata_generator = MetadataGenerator(
+        #     config.project, config.metadata, self.local
+        # )
+        # if run_local_api_server:
+        #     self.local_server = LocalServer(self.metadata_generator, self.local)
 
         # TODO: we should refresh the metadata every time we run a command
-        self.generate_metadata()
-        self.metadata: Optional[dict] = None
+        # self.generate_metadata()
+        # self.metadata: Optional[dict] = None
 
     def install_url(self, url: str):
         self.package_manager.install_package(url)
@@ -107,6 +107,7 @@ class PackageRepository:
         return self.local.list(module, query)
 
     def get_mate_summary(self):
+        return self.local.summary()
         if self.metadata is None:
             self.__generate_metadata()
         assert self.metadata is not None, "Metadata shuldn't be None"

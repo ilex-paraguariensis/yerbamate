@@ -235,7 +235,6 @@ def find_root():
     root_folder = ""
     config: Optional[MateConfig] = None
     while not found and i < 6:
-
         if os.path.exists(os.path.join(current_path, "mate.json")):
             conf_path = os.path.join(current_path, "mate.json")
             config = load_mate_config(conf_path)
@@ -254,6 +253,7 @@ def find_root():
     # self.root_save_folder = self.root_folder
     sys.path.insert(0, os.getcwd())
     return root_folder, config
+
 
 
 def list_packages(root_folder: str, folder: str):
