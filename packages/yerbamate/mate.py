@@ -28,14 +28,29 @@ class Mate:
         self.current_folder = os.path.dirname(__file__)
         self.config: Optional[MateConfig] = None
         self.__findroot()
-        self.models = self.__list_packages("models")
+
+        try:
+            # self.models = self.__list_packages("models")
+            self.trainer: Optional[Trainer] = None
+            self.api = MateAPI(self.config)
+        except Exception as e:
+            # INIT PROJECT
+            pass
+
         self.is_restart = False
         self.run_params = None
         self.custom_save_path = None
-        self.trainer: Optional[Trainer] = None
-        assert self.config is not None
-        self.api = MateAPI(self.config)
         # ipdb.set_trace()
+
+    @staticmethod
+    def init( project_name: str):
+
+        MateAPI.init_project(project_name)
+        # self.__findroot()
+        # self.models = self.__list_packages("models")
+        # self.api = MateAPI(self.config)
+
+        
 
     def create(self, path: str):
         pass
@@ -51,6 +66,7 @@ class Mate:
             print(json.dumps(li, indent=4))
         else:
             print(li)
+
     def auto(self, command: str):
         self.api.auto(command)
 

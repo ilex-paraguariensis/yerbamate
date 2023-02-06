@@ -1,5 +1,7 @@
 from distutils.command.config import config
+import json
 import os
+import sys
 import threading
 from sympy import re
 from yerbamate.api.data.metadata.metadata import Metadata
@@ -33,6 +35,36 @@ class PackageRepository:
         # TODO: we should refresh the metadata every time we run a command
         # self.generate_metadata()
         # self.metadata: Optional[dict] = None
+
+    @staticmethod
+    def init_project(project_name: str):
+        mate_json = os.path.join("mate.json")
+        if not os.path.exists(mate_json):
+            dic = {
+                "project": project_name,
+            }
+            # create mate.json
+
+            with open(mate_json, "w") as f:
+                json.dump(dic, f, indent=4)
+        else:
+            print("Project already exists")
+            sys.exit(1)
+
+        if not os.path.exists(project_name):
+            os.mkdir(project_name)
+            init__file = os.path.join(project_name, "__init__.py")
+            open(init__file, "a").close()
+        try:
+            folders = ["experiments", "models", "data", "trainers"]
+            for folder in folders:
+                os.makedirs(os.path.join(project_name, folder), exist_ok=True)
+                init__file = os.path.join(project_name, folder, "__init__.py")
+                if not os.path.exists(init__file):
+                    open(init__file, "a").close()
+
+        except Exception as e:
+            print(e)
 
     def install_url(self, url: str):
         self.package_manager.install_package(url)
@@ -75,10 +107,16 @@ class PackageRepository:
     def auto(self, command: str, *args):
         if command == "export":
             self.__generate_sub_pip_reqs()
-        elif command == "init":
+        elif command in ["init", "fix", "i"]:
             self.__generate__init__(self.config.project)
 
     def __generate__init__(self, root: str = None):
+        init__py = os.path.join(root, "__init__.py")
+        if not os.path.exists(init__py):
+            with open(init__py, "w") as f:
+                f.write("")
+            print(f"Created {init__py}")
+            
         for folder in os.listdir(root):
             path = os.path.join(root, folder)
             if not os.path.isdir(path) or path == "__pycache__" or "." in folder:

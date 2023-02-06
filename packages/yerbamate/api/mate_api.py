@@ -30,6 +30,12 @@ class MateAPI:
         self.checkpoint_path: Optional[str] = None
         self.trainer: Optional[Trainer] = None
 
+
+    # reformat this to static methods
+    @staticmethod
+    def init_project(project_name: str):
+        PackageRepository.init_project(project_name)
+
     def generate_metadata(self, rewrite: bool = False):
         return self.repository.metadata_generator.generate(rewrite)
 

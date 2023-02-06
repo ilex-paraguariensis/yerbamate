@@ -72,9 +72,9 @@ class MateConfig(Config):
         # self.backbone: BackboneType = BackboneType.lightning
         self.override_params: dict[str, Any] = {}
         self.restarting = False
-        self.metadata: BaseMetadata = BaseMetadata(
-            root_module=config.get("project", "")
-        )
+        # self.metadata: BaseMetadata = BaseMetadata(
+        #     root_module=config.get("project", "")
+        # )
         super().__init__(config)
 
     def save(self, path="mate.json"):
