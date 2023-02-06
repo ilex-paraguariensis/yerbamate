@@ -43,20 +43,15 @@ class Mate:
         # ipdb.set_trace()
 
     @staticmethod
-    def init( project_name: str):
+    def init(project_name: str):
 
         MateAPI.init_project(project_name)
         # self.__findroot()
         # self.models = self.__list_packages("models")
         # self.api = MateAPI(self.config)
 
-        
-
-    def create(self, path: str):
-        pass
-
-    def remove(self, model_name: str):
-        pass
+    def export(self):
+        self.api.auto("export")
 
     def list(
         self, module_name: str, query: Optional[str] = None, output_json: bool = True
@@ -66,6 +61,11 @@ class Mate:
             print(json.dumps(li, indent=4))
         else:
             print(li)
+
+    """
+        auto init -> creates __init__.py recursively
+        auto export -> creates requirements.txt for export
+    """
 
     def auto(self, command: str):
         self.api.auto(command)

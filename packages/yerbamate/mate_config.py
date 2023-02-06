@@ -1,6 +1,3 @@
-from .api.data.metadata.metadata import BaseMetadata, Metadata
-from .utils.bunch import Bunch
-from .backbone_type import BackboneType
 from enum import Enum
 from typing import Any
 import json
@@ -8,13 +5,7 @@ import ipdb
 
 
 class Config:
-    def __init__(self, config: Bunch):
-
-        if "metadata" in config:
-            config["metadata"] = Metadata(
-                **config["metadata"], root_module=config.get("project", "")
-            )
-
+    def __init__(self, config: dict):
         for key, value in self.__dict__.items():
             if value != None and value != {}:
                 # Why assert when we can just set the default value?
@@ -69,11 +60,8 @@ class MateConfig(Config):
         self.project = ""
         self.mate_version = ""
         self.results_folder = ""
-        # self.backbone: BackboneType = BackboneType.lightning
         self.override_params: dict[str, Any] = {}
         self.restarting = False
-        # self.metadata: BaseMetadata = BaseMetadata(
-        #     root_module=config.get("project", "")
         # )
         super().__init__(config)
 

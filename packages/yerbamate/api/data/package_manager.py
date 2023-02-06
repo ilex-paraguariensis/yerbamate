@@ -4,7 +4,6 @@ import os
 import re
 from shutil import copytree, rmtree
 import validators
-from yerbamate.api.data.metadata.metadata import Metadata
 from yerbamate.mate_config import MateConfig
 
 from .utils.gitdir import download
@@ -30,14 +29,6 @@ class PackageManager:
     def get_path(self, *args):
         return os.path.join(self.root_path, *args)
 
-    def read_history(self):
-
-        history_path = self.get_path("history.json")
-        if not os.path.exists(history_path):
-            return []
-
-        with open(history_path, "r") as f:
-            return json.load(f)
 
     def install_package(self, url):
 
@@ -154,100 +145,3 @@ class PackageManager:
         rmtree(output_dir)
         return dest_path
 
-    def __get_destination_path(self, metadata: Metadata):
-
-        path = [self.conf["project"]] + metadata.module_path
-        path = os.path.join(*path)
-
-        return path
-
-    # check if the name is a valid python module name
-    def __validate_module_name(self, name: str):
-
-        # should be a valid python module name
-
-        supported_regex = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")
-        return supported_regex.match(name)
-
-    def __copy_package(
-        self, metadata: Metadata, output_dir: str, module_path_from_git: list
-    ):
-
-        dest_path = self.__get_destination_path(metadata)
-        src_path = os.path.join(
-            output_dir, *module_path_from_git, *metadata.module_path
-        )
-        while os.path.exists(dest_path):
-            cmd = input(
-                "Package already exists, options: [o]verwrite, [c]ancel, [r]ename: "
-            )
-
-            if cmd == "o":
-                rmtree(dest_path)
-                break
-
-            elif cmd == "c":
-                return
-
-            elif cmd == "r":
-                while True:
-                    new_name = input("New name: ")
-                    if self.__validate_module_name(new_name):
-                        metadata.module_path[-1] = new_name
-                        dest_path = self.__get_destination_path(metadata)
-                        break
-                    else:
-                        print("Invalid name, try again")
-
-        if not os.path.exists(dest_path):
-            # os.makedirs(dest_path, exist_ok=True)
-            # copytree(output_dir, path)
-            copytree(src_path, dest_path)
-            self.__update_metadata(metadata)
-            self.__auto_create_init_pys(metadata)
-            print(f"Successfully installed package in {dest_path}")
-
-        else:
-            print("Package already installed")
-            # TODO, update, ask for rename, etc
-
-    # def __copy_installed_package()
-
-    def __find_save_metadata_path(self, metadata: Metadata):
-
-        root_module = self.conf["project"]
-        modules = metadata.module_path
-
-        path = os.path.join(root_module, *modules, "fork_metadata.json")
-        return path
-        pass
-
-    def __auto_create_init_pys(self, metadata: Metadata):
-
-        path = [self.conf["project"]] + metadata.module_path
-
-        for i in range(len(path)):
-            init_path = os.path.join(*path[:i], "__init__.py")
-            if not os.path.exists(init_path):
-                with open(init_path, "w") as f:
-                    f.write("")
-
-        #
-        #
-
-    def __update_metadata(self, metadata: Metadata):
-
-        # hist_url = metadata.get("history_url", [])
-
-        # hist_url += [metadata.url]
-
-        # metadata["url"] = ""
-        # metadata["history_url"] = hist_url
-
-        path = self.__find_save_metadata_path(metadata)
-
-        # assert os.path.exists(path), "metadata.json not found"
-        with open(path, "w") as f:
-            json.dump(metadata.to_dict(), f, indent=4)
-
-        # pass
