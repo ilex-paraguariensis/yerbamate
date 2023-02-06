@@ -66,26 +66,74 @@ class PackageManager:
 
         output_path = self.get_path(url_hash)
 
+        # ipdb.set_trace()
+
         if not os.path.exists(output_path):
             os.makedirs(output_path, exist_ok=True)
 
-        output_dir = os.path.join(os.getcwd(), output_path)
+        output_dir = output_path
 
+        print(f"Downloading {url}")
+        
         download(url, output_dir=output_dir)
-        module_path_from_git = url.split("/")[7:8]
+        # ipdb.set_trace()
+        root_module = url.split("/")[-2]
+        module_name = url.split("/")[-1]
 
-        metadata_path = os.path.join(output_dir, *module_path_from_git, "metadata.json")
+        # ipdb.set_trace()
 
-        if os.path.exists(metadata_path):
-            print(f"No metadata.json found in {metadata_path}")
+        if root_module in ["models", "data", "experiments", "trainers"]:
+            dest_path = os.path.join(
+                os.getcwd(), self.conf.project, root_module, module_name
+            )
 
-            with open(metadata_path, "r") as f:
-                metadata = Metadata(**json.load(f))
         else:
-            print("No metadata.json found.")
-            metadata = Metadata(module_path=url.split("/")[8:])
+            print("Could not automatically determine the module type. Please specify.")
+            command = input(f"Is {root_module}/{module_name} Correct [y,n]?")
+            if command == "y":
+                dest_path = os.path.join(
+                    os.getcwd(), self.conf.project, root_module, module_name
+                )
+            else:
+                dest_path = input(
+                    "Please specify the correct path: (e.g. models.my_model)"
+                )
+                while dest_path.count(".") < 0:
+                    dest_path = input(
+                        "Please specify the correct path: (e.g. models.my_model) "
+                    )
+                dest_path = dest_path.split(".")
+                dest_path = os.path.join(os.getcwd(), self.conf.project, *dest_path)
 
-        self.__copy_package(metadata, output_dir, module_path_from_git)
+        while os.path.exists(dest_path):
+            cmd = input(
+                "Package already exists, options: [o]verwrite, [c]ancel, [r]ename: "
+            )
+
+            if cmd == "o":
+                rmtree(dest_path)
+                break
+
+            elif cmd == "c":
+                return
+
+            elif cmd == "r":
+                dest_path = input("Please specify the correct path: (e.g. models.my_model) ")
+                while dest_path.count(".") < 0:
+                    dest_path = input(
+                        "Please specify the correct path: (e.g. models.my_model) "
+                    )
+                    print(dest_path.count("."))
+                dest_path = dest_path.split(".")
+                dest_path = os.path.join(os.getcwd(), self.conf.project, *dest_path)
+                break
+
+        # ipdb.set_trace()
+        src_module = url.split("tree")[1].split("/")[2:]
+        src_module = os.path.join(output_dir, *src_module)
+        copytree(src_module, dest_path)
+        rmtree(output_dir)
+        print(f"Package installed at {dest_path}")
 
     def __get_destination_path(self, metadata: Metadata):
 
@@ -116,7 +164,6 @@ class PackageManager:
             )
 
             if cmd == "o":
-                # delete dest_path
                 rmtree(dest_path)
                 break
 

@@ -38,6 +38,14 @@ class PackageRepository:
 
     @staticmethod
     def init_project(project_name: str):
+
+        if not os.path.exists(project_name):
+            os.mkdir(project_name)
+            os.chdir(project_name)
+        else:
+            print("Project already exists")
+            sys.exit(1)
+
         mate_json = os.path.join("mate.json")
         if not os.path.exists(mate_json):
             dic = {
@@ -116,7 +124,7 @@ class PackageRepository:
             with open(init__py, "w") as f:
                 f.write("")
             print(f"Created {init__py}")
-            
+
         for folder in os.listdir(root):
             path = os.path.join(root, folder)
             if not os.path.isdir(path) or path == "__pycache__" or "." in folder:

@@ -74,7 +74,6 @@ def download(repo_url, output_dir="./"):
     sub-directories will be pulled upwards into the root folder."""
 
     # generate the url which returns the JSON data
-
     api_url, download_dirs = create_url(repo_url)
 
     # ipdb.set_trace()
@@ -148,10 +147,10 @@ def download(repo_url, output_dir="./"):
             path = file_path
             dirname = os.path.dirname(path)
 
-            if dirname != "":
-                os.makedirs(os.path.dirname(path), exist_ok=True)
-            else:
-                pass
+            # if dirname != "":
+            #     os.makedirs(os.path.dirname(path), exist_ok=True)
+            # else:
+            #     pass
 
             if file_url is not None:
                 try:
