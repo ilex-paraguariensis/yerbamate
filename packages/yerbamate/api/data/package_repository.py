@@ -1,4 +1,5 @@
 from distutils.command.config import config
+import os
 import threading
 from sympy import re
 from yerbamate.api.data.metadata.metadata import Metadata
@@ -21,6 +22,8 @@ class PackageRepository:
         self.package_manager = PackageManager(config)
         self.remote = RemoteDataSource()
         self.local = LocalDataSource(config)
+        self.__generate_pip_requirements(self.config.project)
+        # self.__generate_sub_pip_reqs()
         # self.metadata_generator = MetadataGenerator(
         #     config.project, config.metadata, self.local
         # )
@@ -37,15 +40,13 @@ class PackageRepository:
     def generate_metadata(self, rewrite: bool = False):
 
         self.__generate_metadata()
-    
+
         base_meta = self.config.metadata.base_metadata()
         base_meta["exports"] = self.__export_metadata()
         base_meta["dependencies"] = self.__generate_pip_requirements()
         base_meta["experiments"] = self.local.list("experiments")
         self.config.metadata = base_meta
         self.config.save()
-
-        
 
     def __export_metadata(self):
         assert self.metadata is not None, "Metadata shuldn't be None"
@@ -71,13 +72,52 @@ class PackageRepository:
 
         return exports
 
-    def __generate_pip_requirements(self):
+    def auto(self, command: str, *args):
+        if command == "export":
+            self.__generate_sub_pip_reqs()
+        elif command == "init":
+            self.__generate__init__(self.config.project)
 
-        imports = pipreqs.get_all_imports(self.config.project)
+    def __generate__init__(self, root: str = None):
+        for folder in os.listdir(root):
+            path = os.path.join(root, folder)
+            if not os.path.isdir(path) or path == "__pycache__" or "." in folder:
+                continue
+            init__py = os.path.join(path, "__init__.py")
+            if not os.path.exists(init__py):
+                with open(init__py, "w") as f:
+                    f.write("")
+                print(f"Created {init__py}")
+            self.__generate__init__(path)
+
+    def __generate_sub_pip_reqs(self):
+
+        for folder in os.listdir(self.config.project):
+            path = os.path.join(self.config.project, folder)
+            if os.path.isdir(path) and "__" not in folder:
+                for subfolder in os.listdir(path):
+                    subpath = os.path.join(path, subfolder)
+                    if os.path.isdir(subpath) and "__" not in subfolder:
+                        self.__generate_pip_requirements(subpath)
+                # self.__generate_pip_requirements(path)
+
+    def __generate_pip_requirements(self, path):
+
+        imports = pipreqs.get_all_imports(path)
         # import_info_remote = pipreqs.get_imports_info(imports)
         import_info_local = pipreqs.get_import_local(imports)
 
         import_info = []
+
+        if path == self.config.project:
+            pipreqs.generate_requirements_file(
+                "requirements.txt", import_info_local, "=="
+            )
+        else:
+            pipreqs.generate_requirements_file(
+                os.path.join(path, "requirements.txt"), import_info_local, "=="
+            )
+            print(f"Generated requirements.txt in {path} folder")
 
         for im in import_info_local:
 

@@ -42,6 +42,9 @@ class MateAPI:
     def summary(self):
         return self.repository.get_mate_summary()
 
+    def auto(self, command: str):
+        self.repository.auto(command)
+
     def load_experiment(self, experiment_name: str):
         return self.repository.local.load_experiment(experiment_name)
 

@@ -51,6 +51,8 @@ class Mate:
             print(json.dumps(li, indent=4))
         else:
             print(li)
+    def auto(self, command: str):
+        self.api.auto(command)
 
     def summary(self, output_json: bool = True):
         print(json.dumps(self.api.summary(), indent=4))
