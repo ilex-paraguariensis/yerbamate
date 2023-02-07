@@ -47,9 +47,11 @@ class Mate:
         self.api.auto("export")
 
     def list(
-        self, module_name: str, query: Optional[str] = None, output_json: bool = True
+        self,
+        module_name: str = None,
+        output_json: bool = True,
     ):
-        li = self.api.list(module_name, query)
+        li = self.api.list(module_name)
         if output_json:
             print(json.dumps(li, indent=4))
         else:

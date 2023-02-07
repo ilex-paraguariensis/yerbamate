@@ -42,8 +42,8 @@ class MateAPI:
     def install_url(self, url: str):
         self.repository.install_url(url)
 
-    def list(self, module: str, query: Optional[str] = None):
-        return self.repository.list(module, query)
+    def list(self, module: str):
+        return self.repository.list(module)
 
     def summary(self):
         return self.repository.get_mate_summary()

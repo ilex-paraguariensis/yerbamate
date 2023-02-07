@@ -22,6 +22,7 @@ class LocalDataSource(DataSource):
         root_dir = config.project
         self.root_folder = root_dir
         self.config = config
+        self.map = None
 
         # ProjectParser.check_project_structure(root_dir)
 
@@ -76,6 +77,10 @@ class LocalDataSource(DataSource):
         return self.map
 
     def __load_data(self, root_dir: str):
+
+        if self.map != None:
+            return
+
         self.models = self.__filter_regular_folders(
             os.listdir(os.path.join(root_dir, "models"))
         )
@@ -86,13 +91,17 @@ class LocalDataSource(DataSource):
             os.listdir(os.path.join(root_dir, "data"))
         )
 
-        self.experiments = [
-            dir
+        self.experiments = {
+            dir: [
+                exp_file
+                for exp_file in os.listdir(os.path.join(root_dir, "experiments", dir))
+                if ".py" in exp_file and exp_file != "__init__.py"
+            ]
             for dir in os.listdir(os.path.join(root_dir, "experiments"))
             if os.path.isdir(os.path.join(root_dir, "experiments", dir))
             and dir != "__pycache__"
             or (".py" in dir and dir != "__init__.py")
-        ]
+        }
 
         self.map = {
             "models": self.models,
@@ -108,13 +117,13 @@ class LocalDataSource(DataSource):
     def __filter_names(self, query: Optional[str], names: list[str]):
         return names if query is None else [name for name in names if query == name]
 
-    def list(self, module: str, query: Optional[str] = None):
+    def list(self, module: str):
 
-        # if module is None, return all modules
         if module is None:
             return self.map
-        assert module in self.map.keys(), f"Folder {module} not found"
-        return self.__filter_names(query, self.map[module])
+        # ipdb.set_trace()
+        assert module in self.map.keys(), f"Module {module} not found"
+        return self.map[module]
 
     def __findroot(self):
         """

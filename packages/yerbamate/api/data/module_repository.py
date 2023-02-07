@@ -170,10 +170,10 @@ class ModuleRepository:
 
         return {"pip": import_info}
 
-    def list(self, module: str, query: Optional[str] = None):
-        if query == None:
+    def list(self, module: str = None):
+        if module == None:
             return self.local.summary()
-        return self.local.list(module, query)
+        return self.local.list(module)
 
     def get_mate_summary(self):
         return self.local.summary()
