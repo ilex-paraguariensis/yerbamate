@@ -78,13 +78,15 @@ Test
     def snapshot(self, model_name: str):
         pass
 
-    def train(self, model: str, exp:str , **kwargs):
-
+    def train(self, model: str, exp: str , *args, **kwargs):
+        # ipdb.set_trace()
         module = [self.config.project, "experiments", model, exp]
         
         module = ".".join(module)
         __import__(module)
 
+        # get current directory
+        # os.getcwd()
 
         # run the python file
         # ipdb.set_trace()

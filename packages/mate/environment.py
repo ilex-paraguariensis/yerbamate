@@ -8,7 +8,7 @@ import ipdb
 
 ENV_KEY = "env"
 
-class Mate(dict):
+class Environment(dict):
 
     def __init__(self):
         
@@ -21,6 +21,7 @@ class Mate(dict):
         self.hparams = {}
         # set major command to True
         setattr(self, sys.argv[1], True)
+        
 
         self._root = self.__find_root()
 
@@ -33,7 +34,7 @@ class Mate(dict):
             setattr(self, key, value)
             self.hparams[key] = value
         self._path = sys.argv[0]
-        # ipdb.set_trace()
+
         if "bin/mate" in self._path:
             self.name = os.path.join(*sys.argv[2:4])
             self._path = os.path.join(self._root, "experiments", sys.argv[2],  sys.argv[3] + ".py")
@@ -109,29 +110,63 @@ class Mate(dict):
         if not os.path.exists(env_path):
             print("Environment file not found, creating one with defaults: env.json")
             with open(env_path, "w") as f:
-                json.dump(conf[ENV_KEY], f)
+                if ENV_KEY in conf:
+                    json.dump(conf[ENV_KEY], f, indent=4)
+                else:
+                    env = {
+                        "results": "",
+                    }
+                    json.dump(env, f, indent=4)
+            
+        with open(env_path, "r") as f:
+            try:
+                env = json.load(f)
+            except json.decoder.JSONDecodeError:
+                env = {
+                    "results": "",
+                }
 
-        env = json.load(open(env_path, "r"))
-        for key, value in conf[ENV_KEY].items():
-            if not key in env:
-                print(f"Environment variable {key} not found, setting to default: {value}")
-                env[key] = value
-        
+        if ENV_KEY in conf:
+            for key, value in conf[ENV_KEY].items():
+                if not key in env:
+                    print(f"Environment variable {key} not found, setting to default: {value}")
+                    env[key] = value
+            
         # automatically append experiment name to results path
         search_results = ["results", "results_path", "results_dir", "save", "save_path", "save_dir"]
         for key in search_results:
             if key in env:
+                
                 env[key] = os.path.join(env[key], *self.name.split("/"))
                 # ipdb.set_trace()
                 break
-
+            if os.environ.get(key, None) is not None:
+                env[key] = os.environ.get(key)
+                break
+            
+        if len(env) == 0:
+            print(f"results/save_dir/save environment variable is empty. Set it in env.json or in your shell.")
+            print("Exiting...")
+            sys.exit(1)
+        
         setattr(self, "env", env)
     """
     Unknown keys default to False
     """
-    def __getitem__(self, __key):
-        if not __key in self:
-            return False
-        return super().__getitem__(__key)
+    def __getitem__(self, key):
+        if not key in self:
+            # ipdb.set_trace()
+            if key in self.env:
+                return self.env[key]
+            res = os.environ.get(key, None)
+
+            if res is None:
+                print(f"Environment variable {key} not found. Set it in env.json or in your shell.")
+                print("Exiting...") 
+                sys.exit(1)
+            else:
+                return res
+            
+        return super().__getitem__(key)
 
  
