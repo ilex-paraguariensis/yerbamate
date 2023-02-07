@@ -1,8 +1,10 @@
 
 import json
 import os
+import shutil
 import sys
 import ipdb
+from bombilla import Bombilla
 
 ENV_KEY = "env"
 
@@ -16,7 +18,7 @@ class Mate(dict):
         self.test = False
         self.train = False
         self.sample = False
-        
+        self.hparams = {}
         # set major command to True
         setattr(self, sys.argv[1], True)
 
@@ -24,11 +26,42 @@ class Mate(dict):
         for arg in sys.argv[2:]:
             key, value = arg.split("=")
             setattr(self, key[2:], value)
+            self.hparams[key] = value
         self._path = sys.argv[0]
         self.name = self._path.split("/")[-2:]
         self.name = os.path.join(*self.name)[: -3]
         self.__set_env()
         # ipdb.set_trace()
+
+        if self.train:
+            self.__generate_experiment()
+
+
+    def __generate_experiment(self):
+        # copies the experiment to the results folder
+        results =["results", "results_path", "results_dir", "save", "save_path", "save_dir"]
+        result = None
+        for key in results:
+            if key in self.env:
+                result = self.env[key]
+                break
+        if result is None:
+            return
+        if not os.path.exists(result):
+            os.makedirs(result)
+        
+        save_file = os.path.join(result, "experiment.py")
+        # copy from self._path to save_file
+        shutil.copyfile(self._path, save_file)
+       
+       
+        if self.hparams != {}:
+            params_file = os.path.join(result, "experiment.json")
+            # dump self to params
+            with open(params_file, "w") as f:
+                json.dump(self.hparams, f, indent=4)
+
+
 
     def __set_env(self):
         mate_conf_path = os.path.join("mate.json")
