@@ -57,14 +57,18 @@ class Mate:
         else:
             print(li)
 
-    """
-        auto init -> creates __init__.py recursively
-        auto export -> creates requirements.txt for export
-    """
 
     def auto(self, command: str):
+        """
+        auto init -> creates __init__.py recursively
+        auto export -> creates requirements.txt for export
+        """
         self.api.auto(command)
 
+    """
+
+Test
+    """
     def summary(self, output_json: bool = True):
         print(json.dumps(self.api.summary(), indent=4))
 
@@ -74,7 +78,7 @@ class Mate:
     def snapshot(self, model_name: str):
         pass
 
-    def train(self, model: str, exp:str ):
+    def train(self, model: str, exp:str , **kwargs):
 
         module = [self.config.project, "experiments", model, exp]
         
@@ -87,6 +91,7 @@ class Mate:
         
 
         pass
+
 
     def metadata(
         self,
