@@ -8,7 +8,7 @@ from yerbamate.mate_config import MateConfig
 from yerbamate.trainers.trainer import Trainer
 from yerbamate.utils.bunch import Bunch
 
-from .data.package_repository import PackageRepository
+from .data.module_repository import ModuleRepository
 
 from typing import Optional, Union
 import ipdb
@@ -23,7 +23,7 @@ MATE API
 class MateAPI:
     def __init__(self, config: MateConfig):
         self.config: MateConfig = config
-        self.repository = PackageRepository(config)
+        self.repository = ModuleRepository(config)
         self.exp: Optional[Bunch] = None
         self.exp_name: Optional[str] = None
         self.save_dir: Optional[str] = None
@@ -34,7 +34,7 @@ class MateAPI:
     # reformat this to static methods
     @staticmethod
     def init_project(project_name: str):
-        PackageRepository.init_project(project_name)
+        ModuleRepository.init_project(project_name)
 
     def generate_metadata(self, rewrite: bool = False):
         return self.repository.metadata_generator.generate(rewrite)

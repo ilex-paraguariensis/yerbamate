@@ -113,4 +113,9 @@ def main():
                 if hparams_len > 0:
                     run_params = parse_run_params(args[method_args_len + 1 :])
                     mate.run_params = run_params
-                getattr(mate, action)(*method_args)
+                function = getattr(mate, action)
+                # add Nones for missing method_args
+                method_args += (None,) * (
+                    len(inspect.signature(function).parameters) - 1
+                )
+                function(*method_args)
