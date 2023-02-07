@@ -10,7 +10,7 @@ from .utils.gitdir import download
 import ipdb
 
 
-class PackageManager:
+class ModuleManager:
     root_path: str = ""
 
     def __init__(self, conf: MateConfig):

@@ -2,7 +2,7 @@ import json
 import os
 import sys
 
-from .package_manager import PackageManager
+from .module_manager import ModuleManager
 from .utils.exp_util import get_relative_imports
 from .utils.git_util import parse_url_from_git
 from ...mate_config import MateConfig
@@ -18,11 +18,10 @@ import ipdb
 class ModuleRepository:
     def __init__(self, config: MateConfig, run_local_api_server: bool = False):
         self.config = config
-        self.package_manager = PackageManager(config)
+        self.package_manager = ModuleManager(config)
         self.remote = RemoteDataSource()
         self.local = LocalDataSource(config)
         self.__generate_pip_requirements(self.config.project)
-
 
     @staticmethod
     def init_project(project_name: str):
@@ -58,6 +57,11 @@ class ModuleRepository:
                 init__file = os.path.join(project_name, folder, "__init__.py")
                 if not os.path.exists(init__file):
                     open(init__file, "a").close()
+            print(
+                "Project {} created, run `cd {}` to enter the project folder".format(
+                    project_name, project_name
+                )
+            )
 
         except Exception as e:
             print(e)

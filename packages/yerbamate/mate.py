@@ -29,14 +29,7 @@ class Mate:
         self.config: Optional[MateConfig] = None
         self.__findroot()
 
-        try:
-            # self.models = self.__list_packages("models")
-            self.trainer: Optional[Trainer] = None
-            self.api = MateAPI(self.config)
-        except Exception as e:
-            # INIT PROJECT
-            pass
-
+        self.api = MateAPI(self.config)
         self.is_restart = False
         self.run_params = None
         self.custom_save_path = None
