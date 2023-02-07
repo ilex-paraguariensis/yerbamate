@@ -74,10 +74,19 @@ class Mate:
     def snapshot(self, model_name: str):
         pass
 
-    def train(self, experiment_name: str = "default"):
+    def train(self, model: str, exp:str ):
 
-        self.api.select_experiment(experiment_name)
-        self.api.train()
+        module = [self.config.project, "experiments", model, exp]
+        
+        module = ".".join(module)
+        __import__(module)
+
+
+        # run the python file
+        # ipdb.set_trace()
+        
+
+        pass
 
     def metadata(
         self,

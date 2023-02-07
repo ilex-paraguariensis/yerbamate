@@ -4,7 +4,7 @@ import os
 import shutil
 import sys
 import ipdb
-from bombilla import Bombilla
+
 
 ENV_KEY = "env"
 
@@ -22,20 +22,56 @@ class Mate(dict):
         # set major command to True
         setattr(self, sys.argv[1], True)
 
+        self._root = self.__find_root()
+
         # set attributes based on the command line arguments
-        for arg in sys.argv[2:]:
+        for arg in sys.argv:
+            if "=" not in arg:
+                continue
             key, value = arg.split("=")
-            setattr(self, key[2:], value)
+            value = self.convert_str_to_data(value)
+            setattr(self, key, value)
             self.hparams[key] = value
         self._path = sys.argv[0]
-        self.name = self._path.split("/")[-2:]
-        self.name = os.path.join(*self.name)[: -3]
+        # ipdb.set_trace()
+        if "bin/mate" in self._path:
+            self.name = os.path.join(*sys.argv[2:4])
+            self._path = os.path.join(self._root, "experiments", sys.argv[2],  sys.argv[3] + ".py")
+            # detect path to experiment
+        else:
+            self.name = self._path.split("/")[-2:]
+            self.name = os.path.join(*self.name)[: -3]
         self.__set_env()
         # ipdb.set_trace()
 
         if self.train:
             self.__generate_experiment()
 
+    def convert_str_to_data(self, input):
+        try:
+            return int(input)
+        except ValueError:
+            try:
+                return float(input)
+            except ValueError:
+                if input in ["True", "true"]:
+                    return True
+                elif input in ["False", "false"]:
+                    return False
+
+        return input
+
+    def __find_root(self):
+        # TODO, find root of the project
+        
+        path = os.getcwd()
+
+        if os.path.exists(os.path.join(path, "mate.json")):
+            conf = json.load(open(os.path.join(path, "mate.json"), "r"))
+
+            return os.path.join(path, conf["project"])
+       
+        return None
 
     def __generate_experiment(self):
         # copies the experiment to the results folder
@@ -54,12 +90,14 @@ class Mate(dict):
         # copy from self._path to save_file
         shutil.copyfile(self._path, save_file)
        
-       
+        # ipdb.set_trace()
+
         if self.hparams != {}:
             params_file = os.path.join(result, "experiment.json")
             # dump self to params
+            # overwrite if exists
             with open(params_file, "w") as f:
-                json.dump(self.hparams, f, indent=4)
+                json.dump(dict(self.hparams), f, indent=4)
 
 
 
