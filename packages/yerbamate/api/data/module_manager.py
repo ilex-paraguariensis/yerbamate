@@ -36,6 +36,12 @@ class ModuleManager:
         if args[0] == "-y":
             return True
 
+    def check_auto_no_install_reqs(self, *args, **kwargs):
+        if len(args) < 1:
+            return False
+        if args[0] == "-n":
+            return True
+
     def auto_install_manager(self, *args, **kwargs):
         if self.check_auto_install_reqs(*args, **kwargs):
             if len(args) > 1:
@@ -43,14 +49,14 @@ class ModuleManager:
                 if pm in ["pip", "conda"]:
                     return pm
             else:
-                input = input("Install with pip or conda? [pip/conda]: ")
-                if input in ["pip", "conda"]:
-                    return input
+                cmd = input("Install with pip or conda? [pip/conda]: ")
+                if cmd in ["pip", "conda"]:
+                    return cmd
 
-            while input not in ["pip", "conda"]:
-                input = input("Install with pip or conda? [pip/conda]: ")
-                if input in ["pip", "conda"]:
-                    return input
+            while cmd not in ["pip", "conda"]:
+                cmd = cmd("Install with pip or conda? [pip/conda]: ")
+                if cmd in ["pip", "conda"]:
+                    return cmd
             
             return None
         return None
@@ -75,19 +81,24 @@ class ModuleManager:
                     pm = self.auto_install_manager(*args, **kwargs)
                     if pm == "pip":
                         os.system(f"pip install -r {requirements_path}")
+                        print("")
                     elif pm == "conda":
                         os.system(f"conda install --file {requirements_path}")
+                        print("")
                     else:
                         print("Skipping requirements installation")
                     
-                else:
+                elif not self.check_auto_no_install_reqs(*args, **kwargs):
                     cmd = input(
                         "Requirements found. Do you want to install them with pip? [y/conda/n]: "
                     )
                     if cmd == "y":
                         os.system(f"pip install -r {requirements_path}")
+                        print("")
+
                     elif cmd == "conda":
                         os.system(f"conda install --file {requirements_path}")
+                        print("")
                     else:
                         print("Skipping requirements installation")
             else:
@@ -120,6 +131,8 @@ class ModuleManager:
 
         root_module = url.split("/")[-2]
         module_name = url.split("/")[-1]
+
+        print(f"Installing {root_module}/{module_name} from {base_git_url}")
 
         if root_module in ["models", "data", "experiments", "trainers"]:
             dest_path = os.path.join(
