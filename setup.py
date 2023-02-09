@@ -16,17 +16,17 @@ setup(
 """
 setup(
     name="yerbamate",
-    description="A cowsay clone for python in one file.",
+    description=" A python module and experiment manager for deep learning",
     author="Giulio Zani, Ali Rahimi",
     author_email="yerba.mate.dl@proton.me",
-    url="https://github.com/ilex-paraguariensis/yerbamate",
+    url="https://github.com/oalee/yerbamate",
     python_requires=">=3.9",
-    version="0.8.12",
+    version="0.9.13",
     packages=find_packages("packages", exclude=["tests"]),
     include_package_data=True,
     package_dir={"": "packages/"},
     license="Apache License 2.0",
-    license_files=("LICENSE.md",),
+    license_files=("LICENSE",),
     install_requires=[
         "ipdb",
         "pipreqs",
@@ -37,9 +37,9 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: Apache Software License",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3"
     ],
     scripts=["./src/mate", "./src/mateboard"],
 )
