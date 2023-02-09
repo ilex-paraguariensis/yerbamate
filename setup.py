@@ -28,11 +28,7 @@ setup(
     license="Apache License 2.0",
     license_files=("LICENSE.md",),
     install_requires=[
-        "bomba",
-        "flask",
         "ipdb",
-        "websockets",
-        "flask_cors",
         "pipreqs",
         "dirhash",
         "docstring-parser",

@@ -160,7 +160,7 @@ class Environment(dict):
                 env[key] = os.path.join(env[key], *self.name.split("/"))
                 env["results"] = env[key]
                 break
-            if os.environ.get(key, None) is not None:
+            if os.environ.get(key, None) is not None and os.environ.get(key, None) != "":
                 env[key] = os.environ.get(key)
                 env["results"] = env[key]
                 break
@@ -179,7 +179,7 @@ class Environment(dict):
                 return self.env[key]
             res = os.environ.get(key, None)
 
-            if res is None:
+            if res is None or res == "":
                 print(f"Environment variable {key} not found. Set it in env.json or in your shell.")
                 print("Exiting...") 
                 sys.exit(1)
