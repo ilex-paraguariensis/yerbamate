@@ -62,7 +62,7 @@ class MateConfig(Config):
         self.results_folder = ""
         self.override_params: dict[str, Any] = {}
         self.restarting = False
-        # )
+        
         super().__init__(config)
 
     def save(self, path="mate.json"):

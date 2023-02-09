@@ -19,13 +19,15 @@ class Environment(dict):
         self.train = False
         self.sample = False
         self.hparams = {}
-        # set major command to True
+
+        # set command to True
         setattr(self, sys.argv[1], True)
         
 
         self._root = self.__find_root()
 
-        # set attributes based on the command line arguments
+
+        # parse python -m module train arg=1 arg2=2
         for arg in sys.argv:
             if "=" not in arg:
                 continue
@@ -33,8 +35,9 @@ class Environment(dict):
             value = self.convert_str_to_data(value)
             setattr(self, key, value)
             self.hparams[key] = value
-        self._path = sys.argv[0]
 
+        
+        self._path = sys.argv[0]
         if "bin/mate" in self._path:
             self.name = os.path.join(*sys.argv[2:4])
             self._path = os.path.join(self._root, "experiments", sys.argv[2],  sys.argv[3] + ".py")
@@ -42,8 +45,8 @@ class Environment(dict):
         else:
             self.name = self._path.split("/")[-2:]
             self.name = os.path.join(*self.name)[: -3]
+
         self.__set_env()
-        # ipdb.set_trace()
 
         if self.train:
             self.__generate_experiment()
@@ -109,14 +112,17 @@ class Environment(dict):
         env_path = os.path.join("env.json")
         if not os.path.exists(env_path):
             print("Environment file not found, creating one with defaults: env.json")
+
+            if ENV_KEY in conf:
+                required_keys = conf[ENV_KEY].keys()
+            else:
+                required_keys = ["results"]
+
+            defualt_env = {key: "" for key in required_keys}
+
             with open(env_path, "w") as f:
-                if ENV_KEY in conf:
-                    json.dump(conf[ENV_KEY], f, indent=4)
-                else:
-                    env = {
-                        "results": "",
-                    }
-                    json.dump(env, f, indent=4)
+                json.dump(defualt_env, f, indent=4)
+
             
         with open(env_path, "r") as f:
             try:
@@ -126,22 +132,37 @@ class Environment(dict):
                     "results": "",
                 }
 
+        env_not_found = []
+
         if ENV_KEY in conf:
-            for key, value in conf[ENV_KEY].items():
-                if not key in env:
-                    print(f"Environment variable {key} not found, setting to default: {value}")
-                    env[key] = value
+            for key, value in env.items():
+                if env[key] == "":
+                    if key in os.environ:
+                        env[key] = os.environ[key]
+                        # print(f"Environment variable {key} set to {os.environ[key]} from shell.")
+                    else:
+                        env_not_found.append(key)
+                        env[key] = value
+        
+        if len(env_not_found) > 0:
+            print(f"Environment variables not found. Set them in env.json or in your shell.")
+            for key in env_not_found:
+                desc = conf[ENV_KEY][key] if key in conf[ENV_KEY] else "Required environment variable"
+                print(f"{key} : {desc}")
+
+            print("Exiting...")
+            sys.exit(1)
             
         # automatically append experiment name to results path
         search_results = ["results", "results_path", "results_dir", "save", "save_path", "save_dir"]
         for key in search_results:
             if key in env:
-                
                 env[key] = os.path.join(env[key], *self.name.split("/"))
-                # ipdb.set_trace()
+                env["results"] = env[key]
                 break
             if os.environ.get(key, None) is not None:
                 env[key] = os.environ.get(key)
+                env["results"] = env[key]
                 break
             
         if len(env) == 0:
@@ -150,9 +171,7 @@ class Environment(dict):
             sys.exit(1)
         
         setattr(self, "env", env)
-    """
-    Unknown keys default to False
-    """
+
     def __getitem__(self, key):
         if not key in self:
             # ipdb.set_trace()
