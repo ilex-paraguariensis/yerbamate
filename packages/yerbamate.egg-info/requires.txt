@@ -1,4 +1,8 @@
+colorama>=0.4.5
+GitPython>=3.1.30
+validators>=0.20.0
 ipdb
 pipreqs
 dirhash
+rich
 docstring-parser

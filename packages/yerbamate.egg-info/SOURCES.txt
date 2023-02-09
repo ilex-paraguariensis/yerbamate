@@ -5,6 +5,7 @@ setup.cfg
 setup.py
 ./src/mate
 ./src/mateboard
+packages/requirements.txt
 packages/mate/__init__.py
 packages/mate/environment.py
 packages/mate/__pycache__/__init__.cpython-310.pyc
@@ -59,7 +60,6 @@ packages/yerbamate/api/data/sources/__pycache__/source.cpython-310.pyc
 packages/yerbamate/api/data/sources/local/__init__.py
 packages/yerbamate/api/data/sources/local/io.py
 packages/yerbamate/api/data/sources/local/local.py
-packages/yerbamate/api/data/sources/local/server.py
 packages/yerbamate/api/data/sources/local/__pycache__/__init__.cpython-310.pyc
 packages/yerbamate/api/data/sources/local/__pycache__/io.cpython-310.pyc
 packages/yerbamate/api/data/sources/local/__pycache__/local.cpython-310.pyc
