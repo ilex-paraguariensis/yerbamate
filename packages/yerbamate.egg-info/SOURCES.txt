@@ -6,18 +6,9 @@ setup.py
 ./src/mate
 ./src/mateboard
 packages/requirements.txt
-packages/mate/__init__.py
-packages/mate/environment.py
-packages/mate/__pycache__/__init__.cpython-310.pyc
-packages/mate/__pycache__/environment.cpython-310.pyc
-packages/mate/__pycache__/mate.cpython-310.pyc
-packages/mate/mate.egg-info/PKG-INFO
-packages/mate/mate.egg-info/SOURCES.txt
-packages/mate/mate.egg-info/dependency_links.txt
-packages/mate/mate.egg-info/requires.txt
-packages/mate/mate.egg-info/top_level.txt
 packages/yerbamate/__init__.py
 packages/yerbamate/constants.py
+packages/yerbamate/environment.py
 packages/yerbamate/mate.py
 packages/yerbamate/mate_cli copy.py
 packages/yerbamate/mate_cli.py
@@ -29,6 +20,7 @@ packages/yerbamate.egg-info/requires.txt
 packages/yerbamate.egg-info/top_level.txt
 packages/yerbamate/__pycache__/__init__.cpython-310.pyc
 packages/yerbamate/__pycache__/backbone_type.cpython-310.pyc
+packages/yerbamate/__pycache__/environment.cpython-310.pyc
 packages/yerbamate/__pycache__/mate.cpython-310.pyc
 packages/yerbamate/__pycache__/mate_cli.cpython-310.pyc
 packages/yerbamate/__pycache__/mate_config.cpython-310.pyc

@@ -31,7 +31,7 @@ class ModuleManager:
 
 
     def check_auto_install_reqs(self, *args, **kwargs):
-        if len(args) < 0:
+        if len(args) < 1:
             return False
         if args[0] == "-y":
             return True

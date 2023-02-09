@@ -21,7 +21,7 @@ class ModuleRepository:
         self.package_manager = ModuleManager(config)
         self.remote = RemoteDataSource()
         self.local = LocalDataSource(config)
-        self.__generate_pip_requirements(self.config.project)
+        # self.__generate_pip_requirements(self.config.project)
 
     @staticmethod
     def init_project(project_name: str):
