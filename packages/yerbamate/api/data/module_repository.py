@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import sys
 
 from .module_manager import ModuleManager
@@ -110,9 +111,14 @@ class ModuleRepository:
     def __add_index_url_to_requirements(self, path: str):
         with open(os.path.join(path), "r") as f:
             lines = f.readlines()
+        linecount = len(lines)
+        lines = [line for line in lines if not ".egg>=info" in line and not ".egg==info" in line and not ".egg~=info" in line]
 
-        lines = [line for line in lines if not ".egg>=info" in line]
-        # ipdb.set_trace()
+        # remove +cu{numbers} version form lines
+        # regex for numbers with at least 1 digit
+        regex = re.compile(r"\+cu\d+")
+        lines = [regex.sub("", line) for line in lines]
+        
         urls = self.__parse_index_urls(lines)
         if len(urls) > 0:
             with open(os.path.join(path), "w") as f:
@@ -120,6 +126,11 @@ class ModuleRepository:
                     f.write(f"--extra-index-url {url}\n")
                 for line in lines:
                     f.write(line)
+        elif linecount != len(lines):
+            with open(os.path.join(path), "w") as f:
+                for line in lines:
+                    f.write(line)
+
         
             
 
@@ -197,13 +208,13 @@ class ModuleRepository:
 
         if path == self.config.project:
             pipreqs.generate_requirements_file(
-                "requirements.txt", import_info_local, "=="
+                "requirements.txt", import_info_local, "~="
             )
             self.__add_index_url_to_requirements("requirements.txt")
 
         else:
             pipreqs.generate_requirements_file(
-                os.path.join(path, "requirements.txt"), import_info_local, "=="
+                os.path.join(path, "requirements.txt"), import_info_local, "~="
             )
             self.__add_index_url_to_requirements(os.path.join(path, "requirements.txt"))
             print(f"Generated requirements.txt for {path}")

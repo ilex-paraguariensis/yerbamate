@@ -151,6 +151,7 @@ class ModuleManager:
 
             if cmd == "o":
                 rmtree(dest_path)
+                print("Deleted existing package at ", dest_path)
                 break
 
             elif cmd == "c":

@@ -8,7 +8,6 @@ import sys
 import ipdb
 from .utils import utils
 
-
 from typing import Optional
 
 from .mate_config import MateConfig
@@ -29,8 +28,8 @@ class Mate:
 
  
     @staticmethod
-    def init(project_name: str):
-        MateAPI.init_project(project_name)
+    def init(project_name: str, *args, **kwargs):
+        MateAPI.init_project(project_name, *args, **kwargs)
  
 
     def export(self):
@@ -72,8 +71,9 @@ class Mate:
 
         try:
             __import__(module)
-        except ModuleNotFoundError:
-            print(f"Experiment {model}/{exp} not found")
+        except Exception as e:
+            print(f"Error in loading {model}/{exp}")
+            print(e)
             print("Available experiments:")
             self.list("experiments")
             sys.exit(1)
