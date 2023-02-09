@@ -64,10 +64,7 @@ class ModuleManager:
             url = f"https://github.com/{url[0]}/{url[1]}/tree/main/{'/'.join(url[2:])}"
 
         assert validators.url(url), "Invalid url"
-
         package_install_dst = self.__install_package(url)
-
-        # ipdb.set_trace()
 
         # check for requirements.txt
         if package_install_dst:

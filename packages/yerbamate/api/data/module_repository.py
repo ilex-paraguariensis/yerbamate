@@ -93,6 +93,36 @@ class ModuleRepository:
                 print(f"Created {init__py}")
             self.__generate__init__(path)
 
+    def __parse_index_urls(self, reqs: list[str]):
+        urls = {
+            "torch": "https://download.pytorch.org/whl/torch_stable.html",
+            "jax": "https://storage.googleapis.com/jax-releases/jax_releases.html"
+        }
+        indexes = set()
+        for req in reqs:
+            if "torch" in req:
+                indexes.add(urls["torch"])
+            if "jax" in req:
+                indexes.add(urls["jax"])
+
+        return indexes
+
+    def __add_index_url_to_requirements(self, path: str):
+        with open(os.path.join(path), "r") as f:
+            lines = f.readlines()
+
+        lines = [line for line in lines if not ".egg>=info" in line]
+        # ipdb.set_trace()
+        urls = self.__parse_index_urls(lines)
+        if len(urls) > 0:
+            with open(os.path.join(path), "w") as f:
+                for url in urls:
+                    f.write(f"--index-url {url}\n")
+                for line in lines:
+                    f.write(line)
+        
+            
+
     def __generate_sub_pip_reqs(self):
 
         for folder in os.listdir(self.config.project):
@@ -102,6 +132,7 @@ class ModuleRepository:
                     subpath = os.path.join(path, subfolder)
                     if os.path.isdir(subpath) and "__" not in subfolder:
                         self.__generate_pip_requirements(subpath)
+                        
                 # self.__generate_pip_requirements(path)
 
     def __generate_mate_dependencies(self, path):
@@ -130,8 +161,26 @@ class ModuleRepository:
         if len(deps) == 0:
             return
 
+        try:
+
+            deps_json = os.path.join(path, "dependencies.json")
+            if os.path.exists(deps_json):
+                with open(deps_json, "r") as f:
+                    # ipdb.set_trace()
+                    deps_json = json.load(f)
+                    if "env" in deps_json:
+                        env = deps_json["env"]
+                    else :
+                        env = {}
+
+            else:
+                env = {}
+        except Exception as e:
+            print(f"Error reading {path}/dependencies.json, skipping env")
+            env = {}
+
         with open(os.path.join(path, "dependencies.json"), "w") as f:
-            deps = {"dependencies": list(deps)}
+            deps = {"dependencies": list(deps), "env": env}
             json.dump(deps, f, indent=4)
             print(f"Generated dependencies.json for {path}")
 
@@ -148,12 +197,15 @@ class ModuleRepository:
 
         if path == self.config.project:
             pipreqs.generate_requirements_file(
-                "requirements.txt", import_info_local, "=="
+                "requirements.txt", import_info_local, ">="
             )
+            self.__add_index_url_to_requirements("requirements.txt")
+
         else:
             pipreqs.generate_requirements_file(
-                os.path.join(path, "requirements.txt"), import_info_local, "=="
+                os.path.join(path, "requirements.txt"), import_info_local, ">="
             )
+            self.__add_index_url_to_requirements(os.path.join(path, "requirements.txt"))
             print(f"Generated requirements.txt for {path}")
 
         for im in import_info_local:
