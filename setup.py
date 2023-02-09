@@ -1,19 +1,10 @@
 from setuptools import setup, find_packages
 
-"""
-setup(
-    name="yerbamate",
-    version="0.3.2",
-    license="MIT",
-    author="Giulio Zani, Ali Rahimi",
-    author_email="giulio.zani@gmail.com",
-    scripts=["src/run.py"],
-    packages=["src/yerbamate", "mate"],
-    url="https://github.com/giuliozani/mate",
-    keywords="deep_learning machine_learning package_manager",
-    install_requires=["torch", "pytorch_lightning", "numpy",],
-)
-"""
+from pathlib import Path
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
+
+
 setup(
     name="yerbamate",
     description=" A python module and experiment manager for deep learning",
@@ -21,12 +12,14 @@ setup(
     author_email="yerba.mate.dl@proton.me",
     url="https://github.com/oalee/yerbamate",
     python_requires=">=3.9",
-    version="0.9.13",
+    version="0.9.14",
     packages=find_packages("packages", exclude=["tests"]),
     include_package_data=True,
     package_dir={"": "packages/"},
     license="Apache License 2.0",
     license_files=("LICENSE",),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     install_requires=[
         "ipdb",
         "pipreqs",
@@ -41,5 +34,5 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3"
     ],
-    scripts=["./src/mate", "./src/mateboard"],
+    scripts=["./src/mate"],
 )
