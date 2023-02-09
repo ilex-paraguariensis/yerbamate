@@ -280,7 +280,7 @@ def main():
             else:
                 mate = Mate()
                 if hasattr(mate, action):
-                    getattr(mate, action)(*pos_args)
+                    getattr(mate, action)(*pos_args, **kwargs)
                 else:
                     if len(pos_args) == 2:
                         mate.train(*pos_args)

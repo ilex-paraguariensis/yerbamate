@@ -30,7 +30,32 @@ class ModuleManager:
         return os.path.join(self.root_path, *args)
 
 
-    def install_package(self, url):
+    def check_auto_install_reqs(self, *args, **kwargs):
+        if len(args) < 0:
+            return False
+        if args[0] == "-y":
+            return True
+
+    def auto_install_manager(self, *args, **kwargs):
+        if self.check_auto_install_reqs(*args, **kwargs):
+            if len(args) > 1:
+                pm = args[1]
+                if pm in ["pip", "conda"]:
+                    return pm
+            else:
+                input = input("Install with pip or conda? [pip/conda]: ")
+                if input in ["pip", "conda"]:
+                    return input
+
+            while input not in ["pip", "conda"]:
+                input = input("Install with pip or conda? [pip/conda]: ")
+                if input in ["pip", "conda"]:
+                    return input
+            
+            return None
+        return None
+
+    def install_package(self, url: str, *args, **kwargs):
 
         if url.count("/") > 3 and "github.com" not in url:
 
@@ -42,19 +67,32 @@ class ModuleManager:
 
         package_install_dst = self.__install_package(url)
 
+        # ipdb.set_trace()
+
         # check for requirements.txt
         if package_install_dst:
             requirements_path = os.path.join(package_install_dst, "requirements.txt")
             if os.path.exists(requirements_path):
-                cmd = input(
-                    "Requirements found. Do you want to install them with pip? [y/conda/n]: "
-                )
-                if cmd == "y":
-                    os.system(f"pip install -r {requirements_path}")
-                elif cmd == "conda":
-                    os.system(f"conda install --file {requirements_path}")
+
+                if self.check_auto_install_reqs(*args, **kwargs):
+                    pm = self.auto_install_manager(*args, **kwargs)
+                    if pm == "pip":
+                        os.system(f"pip install -r {requirements_path}")
+                    elif pm == "conda":
+                        os.system(f"conda install --file {requirements_path}")
+                    else:
+                        print("Skipping requirements installation")
+                    
                 else:
-                    print("Skipping requirements installation")
+                    cmd = input(
+                        "Requirements found. Do you want to install them with pip? [y/conda/n]: "
+                    )
+                    if cmd == "y":
+                        os.system(f"pip install -r {requirements_path}")
+                    elif cmd == "conda":
+                        os.system(f"conda install --file {requirements_path}")
+                    else:
+                        print("Skipping requirements installation")
             else:
                 print("No requirements found. Manually check and install dependencies.")
             # read dependencies.json
@@ -64,7 +102,7 @@ class ModuleManager:
                     dependencies = json.load(f)
                 for dependency in dependencies["dependencies"]:
                     # ipdb.set_trace()
-                    self.install_package(dependency)
+                    self.install_package(dependency, *args, **kwargs)
 
         # update history
 

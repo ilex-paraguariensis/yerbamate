@@ -66,8 +66,8 @@ class ModuleRepository:
         except Exception as e:
             print(e)
 
-    def install_url(self, url: str):
-        self.package_manager.install_package(url)
+    def install_url(self, url: str, *args, **kwargs):
+        self.package_manager.install_package(url, *args, **kwargs)
 
     def auto(self, command: str, *args):
         if command == "export":

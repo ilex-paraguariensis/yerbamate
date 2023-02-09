@@ -30,8 +30,8 @@ class MateAPI:
     # def generate_metadata(self, rewrite: bool = False):
     #     return self.repository.metadata_generator.generate(rewrite)
 
-    def install_url(self, url: str):
-        self.repository.install_url(url)
+    def install_url(self, url: str, *args, **kwargs):
+        self.repository.install_url(url, *args, **kwargs)
 
     def list(self, module: str):
         return self.repository.list(module)
