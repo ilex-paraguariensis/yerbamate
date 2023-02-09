@@ -10,227 +10,8 @@ from .....utils.bunch import Bunch
 from .....utils.utils import once
 
 
-def load_json(path):
-    with open(path) as f:
-        return Bunch(json.load(f))
-
-
-def set_save_path(root_save_folder: str, root_folder: str, params: str):
-    save_path = os.path.join(root_save_folder, root_folder, params)
-
-    return save_path
-
-
-def save_train_experiments(save_path, hparams: Bunch, conf: MateConfig):
-    params = hparams.copy()
-    params["mate"] = conf.copy()
-    with open(os.path.join(save_path, "train.json"), "w") as f:
-        json.dump(params, f, indent=4)
-
-
-def update_experiments(root_folder: str, model_name: str, params: str, hparams: Bunch):
-    path = __get_experiment_path(root_folder, model_name, params)
-    with open(
-        os.path.join(
-            root_folder,
-            "models",
-            model_name,
-            "experiments",
-            f"{params}.json",
-        ),
-        "w",
-    ) as f:
-        json.dump(hparams, f, indent=4)
-
-
-def override_params(config: MateConfig, params: Bunch):
-
-    # ipdb.set_trace()
-    if (
-        config.override_params is not None
-        and "enabled" in config.override_params
-        and config.override_params["enabled"]
-    ):
-        for key, value in config.override_params.items():
-            if key == "enabled":
-                key = "override_params"
-            params[key] = value
-    return params
-
-
-def __get_experiment_path(
-    root_folder: str,
-    experiment_name: str,
-    path_types: tuple[str, ...] = ("json", "toml", "py"),
-):
-    assert os.path.exists(
-        os.path.join(root_folder, "experiments", experiment_name)
-    ), f"Could not find experiment {experiment_name} in {root_folder}"
-    paths = [
-        os.path.join(
-            root_folder, "experiments", experiment_name, f"experiment.{path_type}"
-        )
-        for path_type in path_types
-    ]
-    # toml must be 2 because it gets generated every time in all experiments
-    priority = {
-        "json": 0,
-        "toml": 2,
-        "py": 1,
-    }
-    valid_paths = [path for path in paths if os.path.exists(path)]
-    if len(valid_paths) == 0:
-        raise FileNotFoundError(
-            f"Could not find experiment {experiment_name} in {root_folder} (looked for {paths})"
-        )
-    valid_paths.sort(key=lambda path: priority[path.split(".")[-1]])
-    return valid_paths[0]
-
-
-def get_metadata_path(root_folder: str, experiment: str):
-    path = os.path.join(root_folder, "experiments", experiment, "metadata.json")
-    # os.makedirs(os.path.dirname(path), exist_ok=True)
-    return path
-
-
-def save_metadata(root_folder: str, experiment: str, metadata: dict):
-    path = get_metadata_path(root_folder, experiment)
-    with open(path, "w") as f:
-        json.dump(metadata, f, indent=4)
-
-
-def save_toml(root_folder: str, experiment: str, toml: str):
-    path = os.path.join(root_folder, "experiments", experiment, "experiment.toml")
-    with open(path, "w") as f:
-        f.write(toml)
-
-
-def get_experiment_path(root_folder: str, experiment_name: str, type: str = "json"):
-    path = __get_experiment_path(root_folder, experiment_name, type)
-    return path
-
-
-def get_experiment_base_module(root_folder: str, model_name: str, experiment: str):
-
-    if experiment == "default":
-        # firt check if second level default exists
-        if os.path.exists(
-            os.path.join(
-                root_folder, "models", model_name, "experiments", "default.json"
-            )
-        ):
-            return ".".join([root_folder, "models", model_name])
-
-        else:
-            path = os.path.join(root_folder, "experiments", f"{model_name}.json")
-            if os.path.exists(path):
-                return root_folder
-
-    # if not, check if first level default exists
-    # ipdb.set_trace()
-    module = ".".join([root_folder, "models", model_name])
-
-    return module
-
 
 print_once = once(print)
-
-
-def apply_env(root_folder: str, hparams: Bunch):
-    env_location = os.path.join(
-        root_folder,
-        "env.json",
-    )
-    if not os.path.exists(env_location):
-        print(f"Could not find env.json in {env_location}. Created one.")
-        with open(env_location, "w") as f:
-            json.dump({}, f)
-
-    with open(env_location) as f:
-        env = json.load(f)
-
-    env_in_params = [
-        (key, val) for key, val in hparams.items() if key.startswith("env.")
-    ]
-    modified_env = False
-    for key, val in env_in_params:
-        stripped_key = key[4:]
-        if key not in env:
-            env[stripped_key] = val
-            modified_env = True
-        hparams[stripped_key] = env[stripped_key]
-        hparams.pop(key, None)
-
-    if modified_env:
-        with open(env_location, "w") as f:
-            json.dump(env, f, indent=4)
-        print("Updated env.json")
-        # print(json.dumps(env, indent=4))
-
-
-def read_json(path):
-    try:
-        with open(path) as f:
-            return json.load(f)
-    except:
-        return None
-
-
-def read_experiments(
-    conf: MateConfig,
-    root_folder: str,
-    experiment: str = "default",
-    config_types: tuple[str, ...] = ("json", "toml", "py"),
-    run_params: dict | None = None,
-):
-    experiment_path = __get_experiment_path(root_folder, experiment, config_types)
-    assert experiment_path != None, f"Could not find the experiment {experiment}"
-
-    from bombilla.bombilla_dag.bombilla_dag import BombillaDAG
-
-    if experiment_path.endswith(".py"):
-        hparams = BombillaDAG.python_file_to_dict(experiment_path)
-    elif experiment_path.endswith(".toml"):
-        raise NotImplementedError("Toml not implemented yet")
-    else:
-        with open(experiment_path) as f:
-            hparams = json.load(f)
-
-    hparams = Bunch(hparams)
-    hparams = override_params(conf, hparams)
-    hparams = override_run_params(hparams, run_params)
-
-    hparams = Bunch(json.loads(json.dumps(hparams)))
-
-    return hparams
-
-
-def override_run_params(hparams: Bunch, run_params: dict):
-
-    # parsed from mate {command} --param1=value1 --param2=value2
-    # run params is a key value pair of parameters to override
-    # keys are formatted as "model.parameters.lr"
-    # values are the new values
-    # we need to override the config with the new values
-
-    if run_params == None:
-        return hparams
-
-    def update_dict_in_depth(d: dict, keys: list, value):
-        if len(keys) == 1:
-            d[keys[0]] = value
-        else:
-            update_dict_in_depth(d[keys[0]], keys[1:], value)
-
-    for key, value in run_params.items():
-        keys = key.split(".")
-        if len(keys) == 1:
-            hparams[keys[0]] = value
-
-        else:
-            update_dict_in_depth(hparams, keys, value)
-
-    return hparams
 
 
 def find_root():
@@ -330,17 +111,17 @@ def list_experiment_names(root_folder: str, model_name: str):
     return [x[1] for x in experiments]
 
 
-def experiment_exists(root_folder: str, model_name: str, experiment_name: str):
-    # ipdb.set_trace()
-    exp_path = __get_experiment_path(root_folder, model_name, experiment_name)
-    return os.path.exists(exp_path)
+# def experiment_exists(root_folder: str, model_name: str, experiment_name: str):
+#     # ipdb.set_trace()
+#     exp_path = __get_experiment_path(root_folder, model_name, experiment_name)
+#     return os.path.exists(exp_path)
 
 
-def assert_experiment_exists(root_folder: str, model_name: str, experiment_name: str):
-    # ipdb.set_trace()
-    exp_path = __get_experiment_path(root_folder, model_name, experiment_name)
+# def assert_experiment_exists(root_folder: str, model_name: str, experiment_name: str):
+#     # ipdb.set_trace()
+#     exp_path = __get_experiment_path(root_folder, model_name, experiment_name)
 
-    assert os.path.exists(exp_path), f"Experiment {exp_path} does not exist"
+#     assert os.path.exists(exp_path), f"Experiment {exp_path} does not exist"
 
 
 def load_mate_config(path):
