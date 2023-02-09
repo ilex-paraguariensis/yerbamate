@@ -117,7 +117,7 @@ class ModuleRepository:
         if len(urls) > 0:
             with open(os.path.join(path), "w") as f:
                 for url in urls:
-                    f.write(f"--index-url {url}\n")
+                    f.write(f"--extra-index-url {url}\n")
                 for line in lines:
                     f.write(line)
         
@@ -197,13 +197,13 @@ class ModuleRepository:
 
         if path == self.config.project:
             pipreqs.generate_requirements_file(
-                "requirements.txt", import_info_local, ">="
+                "requirements.txt", import_info_local, "=="
             )
             self.__add_index_url_to_requirements("requirements.txt")
 
         else:
             pipreqs.generate_requirements_file(
-                os.path.join(path, "requirements.txt"), import_info_local, ">="
+                os.path.join(path, "requirements.txt"), import_info_local, "=="
             )
             self.__add_index_url_to_requirements(os.path.join(path, "requirements.txt"))
             print(f"Generated requirements.txt for {path}")
