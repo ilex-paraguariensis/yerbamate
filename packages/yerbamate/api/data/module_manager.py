@@ -141,18 +141,18 @@ class ModuleManager:
 
         else:
             print("Could not automatically determine the module type. Please specify.")
-            command = input(f"Is {root_module}/{module_name} Correct [y,n]?")
+            command = input(f"Is {root_module}/{module_name} Correct [y,n]? ")
             if command == "y":
                 dest_path = os.path.join(
                     os.getcwd(), self.conf.project, root_module, module_name
                 )
             else:
                 dest_path = input(
-                    "Please specify the correct path: (e.g. models.my_model)"
+                    "Please specify the correct module: (e.g. models.my_model) "
                 )
                 while dest_path.count(".") < 0:
                     dest_path = input(
-                        "Please specify the correct path: (e.g. models.my_model) "
+                        "Please specify the correct module: (e.g. models.my_model) "
                     )
                 dest_path = dest_path.split(".")
                 dest_path = os.path.join(os.getcwd(), self.conf.project, *dest_path)
@@ -172,11 +172,11 @@ class ModuleManager:
 
             elif cmd == "r":
                 dest_path = input(
-                    "Please specify the correct path: (e.g. models.my_model) "
+                    "Please specify the correct module: (e.g. models.my_model) "
                 )
                 while dest_path.count(".") < 0:
                     dest_path = input(
-                        "Please specify the correct path: (e.g. models.my_model) "
+                        "Please specify the correct module: (e.g. models.my_model) "
                     )
                     print(dest_path.count("."))
                 dest_path = dest_path.split(".")
