@@ -68,6 +68,7 @@ class ModuleRepository:
             print(e)
 
     def install_url(self, url: str, *args, **kwargs):
+        
         self.package_manager.install_package(url, *args, **kwargs)
 
     def auto(self, command: str, *args):
@@ -85,7 +86,7 @@ class ModuleRepository:
 
         for folder in os.listdir(root):
             path = os.path.join(root, folder)
-            if not os.path.isdir(path) or path == "__pycache__" or "." in folder:
+            if not os.path.isdir(path) or folder == "__pycache__" or "." in folder:
                 continue
             init__py = os.path.join(path, "__init__.py")
             if not os.path.exists(init__py):
@@ -136,6 +137,10 @@ class ModuleRepository:
 
     def __generate_sub_pip_reqs(self):
 
+
+        root_path = self.config.project
+        self.__generate_pip_requirements(root_path)
+
         for folder in os.listdir(self.config.project):
             path = os.path.join(self.config.project, folder)
             if os.path.isdir(path) and "__" not in folder:
@@ -150,11 +155,28 @@ class ModuleRepository:
         # ipdb.set_trace()
 
         files = [f for f in os.listdir(path) if f.endswith(".py") and "__" not in f]
+        original_files = [file.replace(".py", "") for file in files]
+
         relative_imports = [get_relative_imports(os.path.join(path, f)) for f in files]
         # flatten array to unique set
         relative_imports = set(
             [item for sublist in relative_imports for item in sublist]
         )
+
+        # remore original files from relative imports
+        # ipdb.set_trace()
+        # importz = []
+        # for module in relative_imports:
+        #     # if any original file is in the module name, remove it
+        #     if any([file in module for file in original_files]):
+        #         continue
+        #     importz.append(module)
+        
+        # refactor above code
+        relative_imports = [module for module in relative_imports if not any([file in module for file in original_files])]
+
+        # ipdb.set_trace()
+        # 
 
         url_git = parse_url_from_git()
 
@@ -164,6 +186,10 @@ class ModuleRepository:
 
         deps = set()
         for module in relative_imports:
+
+            if module.endswith(".py"):
+                continue
+
             url = self.config.project + "/" + module.replace(".", "/")
             if url_git:
                 url = url_git + url
@@ -201,8 +227,8 @@ class ModuleRepository:
         # import_info_remote = pipreqs.get_imports_info(imports)
         import_info_local = pipreqs.get_import_local(imports)
 
-        if "experiments" in path:
-            self.__generate_mate_dependencies(path)
+        
+        self.__generate_mate_dependencies(path)
 
         import_info = []
 

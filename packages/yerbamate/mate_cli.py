@@ -254,18 +254,22 @@ def main():
     help_args = ("help", "--help", "-h")
     actions = tuple(method.replace("_", "-") for method in methods) + help_args
     help = MateHelp()
-    if len(args) == 0 or not args[0] in actions or args[0] in help_args:
+    if len(args) == 0  or args[0] in help_args:
         if len(args) > 1:
             help.print_help(args[1])
         else:
             help.print_help()
     else:
-        if args[0] not in actions:
-            help.print_help()
+        # if args[0] not in actions:
+        #     help.print_help()
         action = args[0]
         if len(args) > 1 and args[1] in ("--help", "-h"):
             md = method_to_md(action)
             print_markdown(md)
+
+        elif action not in methods:
+            mate = Mate()
+            mate.train(*args[1:])
         else:
             annotations = tuple(
                 param.annotation

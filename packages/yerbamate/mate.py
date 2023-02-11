@@ -1,4 +1,5 @@
 import os
+import traceback
 from yerbamate.api.data.sources.local import io
 import json
 from yerbamate.api.mate_api import MateAPI
@@ -7,7 +8,7 @@ import sys
 
 import ipdb
 from .utils import utils
-
+import shutil
 from typing import Optional
 
 from .mate_config import MateConfig
@@ -58,8 +59,31 @@ class Mate:
     def summary(self, output_json: bool = True):
         print(json.dumps(self.api.summary(), indent=4))
 
-    def clone(self, source_model: str, target_model: str):
-        pass
+    def clone(self, module: str, name: str, dest: str):
+        
+        # check if module exists
+        module_path = os.path.join(self.root_folder, module, name)
+        if not os.path.exists(module_path):
+            print(f"Module {module}/{name} does not exist")
+            sys.exit(1)
+        
+        # check if destination exists
+        dest_path = os.path.join(self.root_folder, module, dest)
+        if os.path.exists(dest_path):
+            print(f"Destination {dest} exists")
+            # ask if overwrite
+            overwrite = input("Overwrite? (y/n): ")
+            if overwrite == "y":
+                shutil.rmtree(dest_path)
+            else:
+                sys.exit(1)
+        else:        
+            os.makedirs(dest_path)
+        # copy module to destination
+        shutil.copytree(module_path, dest_path)
+
+        print(f"Module {module}/{name} cloned to {dest}")
+
 
     def snapshot(self, model_name: str):
         pass
@@ -73,9 +97,11 @@ class Mate:
             __import__(module)
         except Exception as e:
             print(f"Error in loading {model}/{exp}")
-            print(e)
             print("Available experiments:")
             self.list("experiments")
+            traceback.print_exc()
+
+            # print(e)
             sys.exit(1)
 
 

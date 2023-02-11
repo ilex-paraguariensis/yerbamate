@@ -24,7 +24,7 @@ def find_root():
     i = 0
     root_folder = ""
     config: Optional[MateConfig] = None
-    while not found and i < 6:
+    while not found and i < 2:
         if os.path.exists(os.path.join(current_path, "mate.json")):
             conf_path = os.path.join(current_path, "mate.json")
             config = load_mate_config(conf_path)
@@ -35,7 +35,7 @@ def find_root():
             os.chdir("..")
             current_path = os.getcwd()
             i += 1
-            if current_path == "/" or i == 6:
+            if current_path == "/" or i == 2:
                 raise Exception(
                     "Could not find mate.json. Please make sure you are in the root folder of the project."
                 )

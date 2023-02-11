@@ -35,6 +35,7 @@ class MateAPI:
 
     def list(self, module: str):
         return self.repository.list(module)
+    
 
     def summary(self):
         return self.repository.get_mate_summary()
