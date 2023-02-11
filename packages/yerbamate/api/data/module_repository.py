@@ -68,7 +68,7 @@ class ModuleRepository:
             print(e)
 
     def install_url(self, url: str, *args, **kwargs):
-        
+
         self.package_manager.install_package(url, *args, **kwargs)
 
     def auto(self, command: str, *args):
@@ -98,7 +98,7 @@ class ModuleRepository:
     def __parse_index_urls(self, reqs: list[str]):
         urls = {
             "torch": "https://download.pytorch.org/whl/torch_stable.html",
-            "jax": "https://storage.googleapis.com/jax-releases/jax_releases.html"
+            "jax": "https://storage.googleapis.com/jax-releases/jax_releases.html",
         }
         indexes = set()
         for req in reqs:
@@ -113,13 +113,19 @@ class ModuleRepository:
         with open(os.path.join(path), "r") as f:
             lines = f.readlines()
         linecount = len(lines)
-        lines = [line for line in lines if not ".egg>=info" in line and not ".egg==info" in line and not ".egg~=info" in line]
+        lines = [
+            line
+            for line in lines
+            if not ".egg>=info" in line
+            and not ".egg==info" in line
+            and not ".egg~=info" in line
+        ]
 
         # remove +cu{numbers} version form lines
         # regex for numbers with at least 1 digit
         regex = re.compile(r"\+cu\d+")
         lines = [regex.sub("", line) for line in lines]
-        
+
         urls = self.__parse_index_urls(lines)
         if len(urls) > 0:
             with open(os.path.join(path), "w") as f:
@@ -132,11 +138,7 @@ class ModuleRepository:
                 for line in lines:
                     f.write(line)
 
-        
-            
-
     def __generate_sub_pip_reqs(self):
-
 
         root_path = self.config.project
         self.__generate_pip_requirements(root_path)
@@ -148,14 +150,16 @@ class ModuleRepository:
                     subpath = os.path.join(path, subfolder)
                     if os.path.isdir(subpath) and "__" not in subfolder:
                         self.__generate_pip_requirements(subpath)
-                        
+
                 # self.__generate_pip_requirements(path)
 
     def __generate_mate_dependencies(self, path):
         # ipdb.set_trace()
 
         files = [f for f in os.listdir(path) if f.endswith(".py") and "__" not in f]
-        original_files = [file.replace(".py", "") for file in files]
+        original_files = [file.replace(".py", "") for file in files] + [
+            f for f in os.listdir(path) if "__" not in f
+        ]
 
         relative_imports = [get_relative_imports(os.path.join(path, f)) for f in files]
         # flatten array to unique set
@@ -171,12 +175,16 @@ class ModuleRepository:
         #     if any([file in module for file in original_files]):
         #         continue
         #     importz.append(module)
-        
+
         # refactor above code
-        relative_imports = [module for module in relative_imports if not any([file in module for file in original_files])]
+        relative_imports = [
+            module
+            for module in relative_imports
+            if not any([file in module for file in original_files])
+        ]
 
         # ipdb.set_trace()
-        # 
+        #
 
         url_git = parse_url_from_git()
 
@@ -190,7 +198,19 @@ class ModuleRepository:
             if module.endswith(".py"):
                 continue
 
-            url = self.config.project + "/" + module.replace(".", "/")
+            # if its a python file, return parent module
+
+            tpath = [self.config.project, *module.split(".")]
+            tpath[-1] = tpath[-1] + ".py"
+
+            # ipdb.set_trace()
+
+            if os.path.exists(os.path.join(*tpath)):
+                # module = parent
+                url = "/".join(tpath[:-1])
+            else:
+                url = self.config.project + "/" + module.replace(".", "/")
+
             if url_git:
                 url = url_git + url
             deps.add(url)
@@ -207,7 +227,7 @@ class ModuleRepository:
                     deps_json = json.load(f)
                     if "env" in deps_json:
                         env = deps_json["env"]
-                    else :
+                    else:
                         env = {}
 
             else:
@@ -227,7 +247,6 @@ class ModuleRepository:
         # import_info_remote = pipreqs.get_imports_info(imports)
         import_info_local = pipreqs.get_import_local(imports)
 
-        
         self.__generate_mate_dependencies(path)
 
         import_info = []
