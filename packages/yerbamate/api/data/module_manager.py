@@ -32,13 +32,13 @@ class ModuleManager:
     def check_auto_install_reqs(self, *args, **kwargs):
         if len(args) < 1:
             return False
-        if args[0] == "-y":
+        if args[0] == "-y" or "y" in args[0]:
             return True
 
     def check_auto_no_install_reqs(self, *args, **kwargs):
         if len(args) < 1:
             return False
-        if args[0] == "-n":
+        if args[0] == "-n" or "n" in args[0]:
             return True
 
     def auto_install_manager(self, *args, **kwargs):
@@ -60,6 +60,34 @@ class ModuleManager:
             return None
         return None
 
+    def check_auto_overwrite(self, *margs, **kwargs):
+        if len(margs) < 1:
+            return False
+        # ipdb.set_trace()
+
+        try:
+            args = margs[0][0]
+
+            for arg in args:
+                if re.match("-\w*o", arg):
+                    return True
+        except:
+            return False
+
+        # for arg in margs:
+        #     if type(arg) is tuple:
+        #         for a in list(arg):
+        #             if type(a) is str:
+        #                 if re.match("-[*]?o[*]?", a):
+        #                     return True
+
+        #     else:
+        #         regex = r"-[*]?o[*]?"
+        #         if type(arg) is str:
+        #             if re.match(regex, arg):
+        #                 return True
+        # return False
+
     def install_package(self, url: str, *args, **kwargs):
 
         if url.count("/") > 3 and "github.com" not in url:
@@ -69,7 +97,7 @@ class ModuleManager:
             url = f"https://github.com/{url[0]}/{url[1]}/tree/main/{'/'.join(url[2:])}"
 
         assert validators.url(url), "Invalid url"
-        package_install_dst = self.__install_package(url)
+        package_install_dst = self.__install_package(url, args, kwargs)
 
         # check for requirements.txt
         if package_install_dst:
@@ -120,7 +148,7 @@ class ModuleManager:
         return re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*$", name)
         # return re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*$", name)
 
-    def __install_package(self, url):
+    def __install_package(self, url, *args, **kwargs):
 
         # just git url
         base_git_url = "/".join(url.split("/")[:7])
@@ -171,9 +199,12 @@ class ModuleManager:
                     dest_path = os.path.join(os.getcwd(), self.conf.project, *dest_path)
 
         while os.path.exists(dest_path):
-            cmd = input(
-                "Package already exists, options: [o]verwrite, [c]ancel, [r]ename: "
-            )
+            if not self.check_auto_overwrite(args, kwargs):
+                cmd = input(
+                    "Package already exists, options: [o]verwrite, [c]ancel, [r]ename: "
+                )
+            else:
+                cmd = "o"
 
             if cmd == "o":
                 rmtree(dest_path)
