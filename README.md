@@ -1,7 +1,6 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 
-Maté is a deep learning framework compatible with pytorch(lightning), tensorflow(keras), and jax(flax). It is a package and experiment manager for deep learning. As a package manager you can add AI models, trainers and data loaders to your projects. As a project manager, Maté evaluates, trains, and keeps track of your experiments. Maté adds the source code of the dependencies to your project, making it fully customizable and reproducible.
-
+Welcome to Maté - the versatile and efficient deep learning framework! Maté is a package and experiment manager that seamlessly integrates with popular deep learning libraries such as PyTorch, TensorFlow, and JAX. Whether you are a seasoned deep learning researcher or just starting out, Maté provides you with the tools to easily add models, trainers, and data loaders to your projects. With Maté, you can also evaluate, train, and keep track of your experiments with ease. By including the source code of dependencies directly in your project, Maté ensures full customizability and reproducibility of your results. Get started with Maté today and elevate your deep learning experience! 🚀
 
 ## Installation 🔌
 
@@ -9,29 +8,75 @@ Maté is a deep learning framework compatible with pytorch(lightning), tensorflo
 pip install yerbamate
 ```
 
-## Examples
 
-Please check out the [examples repo](https://github.com/ilex-paraguariensis/examples/) for examples of pytorch lightning, keras and jax.
+
+## Examples 📚
+
+Please check out the [transfer learning](https://github.com/oalee/big-transfer), [vision models](https://github.com/oalee/deep-vision),
+and [lightweight gan](https://github.com/oalee/lightweight-gan).
 
 ## Quick Start ⚡
+
+**Initialize a project**
+
+```bash
+mate init my_project
+```
+
+**List all modules(trainers/data/models/experiments)**
+
+```bash
+mate list 
+```
 
 **Train a model**
 
 ```bash
-mate train my_experiment
+mate train experiment my_experiment
+# or alternatively use python
+python -m train my_project.experiment.my_experiment
 ```
 
-**Evaluate a model**
+**Install a module**
 
 ```bash
-mate test my_experiment
+# Installs the experiment, code and python dependencies with pip
+mate install oalee/big_transfer/experiments/bit -y pip
+
+# Installs python dependencies with conda
+# Overwrites code dependencies if it already exists
+mate install oalee/big_transfer/experiments/bit -yo conda
+
+# Only installs the code without any pip/conda dependencies
+mate install oalee/big_transfer/experiments/bit -n
+
+# installs a fine tuning resnet experiment
+mate install https://github.com/oalee/deep-vision/tree/main/deepnet/experiments/resnet
+
+# Short install version of this repo: https://github.com/oalee/deep-vision
+# installs a customizable pytorch resnet model implementation
+mate install oalee/deep-vision/deepnet/models/resnet
+
+# installs cifar10 data loader for pytorch lightning
+mate install oalee/deep-vision/deepnet/data/cifar10
+
+# installs augmentation module seperated from torch image models
+mate install oalee/deep-vision/deepnet/data/torch_aug
+
+# installs over 30 Vision in Transformers implementations into models
+mate install oalee/deep-vision/deepnet/models/torch_vit
+
+# Or install torch_vit from lucidrains as a non independent module
+mate install https://github.com/lucidrains/vit-pytorch/tree/main/vit_pytorch
+
+# installs a pytorch lightning classifier module
+mate install oalee/deep-vision/deepnet/trainers/pl_classification
+
+# installs pytorch lightning gan training module from lightweight-gan repo
+mate install oalee/lightweight-gan/lgan/trainers/lgan
 ```
 
-**Run a model**
 
-```bash
-mate run feature_extraction my_experiment
-```
 
 **Clone a model**
 
@@ -39,135 +84,75 @@ mate run feature_extraction my_experiment
 mate clone resnet my_resnet
 ```
 
-More features coming soon!
 
-## Comparison to familiar tools
-
-- *Weights & Biases* wandb is a logger and allows model weights sharing as well
-- *Tensorboard* This is a logger and can be integrated into mate
-- *[Monai](https://github.com/Project-MONAI/MONAI)*
-- *[Ivy](https://github.com/unifyai/ivy)*
-- *[THINGSvision](https://github.com/ViCCo-Group/thingsvision)*
+## Documentation 📚
 
 
-
-## What is the Maté standard?
-Mate enforces modularity and seperation of three basic components of a deep learning project: models, trainers, and data loaders. Each model, data loader, and trainer. Each model, data loader and trainer should be a module inside its respective folder. This allows for out-of-the-box sharing of models, data loaders, and trainers. 
-
-An example of a the foolder structure of a mate project is shown below:
-
+### Modularity
+Modularity is a software design principle that focuses on creating self-contained, reusable and interchangeable components. In the context of a deep learning project, modularity means creating standalone modules that can perform specific functions such as data loading, model training, or evaluation. This allows for a more organized, maintainable and scalable project structure. 
+### Project Structure
+Maté enforces a project structure that is modular and easy to navigate. The project structure is shown below:
+```bash
+/
+|-- models/
+|   |-- __init__.py
+|-- experiments/
+|   |-- __init__.py
+|-- trainers/
+|   |-- __init__.py
+|-- data/
+|   |-- __init__.py
 ```
-├── root_project_folder
-│   ├── data
-│   │   ├── __init__.py
-│   │   ├── cifar
-│   │   │   ├── __init__.py
-│   │   │   ├── cifar10.py
-|
-│   ├── models
-│   │   ├── __init__.py
-│   │   ├── resnet
-│   │   │   ├── __init__.py
-│   │   │   ├── resnet.py
-|
-│   ├── trainers
-│   │   ├── __init__.py
-│   │   ├── classifier
-│   │   │   ├── __init__.py
-│   │   │   ├── classifier.py
-|
-│   ├── experiments
-│   │   ├── resnet18_cifar10.json
-│   │   ├── resnet34_cifar10.json
+All independent sub modules (meaning they don't import from each other) should be placed in their respective folders. For example, a model should be placed in the models folder, a trainer should be placed in the trainers folder, and a data loader should be placed in the data folder. This allows for out-of-the-box sharing of models, data loaders, and trainers.
 
+
+### Experiment Definition
+An experiment is a combination of a model, trainer, and data loader. An experiment is defined in the experiments module. 
+
+### Maté Environment
+The Maté Environment API is a tool for managing your environment variables. It offers a convenient way to set, retrieve and manage these variables throughout your project. The API first searches for an env.json file to find the environment variables, and if it doesn't find one, it then looks to the operating system's environment variables. With the Maté Environment API, you can easily store and access environment-specific information such as API keys, database URLs, and more, ensuring that your application runs smoothly no matter the environment.
+
+You can access the Maté Environment API in your experiments:
+```python
+
+import yerbamate
+
+env = yerbamate.Environment()
+
+# access environment variables
+data_dir = env["data"]
+results = env["results]
+
+if env.train:
+    # do something
+else env.test:
+    # do something else
 ```
 
-
-
-
-
-## For Coders
-Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any mate class to your projects. Mate simply parses the configuration. To make your project mate compatible, you need to move a few files and make a Bombilla configuration file. 
-
-### Mate configuration (AKA Bombilla 🧉)
-Mate defines an experiment with a configuration file, aka Bombilla, that is a ordered dictionary describing arguments and python objects in plain json. Bombilla supports any python module; including all the local project level modules and installed py packages (eg., tensorflow, pytorch, x_transformers, torchvision, vit_pytorch). Mate generates objects in a Bombilla with DFS search. 
-
-**Note that all the arguments are directly passed to the object constructor, so you can use any argument that is accepted by the fucntion call.**
-
-Here you can see some examples of objects in Bombilla format:
-* custom neural network that fine tunes a pretrained resnet:
+The environment variables can be set in the env.json file:
+```json
+{
+    "data": "/home/user/data",
+    "results": "/home/user/results",
+  
+}
 ```
-            "classifier": {
-                "module": "modules.resnet.fine_tune",
-                "class": "ResNetTuneModel",
-                "object_key": "classifier",
-                "params": {
-                    "num_classes": 10,
-                    "resnet": {
-                        "module": "torchvision.models",
-                        "class": "resnet18",
-                        "params": {
-                            "pretrained": true
-                        }
-                    }
-                }
-            },
 
-
+or in the operating system's environment variables:
+```bash
+export data=/home/user/data
+export results=/home/user/results
 ```
-* **Pytorch lightning trainer**
 
+The action (train/test/etc) is automatically set by the CLI and can be accessed in the environment variable:
 ```
-    "trainer": {
-        "module": "pytorch_lightning",
-        "class": "Trainer",
-        "params": {
-            "gpus": 1,
-            "max_epochs": 100,
-            "precision": 16,
-            "gradient_clip_val": 0.5,
-            "enable_checkpointing": true,
-            "callbacks": [
-                {
-                    "module": "pytorch_lightning.callbacks",
-                    "class": "EarlyStopping",
-                    "params": {
-                        "monitor": "val_loss",
-                        "patience": 10,
-                        "mode": "min"
-                    }
-                },
-                {
-                    "module": "pytorch_lightning.callbacks",
-                    "class": "ModelCheckpoint",
-                    "params": {
-                        "dirpath": "{save_dir}/checkpoints",
-                        "monitor": "val_loss",
-                        "save_top_k": 1,
-                        "verbose": true,
-                        "save_last": true,
-                        "mode": "min"
-                    }
-                }
-            ],
-            "logger": {
-                "module": "pytorch_lightning.loggers",
-                "class": "WandbLogger",
-                "params": {
-                    "project": "cifar10",
-                    "name": "vit_vanilla",
-                    "save_dir": "./logs",
-                    "log_model": false
-                }
-            }
-        }
-    
+mate {train/test/etc} experiment my_experiment
+python -m my_project.experiment.my_experiment {train/test/etc}
 ```
 
 
-**More tutorials and examples will be added soon!!**
 
-
+<!-- Please check out the [documentation](https://yerba-mate.readthedocs.io/en/latest/). -->
 
 ## FAQ
 **Q: Does Maté work with colab?**

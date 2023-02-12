@@ -97,13 +97,13 @@ class ModuleManager:
 
             url = url.split("/")
             # oalee/deep-vision/deepnet/models/resnet to https://github.com/oalee/deep-vision/tree/main/deepnet/models/resnet
-            
+
             url = f"https://github.com/{url[0]}/{url[1]}/tree/main/{'/'.join(url[2:])}"
             # if not validators.url(url):
             #     url = f"https://github.com/{url[0]}/{url[1]}/tree/master/{'/'.join(url[2:])}"
-        
+
         elif url.count("/") == 3 and "https" not in url:
-            
+
             # same repo and module name
             # oalee/big_transfer/experiments/bit
             url = url.split("/")
@@ -112,8 +112,6 @@ class ModuleManager:
             # if not validators.url(url):
             #     url = f"https://github.com/{url[0]}/{url[1]}/tree/master/{'/'.join(url[1:])}"
             # # ipdb.set_trace()
-
-        
 
         assert validators.url(url), "Invalid url"
         package_install_dst = self.__install_package(url, args, kwargs)
@@ -194,7 +192,8 @@ class ModuleManager:
             # ipdb.set_trace()
             if module_name == "":
                 dest_path = os.path.join(os.getcwd(), root_module)
-
+            elif root_module in ["master", "main"]:
+                dest_path = os.path.join(os.getcwd(), module_name)
             else:
                 print(
                     "Could not automatically determine the module type. Please specify."
@@ -251,7 +250,7 @@ class ModuleManager:
             download(url, output_dir=output_dir)
         except:
             # try master branch
-            url = url.replace("/main/","/master/")
+            url = url.replace("/main/", "/master/")
             print(f"Downloading {url}")
             download(url, output_dir=output_dir)
 
