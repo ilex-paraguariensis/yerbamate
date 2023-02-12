@@ -90,11 +90,30 @@ class ModuleManager:
 
     def install_package(self, url: str, *args, **kwargs):
 
-        if url.count("/") > 3 and "github.com" not in url:
+        default_trees = ["main", "master"]
+
+        # ipdb.set_trace()
+        if url.count("/") > 3 and "https" not in url:
 
             url = url.split("/")
             # oalee/deep-vision/deepnet/models/resnet to https://github.com/oalee/deep-vision/tree/main/deepnet/models/resnet
+            
             url = f"https://github.com/{url[0]}/{url[1]}/tree/main/{'/'.join(url[2:])}"
+            # if not validators.url(url):
+            #     url = f"https://github.com/{url[0]}/{url[1]}/tree/master/{'/'.join(url[2:])}"
+        
+        elif url.count("/") == 3 and "https" not in url:
+            
+            # same repo and module name
+            # oalee/big_transfer/experiments/bit
+            url = url.split("/")
+            url = f"https://github.com/{url[0]}/{url[1]}/tree/main/{'/'.join(url[1:])}"
+
+            # if not validators.url(url):
+            #     url = f"https://github.com/{url[0]}/{url[1]}/tree/master/{'/'.join(url[1:])}"
+            # # ipdb.set_trace()
+
+        
 
         assert validators.url(url), "Invalid url"
         package_install_dst = self.__install_package(url, args, kwargs)
@@ -228,7 +247,13 @@ class ModuleManager:
 
         print(f"Downloading {url}")
 
-        download(url, output_dir=output_dir)
+        try:
+            download(url, output_dir=output_dir)
+        except:
+            # try master branch
+            url = url.replace("/main/","/master/")
+            print(f"Downloading {url}")
+            download(url, output_dir=output_dir)
 
         src_module = url.split("tree")[1].split("/")[2:]
         src_module = os.path.join(output_dir, *src_module)
