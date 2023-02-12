@@ -29,7 +29,6 @@ class ModuleManager:
     def get_path(self, *args):
         return os.path.join(self.root_path, *args)
 
-
     def check_auto_install_reqs(self, *args, **kwargs):
         if len(args) < 1:
             return False
@@ -57,7 +56,7 @@ class ModuleManager:
                 cmd = cmd("Install with pip or conda? [pip/conda]: ")
                 if cmd in ["pip", "conda"]:
                     return cmd
-            
+
             return None
         return None
 
@@ -87,7 +86,7 @@ class ModuleManager:
                         print("")
                     else:
                         print("Skipping requirements installation")
-                    
+
                 elif not self.check_auto_no_install_reqs(*args, **kwargs):
                     cmd = input(
                         "Requirements found. Do you want to install them with pip? [y/conda/n]: "
@@ -121,7 +120,6 @@ class ModuleManager:
         return re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*$", name)
         # return re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*$", name)
 
-
     def __install_package(self, url):
 
         # just git url
@@ -146,22 +144,17 @@ class ModuleManager:
             )
             # command = input(f"Install {self.conf.project}/{root_module}/{module_name} at {dest_path} [y,n]? ")
         else:
-            print("Could not automatically determine the module type. Please specify.")
-            if root_module in ["main", "master"]:
-                # command = input (f"Is {module_name} Correct [y,n]? ")
-                dest_path = os.path.join(os.getcwd, module_name)
-                # if command == "y":
-                #     dest_path = os.path.join(os.getcwd(), module_name)
-                # else:
-                #     dest_path = input("Please specify the correct module: (e.g. models.my_model) ")
-                #     while not self.__is_valid_module(dest_path):
-                #         dest_path = input("Please specify the correct module: (e.g. models.my_model) ")
-                #     dest_path = dest_path.split(".")
-                #     dest_path = os.path.join(os.getcwd(), *dest_path)
-                
-            else:
+            # ipdb.set_trace()
+            if module_name == "":
+                dest_path = os.path.join(os.getcwd(), root_module)
 
-                command = input(f"Is {root_module}/{module_name} Correct [y,n]? ")
+            else:
+                print(
+                    "Could not automatically determine the module type. Please specify."
+                )
+                command = input(
+                    f"Is {self.conf.project}.{root_module}.{module_name} Correct [y,n]? "
+                )
                 if command == "y":
                     dest_path = os.path.join(
                         os.getcwd(), self.conf.project, root_module, module_name
@@ -170,7 +163,7 @@ class ModuleManager:
                     dest_path = input(
                         "Please specify the correct module: (e.g. models.my_model) "
                     )
-                    while dest_path.count(".") < 0:
+                    while not self.__is_valid_module(dest_path):
                         dest_path = input(
                             "Please specify the correct module: (e.g. models.my_model) "
                         )
@@ -194,11 +187,10 @@ class ModuleManager:
                 dest_path = input(
                     "Please specify the correct module: (e.g. models.my_model) "
                 )
-                while dest_path.count(".") < 0:
+                while not self.__is_valid_module(dest_path):
                     dest_path = input(
                         "Please specify the correct module: (e.g. models.my_model) "
                     )
-                    print(dest_path.count("."))
                 dest_path = dest_path.split(".")
                 dest_path = os.path.join(os.getcwd(), self.conf.project, *dest_path)
                 break
@@ -210,7 +202,9 @@ class ModuleManager:
         src_module = url.split("tree")[1].split("/")[2:]
         src_module = os.path.join(output_dir, *src_module)
 
+        # if "timm" in dest_path:
+        #     ipdb.set_trace()
+
         copytree(src_module, dest_path)
         rmtree(output_dir)
         return dest_path
-
