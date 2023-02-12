@@ -1,6 +1,8 @@
 #!/usr/bin/python3
+from concurrent.futures import ThreadPoolExecutor
 import re
 import os
+import threading
 import urllib.request
 import signal
 import argparse
@@ -8,6 +10,7 @@ import json
 import sys
 from colorama import Fore, Style, init
 import ipdb
+from queue import Queue
 
 init()
 
@@ -69,6 +72,33 @@ def create_url(url):
     return api_url, download_dirs
 
 
+def __download_file(url, output_dir):
+    """
+    Download a file from the given url to the given output directory.
+    """
+    # get the file name from the url
+    file_name = url.split("/")[-1]
+
+    # create the output directory if it doesn't exist
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # download the file to the output directory
+    try:
+        opener = urllib.request.build_opener()
+        opener.addheaders = [("User-agent", "Mozilla/5.0")]
+        urllib.request.install_opener(opener)
+        response = urllib.request.urlretrieve(url)
+    except KeyboardInterrupt:
+        # when CTRL+C is pressed during the execution of this script,
+        # bring the cursor to the beginning, erase the current line, and dont make a new line
+        print_text("✘ Got interrupted", "red", in_place=True)
+        sys.exit()
+
+    # print a message to the console
+    print_text("✔ Downloaded " + file_name, "green", in_place=True)
+
+
 def download(repo_url, output_dir="./"):
     """Downloads the files and directories in repo_url. If flatten is specified, the contents of any and all
     sub-directories will be pulled upwards into the root folder."""
@@ -109,6 +139,8 @@ def download(repo_url, output_dir="./"):
     # total files count
     total_files = 0
 
+    max_concurrent_downloads = 10
+
     with open(response[0], "r") as f:
         data = json.load(f)
         # getting the total number of files so that we
@@ -117,27 +149,10 @@ def download(repo_url, output_dir="./"):
 
         # If the data is a file, download it as one.
         if isinstance(data, dict) and data["type"] == "file":
-            try:
-                # download the file
-                opener = urllib.request.build_opener()
-                opener.addheaders = [("User-agent", "Mozilla/5.0")]
-                urllib.request.install_opener(opener)
-                urllib.request.urlretrieve(
-                    data["download_url"], os.path.join(dir_out, data["name"])
-                )
-                # bring the cursor to the beginning, erase the current line, and dont make a new line
-                print_text(
-                    "Downloaded: " + Fore.WHITE + "{}".format(data["name"]),
-                    "green",
-                    in_place=True,
-                )
 
-                return total_files
-            except KeyboardInterrupt:
-                # when CTRL+C is pressed during the execution of this script,
-                # bring the cursor to the beginning, erase the current line, and dont make a new line
-                print_text("✘ Got interrupted", "red", in_place=False)
-                sys.exit()
+            # download the file
+            dest = os.path.join(dir_out, data["name"])
+            __download_file(data["download_url"], dest)
 
         for file in data:
             file_url = file["download_url"]
@@ -145,41 +160,130 @@ def download(repo_url, output_dir="./"):
             file_path = file["path"]
 
             path = file_path
-            dirname = os.path.dirname(path)
-
-            # if dirname != "":
-            #     os.makedirs(os.path.dirname(path), exist_ok=True)
-            # else:
-            #     pass
 
             if file_url is not None:
-                try:
-                    opener = urllib.request.build_opener()
-                    opener.addheaders = [("User-agent", "Mozilla/5.0")]
-                    urllib.request.install_opener(opener)
-                    # download the file
-                    urllib.request.urlretrieve(
-                        file_url, os.path.join(dir_out, file_name)
-                    )
-
-                    # bring the cursor to the beginning, erase the current line, and dont make a new line
-                    print_text(
-                        "Downloaded: " + Fore.WHITE + "{}".format(file_name),
-                        "green",
-                        in_place=False,
-                        end="\n",
-                        flush=True,
-                    )
-
-                except KeyboardInterrupt:
-                    # when CTRL+C is pressed during the execution of this script,
-                    # bring the cursor to the beginning, erase the current line, and dont make a new line
-                    print_text("✘ Got interrupted", "red", in_place=False)
-                    sys.exit()
+                dest = os.path.join(dir_out, file_name)
+                __download_file(file_url, dest)
             else:
                 download(file["html_url"], output_dir)
 
     return total_files
+
+
+class GitDownloader:
+    def __init__(self, url: str, output_dir: str, max_concurrent_downloads: int = 2):
+        self.url = url
+        self.output_dir = output_dir
+        self.max_concurrent_downloads = max_concurrent_downloads
+        self.queue = Queue()
+        self.thread_pool = Queue()
+        self.add_download(url, output_dir)
+
+    def __download_file(self, url: str, out: str):
+        """
+        Download a file from the given url to the given output directory.
+        """
+        # get the file name from the url
+        file_name = url.split("/")[-1]
+
+        # create the output directory if it doesn't exist
+        if not os.path.exists(out):
+            os.makedirs(out)
+
+        # download the file to the output directory
+        try:
+            opener = urllib.request.build_opener()
+            opener.addheaders = [("User-agent", "Mozilla/5.0")]
+            urllib.request.install_opener(opener)
+            response = urllib.request.urlretrieve(url)
+        except KeyboardInterrupt:
+            # when CTRL+C is pressed during the execution of this script,
+            # bring the cursor to the beginning, erase the current line, and dont make a new line
+            print_text("✘ Got interrupted", "red", in_place=True)
+            sys.exit()
+
+        # print a message to the console
+        print_text("✔ Downloaded " + file_name, "green", in_place=True)
+
+    def start_download(self):
+
+        # check from queue
+        while not self.queue.empty():
+
+            # check max concurrent downloads
+            if threading.active_count() < self.max_concurrent_downloads // 2:
+                # get item from queue
+                item = self.queue.get()
+                # api_url, download_dirs = create_url(item)
+                # create thread
+                t = threading.Thread(
+                    target=self.__download_file, args=(item["url"], item["out"])
+                )
+                # start thread
+                self.thread_pool.put(t)
+                t.start()
+
+                # self.thread_pool.submit(self.add_download, item["url"], item["out"])
+                # join thread
+                # t.join()
+                # task done
+                # self.queue.task_done()
+
+        # check if all threads are done
+        
+        while not self.thread_pool.empty():
+            t = self.thread_pool.get()
+            t.join()
+        
+
+    def add_download(self, url, output_dir):
+
+        api_url, download_dirs = create_url(self.url)
+
+        dir_out = [d for d in download_dirs.split("/") if d != ""]
+        dir_out = os.path.join(self.output_dir, *dir_out)
+
+        try:
+            opener = urllib.request.build_opener()
+            opener.addheaders = [("User-agent", "Mozilla/5.0")]
+            urllib.request.install_opener(opener)
+            response = urllib.request.urlretrieve(api_url)
+        except KeyboardInterrupt:
+            # when CTRL+C is pressed during the execution of this script,
+            # bring the cursor to the beginning, erase the current line, and dont make a new line
+            print_text("✘ Got interrupted", "red", in_place=True)
+            sys.exit()
+
+        os.makedirs(dir_out, exist_ok=True)
+
+        # total files count
+        total_files = 0
+
+        with open(response[0], "r") as f:
+            data = json.load(f)
+            # getting the total number of files so that we
+            # can use it for the output information later
+            total_files += len(data)
+
+            # If the data is a file, download it as one.
+            if isinstance(data, dict) and data["type"] == "file":
+
+                # download the file
+                dest = os.path.join(dir_out, data["name"])
+                self.queue.put({"url": data["download_url"], "out": dest})
+                # self.__download_file(data["download_url"], dest)
+
+            for file in data:
+                file_url = file["download_url"]
+                file_name = file["name"]
+                file_path = file["path"]
+                # path = file_path
+                if file_url is not None:
+                    dest = os.path.join(dir_out, file_name)
+                    self.queue.put({"url": file_url, "out": dest})
+                    # self.__download_file(file_url, dest)
+                else:
+                    self.add_download(file["html_url"], self.output_dir)
 
 
 def main():

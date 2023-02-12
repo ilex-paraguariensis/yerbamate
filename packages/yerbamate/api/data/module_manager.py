@@ -116,6 +116,12 @@ class ModuleManager:
 
         print(f"Module installed at {package_install_dst}")
 
+    def __is_valid_module(self, name):
+        # module names, such as models.my_model, or models or my_model.e.z
+        return re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*$", name)
+        # return re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*$", name)
+
+
     def __install_package(self, url):
 
         # just git url
@@ -138,24 +144,35 @@ class ModuleManager:
             dest_path = os.path.join(
                 os.getcwd(), self.conf.project, root_module, module_name
             )
-
+            # command = input(f"Install {self.conf.project}/{root_module}/{module_name} at {dest_path} [y,n]? ")
         else:
             print("Could not automatically determine the module type. Please specify.")
-            command = input(f"Is {root_module}/{module_name} Correct [y,n]? ")
-            if command == "y":
-                dest_path = os.path.join(
-                    os.getcwd(), self.conf.project, root_module, module_name
-                )
+            if root_module in ["main", "master"]:
+                command = input (f"Is {module_name} Correct [y,n]? ")
+                if command == "y":
+                    dest_path = os.path.join(os.getcwd(), module_name)
+                else:
+                    dest_path = input("Please specify the correct module: (e.g. models.my_model) ")
+                    while not self.__is_valid_module(dest_path):
+                        dest_path = input("Please specify the correct module: (e.g. models.my_model) ")
+                    dest_path = dest_path.split(".")
+                    dest_path = os.path.join(os.getcwd(), *dest_path)
             else:
-                dest_path = input(
-                    "Please specify the correct module: (e.g. models.my_model) "
-                )
-                while dest_path.count(".") < 0:
+                command = input(f"Is {root_module}/{module_name} Correct [y,n]? ")
+                if command == "y":
+                    dest_path = os.path.join(
+                        os.getcwd(), self.conf.project, root_module, module_name
+                    )
+                else:
                     dest_path = input(
                         "Please specify the correct module: (e.g. models.my_model) "
                     )
-                dest_path = dest_path.split(".")
-                dest_path = os.path.join(os.getcwd(), self.conf.project, *dest_path)
+                    while dest_path.count(".") < 0:
+                        dest_path = input(
+                            "Please specify the correct module: (e.g. models.my_model) "
+                        )
+                    dest_path = dest_path.split(".")
+                    dest_path = os.path.join(os.getcwd(), self.conf.project, *dest_path)
 
         while os.path.exists(dest_path):
             cmd = input(

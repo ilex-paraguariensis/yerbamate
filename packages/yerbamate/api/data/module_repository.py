@@ -138,20 +138,49 @@ class ModuleRepository:
                 for line in lines:
                     f.write(line)
 
+    def __generate_deps_in_depth(self, root_path):
+
+        # init__path = os.path.join(path, "__init__.py")
+
+        for dir in os.listdir(root_path):
+            if dir.startswith(".") or dir.startswith("__"):
+                continue
+            path = os.path.join(root_path, dir)
+            if os.path.isdir(path):
+                # check if this is a python module
+                init__path = os.path.join(root_path, dir, "__init__.py")
+                if not os.path.exists(init__path):
+                    continue
+                # if dir in ["trainers", "experiments", "models", "data"] and
+                if not (
+                    dir in ["trainers", "experiments", "models", "data"]
+                    and self.config.project in root_path
+                ):
+                    self.__generate_pip_requirements(path)
+                
+                self.__generate_deps_in_depth(path)
+
     def __generate_sub_pip_reqs(self):
 
         root_path = self.config.project
-        self.__generate_pip_requirements(root_path)
 
-        for folder in os.listdir(self.config.project):
-            path = os.path.join(self.config.project, folder)
-            if os.path.isdir(path) and "__" not in folder:
-                for subfolder in os.listdir(path):
-                    subpath = os.path.join(path, subfolder)
-                    if os.path.isdir(subpath) and "__" not in subfolder:
-                        self.__generate_pip_requirements(subpath)
+        # path = os.path.join(".", root_path)
+        self.__generate_deps_in_depth(root_path)
 
-                # self.__generate_pip_requirements(path)
+        for dir in os.listdir("."):
+            if (
+                dir.startswith(".")
+                or dir.startswith("__")
+                or dir == self.config.project
+            ):
+                continue
+            path = os.path.join(".", dir)
+            if os.path.isdir(path):
+                # check if this is a python module
+                init__path = os.path.join(".", dir, "__init__.py")
+                if not os.path.exists(init__path):
+                    continue
+                self.__generate_pip_requirements(path)
 
     def __generate_mate_dependencies(self, path):
         # ipdb.set_trace()
@@ -167,24 +196,11 @@ class ModuleRepository:
             [item for sublist in relative_imports for item in sublist]
         )
 
-        # remore original files from relative imports
-        # ipdb.set_trace()
-        # importz = []
-        # for module in relative_imports:
-        #     # if any original file is in the module name, remove it
-        #     if any([file in module for file in original_files]):
-        #         continue
-        #     importz.append(module)
-
-        # refactor above code
         relative_imports = [
             module
             for module in relative_imports
             if not any([file in module for file in original_files])
         ]
-
-        # ipdb.set_trace()
-        #
 
         url_git = parse_url_from_git()
 
@@ -197,17 +213,18 @@ class ModuleRepository:
 
             if module.endswith(".py"):
                 continue
-
             # if its a python file, return parent module
 
             tpath = [self.config.project, *module.split(".")]
             tpath[-1] = tpath[-1] + ".py"
 
-            # ipdb.set_trace()
+            sister_module_path = [*module.split(".")]
 
             if os.path.exists(os.path.join(*tpath)):
                 # module = parent
                 url = "/".join(tpath[:-1])
+            elif os.path.exists(os.path.join(*sister_module_path)):
+                url = sister_module_path[0] + "/"
             else:
                 url = self.config.project + "/" + module.replace(".", "/")
 
