@@ -21,13 +21,12 @@ track of your experiments with ease 🚀
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Project Structure](https://oalee.github.io/yerbamate/#/?id=project-structure-%f0%9f%93%81)
-- [Example Projects](#example-projects)
+- [Installation](#installation-🔌)
+- [Quick Start](#quick-start-⚡)
+- [Project Structure](#project-structure-📁)
+- [Example Projects](#example-projects-📚)
 - [Documentation](https://oalee.github.io/yerbamate/)
-- [Contributing](#contributing)
-- [FAQ](#faq)
+- [Contribution](#Contribution-🤝)
 
 ## Installation 🔌
 
@@ -43,7 +42,7 @@ pip install yerbamate
 mate init deepnet
 ```
 
-This will generate the following structure:
+This will generate the following empty project structure:
 
 ```bash
 /
@@ -122,7 +121,7 @@ maintainable and sharable project structure. The forth module, experiments, is
 not independent, but rather combines the three modules together to create a
 complete experiment.
 
-### Sample Project Structure
+### Sample Modular Project Structure
 
 This structure highlights modularity and seperation of concerns. The `models`,
 `data` and `trainers` modules are independent and can be used in any project.
@@ -187,7 +186,7 @@ Please check out the [documentation](https://oalee.github.io/yerbamate).
 
 For more information on modularity, please check out this [guide]().
 
-## Contributing 🤝
+## Contribution 🤝
 
 We welcome contributions from the community! Please check out our
 [contributing](https://github.com/oalee/yerbamate/blob/main/CONTRIBUTING.md)
