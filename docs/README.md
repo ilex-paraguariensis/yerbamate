@@ -67,13 +67,10 @@ github repository. See [Install](#install) for more details.
 
 
 ```bash
-
 # Short version of GitHub URL https://github.com/oalee/big_transfer/tree/master/big_transfer/experiments/bit
-
 mate install oalee/big_transfer/experiments/bit -yo pip
 
 # Short version of GitHub URL https://github.com/oalee/deep-vision/tree/main/deepnet/experiments/resnet
-
 mate install oalee/deep-vision/deepnet/experiments/resnet -yo pip
 ```
 
@@ -523,13 +520,26 @@ Examples: `mate list models`
 
     `mate list`
 
----
+ --- 
 
-### summary
+### `mate` clone
 
-Prints a summary of the project modules. Same as `mate list`
+`mate clone {module} {name} {dest}`
 
----
+Clones a module to a destination.
+Args:
+    module: Module to clone.
+
+    name: Name of the module to clone.
+
+    dest: Destination to clone the module to.
+
+Example:
+
+    `mate clone models torch_vit my_vit`
+
+ --- 
+
 
 ### train
 

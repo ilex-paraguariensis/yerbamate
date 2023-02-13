@@ -65,11 +65,9 @@ github repository. See [docs](https://oalee.github.io/yerbamate/#/?id=install) f
 ```bash
 
 # Short version of GitHub URL https://github.com/oalee/big_transfer/tree/master/big_transfer/experiments/bit
-
 mate install oalee/big_transfer/experiments/bit -yo pip
 
 # Short version of GitHub URL https://github.com/oalee/deep-vision/tree/main/deepnet/experiments/resnet
-
 mate install oalee/deep-vision/deepnet/experiments/resnet -yo pip
 ```
 
