@@ -8,13 +8,14 @@ track of your experiments with ease 🚀
 
 ## Features 🎉
 
-- Seamless integration with popular deep learning libraries such as PyTorch,
-  TensorFlow, and JAX.
+- Seamless integration with any installed python library such as PyTorch,
+  TensorFlow, JAX, Huggingfacehub and etc.
 - Easy to use interface to add source code of models, trainers, and data loaders
   to your projects.
 - Support for full customizability and reproducibility of results through the
-  inclusion of source code dependencies in your project.
+  inclusion of dependencies in your project.
 - Modular project structure that enforces a clean and organized codebase.
+- Fully compatible with python. 
 - Convenient environment management through the Maté Environment API.
 - Support for pip and conda for dependency management.
 - Works with Colab.
@@ -98,7 +99,7 @@ called `learn` in the `bit` module, you can use the following command:
 ```bash
 mate train bit learn
 # or alternatively use python
-python -m train deepnet.experiments.bit.learn
+python -m deepnet.experiments.bit.learn train
 ```
 
 ## Project Structure 📁
