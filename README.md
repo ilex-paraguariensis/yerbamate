@@ -1,6 +1,15 @@
-<h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
+<h1 style="color:green"><span style="color:green">Maté 🧉</span> - AI Project and Experiment Manager</h1>
 
-Maté is a package and experiment manager that seamlessly integrates with popular deep learning libraries such as PyTorch, TensorFlow, and JAX. Whether you are a seasoned deep learning researcher or just starting out, Maté provides you with the tools to easily add models, trainers, and data loaders to your projects. With Maté, you can also evaluate, train, and keep track of your experiments with ease. By including the source code of dependencies directly in your project.  Maté ensures full customizability and reproducibility of your results. Get started with Maté today and elevate your deep learning experience! 🚀
+Maté is a package and experiment manager that seamlessly integrates with popular deep learning libraries such as PyTorch, TensorFlow, and JAX. Whether you are a seasoned deep learning researcher or just starting out, Maté provides you with the tools to easily add source code and dependencies of models, trainers, and data loaders to your projects. With Maté, you can also evaluate, train, and keep track of your experiments with ease. By including the source code of dependencies directly in your project. Maté ensures full customizability and reproducibility of your results. Get started with Maté today and elevate your deep learning experience! 🚀
+
+
+## Table of Contents
++ [Installation](#installation)
++ [Quick Start](#quick-start)
++ [Example Projects](#example-projects)
++ [Documentation](#documentation)
++ [Contributing](#contributing)
+
 
 ## Installation 🔌
 
@@ -9,13 +18,12 @@ pip install yerbamate
 ```
 
 
-
 ## Quick Start ⚡
 
 ### **Initialize a project**
 
 ```bash
-mate init my_project
+mate init deepnet
 ```
 
 This will generate the following structure:
@@ -31,6 +39,14 @@ This will generate the following structure:
 |   |-- __init__.py
 ```
 
+### **Install an experiment**
+
+To install an experiment, you can use `mate install` to install a module from a github repo with the full path to the module.
+```bash
+mate install oalee/big_transfer/experiments/bit -yo pip
+```
+
+
 ### **List all modules**
 
 List all your models, trainers, data and experiments modules:
@@ -40,12 +56,12 @@ mate list
 
 ### **Train a model**
 
-To train a model, you can use the `mate train` command. This command will train the model with the specified experiment. For example, to train the an experiment called `big` in the `my_experiment` module, you can use the following command:
+To train a model, you can use the `mate train` command. This command will train the model with the specified experiment. For example, to train the an experiment called `learn` in the `bit` module, you can use the following command:
 
 ```bash
-mate train my_experiment big
+mate train bit learn
 # or alternatively use python
-python -m train my_project.experiments.my_experiment.big
+python -m train deepnet.experiments.bit.learn
 ```
 
 ### **Export a module**
@@ -140,7 +156,7 @@ and [lightweight gan](https://github.com/oalee/lightweight-gan).
 
 
 ### Modularity
-Modularity is a software design principle that focuses on creating self-contained, reusable and interchangeable components. In the context of a deep learning project, modularity means creating standalone modules that can perform specific functions such as data loading, model training, or evaluation. This allows for a more organized, maintainable and scalable project structure. 
+Modularity is a software design principle that focuses on creating self-contained, reusable and interchangeable components. In the context of a deep learning project, modularity means creating three independent standalone modules for models, trainers and data. This allows for a more organized, maintainable and scalable project structure. The forth module, experiments, is not independent, but rather combines the three modules together to create a complete experiment. 
 
 ### Project Structure
 Maté enforces a project structure that is modular and easy to navigate. The project structure is shown below:
@@ -202,6 +218,7 @@ python -m my_project.experiment.my_experiment {train/test/etc}
 
 ### Experiment Definition
 An experiment is a combination of a model, trainer, and data loader. An experiment is defined in the experiments module. 
+
 ```python
 from ...data.cifar10 import CifarLightningDataModule
 from ...trainers.classification import LightningClassificationModule
