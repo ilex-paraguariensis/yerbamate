@@ -31,6 +31,9 @@ class Mate:
     @staticmethod
     def init(project_name: str, *args, **kwargs):
         """
+
+        `mate init {project_name}`
+
         Initializes a new project.
         This will create the following structure:
         ```
@@ -70,8 +73,18 @@ class Mate:
         output_json: bool = True,
     ):
         """
+
+
         Lists all available modules.
-        module_name: models, experiments, trainers, data
+        
+        Args:
+            module_name: Name of the module to list. If not specified, all modules will be listed.
+        
+        Examples:
+            `mate list models`
+
+            `mate list`
+
         """
 
         li = self.api.list(module_name)
@@ -82,8 +95,13 @@ class Mate:
 
     def auto(self, command: str):
         """
+        
+        `mate auto {command}`
+        
         Various commands to help with the development process.
 
+
+        commands:
         - `export`: Creates a requirements.txt and dependencies.json files for sharing and reproducibility.
         - `init`: Automatically creates `__init__.py` files in the project structure.
 
@@ -91,15 +109,13 @@ class Mate:
 
 
             `mate auto export`
-
-
             `mate auto init`
         """
         self.api.auto(command)
 
-    def summary(self, output_json: bool = True):
+    def summary(self):
         """
-        Prints a summary of the project modules.
+        Prints a summary of the project modules. Same as `mate list` 
         """
 
         print(json.dumps(self.api.summary(), indent=4))
@@ -134,7 +150,9 @@ class Mate:
 
     def train(self, exp_module: str, exp: str, *args, **kwargs):
         """
-        Runs an experiment.
+        Executes an experiment.
+
+        Usage: ``mate train {module} {experiment}``
 
         Args:
 
@@ -147,7 +165,8 @@ class Mate:
             mate train experiments my_experiment`
 
         This will run the experiment `my_experiment` located in the `experiments` module.
-        Equivalent to `python -m experiments.my_experiment`
+        
+        Equivalent to `python -m root_module.experiments.my_experiment`
         """
 
         # ipdb.set_trace()
@@ -193,7 +212,7 @@ class Mate:
 
         Example Installing a module from unstructured git repository:
             
-            
+
             `mate install https://github.com/rwightman/pytorch-image-models/tree/main/timm`
 
 
@@ -202,22 +221,7 @@ class Mate:
         """
         self.api.install_url(url, *args, **kwargs)
 
-    def exec(self, model: str, params: str, exec_file: str):
-        params = "parameters" if params == "" or params == "None" else params
-        print(f"Executing model {model} with result of: {params}")
-        _, model, _ = self.__get_trainer(model, params)
 
-        self.__load_exec_function(exec_file)(model)
-
-    # def board(self):
-
-    #     self.api.start_mateboard()
-
-    # def __list_packages(self, folder: str):
-    #     return io.list_packages(self.root_folder, folder)
-
-    # def __update_mate_version(self):
-    #     utils.migrate_mate_version(self.config, self.root_folder)
 
     def __findroot(self):
         """
@@ -226,31 +230,3 @@ class Mate:
         self.root_folder, self.config = io.find_root()
         self.root_save_folder = self.config.results_folder
 
-    # def __get_trainer(self, params: str):
-    #     if self.trainer is None:
-
-    #         conf, save_path = self.package_manager.load_experiment(params)
-
-    #         print(conf)
-
-    #         map_key_value = {
-    #             "save_path": self.save_path,
-    #             "save_dir": self.save_path,
-    #         }
-    #         root_module = f"{self.root_folder}"
-
-    #         self.trainer = Trainer.create(conf, root_module, map_key_value)
-
-    #     return self.trainer
-
-    # def __fit(self, params: str):
-
-    #     trainer = self.__get_trainer(params)
-
-    #     self.__parse_and_validate_params(params)
-
-    #     if self.is_restart:
-    #         checkpoint_path = os.path.join(self.save_path, "checkpoints", "last.ckpt")
-    #         trainer.fit(ckpt_path=checkpoint_path)
-    #     else:
-    #         trainer.fit()

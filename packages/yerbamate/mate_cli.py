@@ -127,6 +127,11 @@ class MateHelp:
 
         self._full_docs, self._methods = self.get_full_docs(Mate)
 
+        # save full docs to file
+        with open("docs.md", "w") as f:
+            f.write(self._full_docs)
+            
+
     def get_index(self):
         nl = "\n"
         # return self._full_docs
