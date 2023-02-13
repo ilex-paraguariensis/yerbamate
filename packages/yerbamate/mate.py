@@ -215,7 +215,7 @@ class Mate:
         -    url: Url of the git repository.
         -    -y: Skips confirmation and installs python dependencies
         -    -n: Skips installing python dependencies
-        -    -o: Overwrites existing module
+        -    -o: Overwrites existing code modules
         -    pm: Package manager to use. Defaults to asking the user.
 
         Example Installing a module from structured git repository (recommended):
