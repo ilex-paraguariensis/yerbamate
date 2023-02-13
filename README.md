@@ -1,4 +1,4 @@
-<h1 style="color:green"><span style="color:green">Maté 🧉</span> your friendly AI project and experiment manager</h1>
+<h1 style="color:green"><span style="color:green">Maté 🧉</span> your modular AI project and experiment manager</h1>
 
 Maté is a python project, package and experiment manager. Whether you are a
 seasoned deep learning researcher or just starting out, Maté provides you with
@@ -183,7 +183,7 @@ modules together to create a complete experiment.
 
 ## Example Projects 📚
 
-Please check out the [transfer learning](https://github.com/oalee/big-transfer),
+Please check out the [transfer learning](https://github.com/oalee/big_transfer),
 [vision models](https://github.com/oalee/deep-vision), and
 [lightweight gan](https://github.com/oalee/lightweight-gan).
 
@@ -208,4 +208,4 @@ guide for more information on how to get started.
 
 For questions please contact:
 
-yerba.mate.dl(at)proton.me
+oalee(at)proton.me
