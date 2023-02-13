@@ -1,14 +1,32 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span> - AI Project and Experiment Manager</h1>
 
-Maté is a package and experiment manager that seamlessly integrates with popular deep learning libraries such as PyTorch, TensorFlow, and JAX. Whether you are a seasoned deep learning researcher or just starting out, Maté provides you with the tools to easily add source code and dependencies of models, trainers, and data loaders to your projects. With Maté, you can also evaluate, train, and keep track of your experiments with ease. By including the source code of dependencies directly in your project. Maté ensures full customizability and reproducibility of your results. Get started with Maté today and elevate your deep learning experience! 🚀
+Maté is a python AI project, package and experiment manager. Whether you are a
+seasoned deep learning researcher or just starting out, Maté provides you with
+the tools to easily add source code and dependencies of models, trainers, and
+data loaders to your projects. With Maté, you can also evaluate, train, and keep
+track of your experiments with ease. By including the source code of
+dependencies directly in your project. Maté ensures full customizability and
+reproducibility of your results. Get started with Maté today and elevate your
+deep learning experience! 🚀
 
+## Features 🎉
+* Seamless integration with popular deep learning libraries such as PyTorch, TensorFlow, and JAX.
+* Easy to use interface to add source code of models, trainers, and data loaders to your projects.
+* Support for full customizability and reproducibility of results through the inclusion of source code dependencies in your project.
+* Modular project structure that enforces a clean and organized codebase.
+* Convenient environment management through the Maté Environment API.
+* Support for pip and conda for dependency management.
+* Works with Colab.
 
 ## Table of Contents
-+ [Installation](#installation)
-+ [Quick Start](#quick-start)
-+ [Example Projects](#example-projects)
-+ [Documentation](#documentation)
-+ [Contributing](#contributing)
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Example Projects](#example-projects)
+- [Documentation](#documentation) 
+- [Contributing](#contributing) 
+- [FAQ](#faq) 
+
 
 
 ## Installation 🔌
@@ -16,7 +34,6 @@ Maté is a package and experiment manager that seamlessly integrates with popula
 ```bash
 pip install yerbamate
 ```
-
 
 ## Quick Start ⚡
 
@@ -27,6 +44,7 @@ mate init deepnet
 ```
 
 This will generate the following structure:
+
 ```bash
 /
 |-- models/
@@ -41,22 +59,25 @@ This will generate the following structure:
 
 ### **Install an experiment**
 
-To install an experiment, you can use `mate install` to install a module from a github repo with the full path to the module.
+To install an experiment, you can use `mate install` to install a module from a github repository:
+
 ```bash
 mate install oalee/big_transfer/experiments/bit -yo pip
 ```
 
-
 ### **List all modules**
 
 List all your models, trainers, data and experiments modules:
+
 ```bash
-mate list 
+mate list
 ```
 
 ### **Train a model**
 
-To train a model, you can use the `mate train` command. This command will train the model with the specified experiment. For example, to train the an experiment called `learn` in the `bit` module, you can use the following command:
+To train a model, you can use the `mate train` command. This command will train
+the model with the specified experiment. For example, to train the an experiment
+called `learn` in the `bit` module, you can use the following command:
 
 ```bash
 mate train bit learn
@@ -66,42 +87,64 @@ python -m train deepnet.experiments.bit.learn
 
 ### **Export a module**
 
-To export, share your modules (models/trainers/data/experiments) you can use the following command, then push and share the module with others:
+To export, share your modules (models/trainers/data/experiments) you can use the
+following command, then push and share the module with others:
+
 ```bash
 mate export
 ```
-This command will generate `requirements.txt` and `dependencies.json` for sharing, dependency management and reprodiciblity.
 
+This command will generate `requirements.txt` and `dependencies.json` for
+sharing, dependency management and reprodiciblity.
 
 ### **Install a module**
 
-To install a module, you can use `mate install` to install a module from a github repository. All modules inside a project that follow modularity can be independently installed. 
+To install a module, you can use `mate install` to install a module from a
+github repository. All modules inside a project that follow modularity can be
+independently installed.
 
 ```bash
-mate install https://github.com/oalee/big_transfer/tree/master/big_transfer/experiments/bit 
+mate install https://github.com/oalee/big_transfer/tree/master/big_transfer/experiments/bit
 ```
-This will install the big transfer experiment into your project. You can also use the shorthand version of the command:
+
+This will install the big transfer experiment into your project. You can also
+use the shorthand version of the command:
+
 ```bash
 mate install oalee/big_transfer/experiments/bit
 ```
 
 ### **Install dependencies**
-Maté supports both pip and conda for dependency management. To install dependencies, you can use `mate install` with the `-y {option}` flag to install dependencies. Options include `pip` and `conda`. The -o flag will overwrite the code dependencies if it already exists. For example, to install the big transfer experiment with pip dependencies, you can use the following command:
+
+Maté supports both pip and conda for dependency management. To install
+dependencies, you can use `mate install` with the `-y {option}` flag to install
+dependencies. Options include `pip` and `conda`. The -o flag will overwrite the
+code dependencies if it already exists. For example, to install the big transfer
+experiment with pip dependencies, you can use the following command:
+
 ```bash
 mate install oalee/big_transfer/experiments/bit -yo pip
 mate install oalee/big_transfer/experiments/bit -yo conda
 ```
 
-
 ### **Install python module**
-To install a python module, you can use `mate install` to install a module from a github repo with the full path to the module.
-This way, you can install any python module into your project. For example, to install the pytorch image module, you can use the following command:
+
+To install a python module, you can use `mate install` to install a module from
+a github repo with the full path to the module. This way, you can install any
+python module into your project. For example, to install the pytorch image
+module, you can use the following command:
+
 ```bash
 mate install https://github.com/rwightman/pytorch-image-models/tree/main/timm
 ```
-The module will be installed into your project, However python module dependencies will not be installed. To install the python module dependencies, you can use either manually install the dependencies or simply use `pip install module` to make sure dependencies are installed.
+
+The module will be installed into your project, However python module
+dependencies will not be installed. To install the python module dependencies,
+you can use either manually install the dependencies or simply use
+`pip install module` to make sure dependencies are installed.
 
 ### **Examples**
+
 ```bash
 # Installs the experiment, code and python dependencies with pip
 mate install oalee/big_transfer/experiments/bit -y pip
@@ -139,7 +182,6 @@ mate install oalee/deep-vision/deepnet/trainers/pl_classification
 mate install oalee/lightweight-gan/lgan/trainers/lgan
 ```
 
-
 ### **Clone a model**
 
 ```bash
@@ -148,18 +190,27 @@ mate clone resnet my_resnet
 
 ## Example Projects 📚
 
-Please check out the [transfer learning](https://github.com/oalee/big-transfer), [vision models](https://github.com/oalee/deep-vision),
-and [lightweight gan](https://github.com/oalee/lightweight-gan).
-
+Please check out the [transfer learning](https://github.com/oalee/big-transfer),
+[vision models](https://github.com/oalee/deep-vision), and
+[lightweight gan](https://github.com/oalee/lightweight-gan).
 
 ## Documentation 📚
 
-
 ### Modularity
-Modularity is a software design principle that focuses on creating self-contained, reusable and interchangeable components. In the context of a deep learning project, modularity means creating three independent standalone modules for models, trainers and data. This allows for a more organized, maintainable and scalable project structure. The forth module, experiments, is not independent, but rather combines the three modules together to create a complete experiment. 
+
+Modularity is a software design principle that focuses on creating
+self-contained, reusable and interchangeable components. In the context of a
+deep learning project, modularity means creating three independent standalone
+modules for models, trainers and data. This allows for a more organized,
+maintainable and scalable project structure. The forth module, experiments, is
+not independent, but rather combines the three modules together to create a
+complete experiment.
 
 ### Project Structure
-Maté enforces a project structure that is modular and easy to navigate. The project structure is shown below:
+
+Maté enforces a project structure that is modular and easy to navigate. The
+project structure is shown below:
+
 ```bash
 /
 |-- models/
@@ -171,15 +222,27 @@ Maté enforces a project structure that is modular and easy to navigate. The pro
 |-- data/
 |   |-- __init__.py
 ```
-All independent sub modules (meaning they don't import from each other) should be placed in their respective folders. For example, a model should be placed in the models folder, a trainer should be placed in the trainers folder, and a data loader should be placed in the data folder. This allows for out-of-the-box sharing of models, data loaders, and trainers.
 
+All independent sub modules (meaning they don't import from each other) should
+be placed in their respective folders. For example, a model should be placed in
+the models folder, a trainer should be placed in the trainers folder, and a data
+loader should be placed in the data folder. This allows for out-of-the-box
+sharing of models, data loaders, and trainers.
 
 ### Maté Environment
-The Maté Environment API is a tool for managing your environment variables. It offers a convenient way to set, retrieve and manage these variables throughout your project. The API first searches for an env.json file to find the environment variables, and if it doesn't find one, it then looks to the operating system's environment variables. With the Maté Environment API, you can easily store and access environment-specific information such as API keys, database URLs, and more, ensuring that your application runs smoothly no matter the environment.
+
+The Maté Environment API is a tool for managing your environment variables. It
+offers a convenient way to set, retrieve and manage these variables throughout
+your project. The API first searches for an env.json file to find the
+environment variables, and if it doesn't find one, it then looks to the
+operating system's environment variables. With the Maté Environment API, you can
+easily store and access environment-specific information such as API keys,
+database URLs, and more, ensuring that your application runs smoothly no matter
+the environment.
 
 You can access the Maté Environment API in your experiments:
-```python
 
+```python
 import yerbamate
 
 env = yerbamate.Environment()
@@ -195,29 +258,33 @@ else env.test:
 ```
 
 The environment variables can be set in the env.json file:
+
 ```json
 {
-    "data": "/home/user/data",
-    "results": "/home/user/results",
-  
+  "data": "/home/user/data",
+  "results": "/home/user/results"
 }
 ```
 
 or in the operating system's environment variables:
+
 ```bash
 export data=/home/user/data
 export results=/home/user/results
 ```
 
-The action (train/test/etc) in `env.{action}` is automatically set to `True` from the CLI command and can be accessed in the environment variable:
+The action (train/test/etc) in `env.{action}` is automatically set to `True`
+from the CLI command and can be accessed in the environment variable:
+
 ```
 mate {train/test/etc} experiment my_experiment
 python -m my_project.experiment.my_experiment {train/test/etc}
 ```
 
-
 ### Experiment Definition
-An experiment is a combination of a model, trainer, and data loader. An experiment is defined in the experiments module. 
+
+An experiment is a combination of a model, trainer, and data loader. An
+experiment is defined in the experiments module.
 
 ```python
 from ...data.cifar10 import CifarLightningDataModule
@@ -274,17 +341,21 @@ if env.restart:
     )
 elif env.test: 
     pl_trainer.test(pl_module, data_module, ckpt_path=os.path.join( env["results"], "last.ckpt"))
-
 ```
 
 <!-- Please check out the [documentation](https://yerba-mate.readthedocs.io/en/latest/). -->
 
-## FAQ
-**Q: Does Maté work with colab?**
 
-**A**: Yes! Maté works with colab as any Maté project is exportable to a juypter notebook.
 
-## Contact 🤝 
+
+## Contributing 🤝
+
+We welcome contributions from the community! Please check out our
+[contributing](https://github.com/oalee/yerbamate/blob/main/CONTRIBUTING.md)
+guide for more information on how to get started.
+
+
+## Contact 🤝
 
 For questions please contact:
 
