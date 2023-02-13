@@ -69,7 +69,7 @@ This will install the big transfer experiment into your project. You can also us
 mate install oalee/big_transfer/experiments/bit
 ```
 
-### **Install dependencies **
+### **Install dependencies**
 Maté supports both pip and conda for dependency management. To install dependencies, you can use `mate install` with the `-y {option}` flag to install dependencies. Options include `pip` and `conda`. The -o flag will overwrite the code dependencies if it already exists. For example, to install the big transfer experiment with pip dependencies, you can use the following command:
 ```bash
 mate install oalee/big_transfer/experiments/bit -yo pip
@@ -77,7 +77,7 @@ mate install oalee/big_transfer/experiments/bit -yo conda
 ```
 
 
-### **Install python module **
+### **Install python module**
 To install a python module, you can use `mate install` to install a module from a github repo with the full path to the module.
 This way, you can install any python module into your project. For example, to install the pytorch image module, you can use the following command:
 ```bash
@@ -85,7 +85,7 @@ mate install https://github.com/rwightman/pytorch-image-models/tree/main/timm
 ```
 The module will be installed into your project, However python module dependencies will not be installed. To install the python module dependencies, you can use either manually install the dependencies or simply use `pip install module` to make sure dependencies are installed.
 
-### **Examples **
+### **Examples**
 ```bash
 # Installs the experiment, code and python dependencies with pip
 mate install oalee/big_transfer/experiments/bit -y pip
@@ -141,6 +141,7 @@ and [lightweight gan](https://github.com/oalee/lightweight-gan).
 
 ### Modularity
 Modularity is a software design principle that focuses on creating self-contained, reusable and interchangeable components. In the context of a deep learning project, modularity means creating standalone modules that can perform specific functions such as data loading, model training, or evaluation. This allows for a more organized, maintainable and scalable project structure. 
+
 ### Project Structure
 Maté enforces a project structure that is modular and easy to navigate. The project structure is shown below:
 ```bash
