@@ -12,7 +12,7 @@ pip install yerbamate
 
 ## Quick Start ⚡
 
-**Initialize a project**
+### **Initialize a project**
 
 ```bash
 mate init my_project
@@ -69,7 +69,7 @@ This will install the big transfer experiment into your project. You can also us
 mate install oalee/big_transfer/experiments/bit
 ```
 
-### ** Install dependencies **
+### **Install dependencies **
 Maté supports both pip and conda for dependency management. To install dependencies, you can use `mate install` with the `-y {option}` flag to install dependencies. Options include `pip` and `conda`. The -o flag will overwrite the code dependencies if it already exists. For example, to install the big transfer experiment with pip dependencies, you can use the following command:
 ```bash
 mate install oalee/big_transfer/experiments/bit -yo pip
@@ -77,7 +77,7 @@ mate install oalee/big_transfer/experiments/bit -yo conda
 ```
 
 
-### ** Install python module **
+### **Install python module **
 To install a python module, you can use `mate install` to install a module from a github repo with the full path to the module.
 This way, you can install any python module into your project. For example, to install the pytorch image module, you can use the following command:
 ```bash
@@ -85,7 +85,7 @@ mate install https://github.com/rwightman/pytorch-image-models/tree/main/timm
 ```
 The module will be installed into your project, However python module dependencies will not be installed. To install the python module dependencies, you can use either manually install the dependencies or simply use `pip install module` to make sure dependencies are installed.
 
-### ** Examples **
+### **Examples **
 ```bash
 # Installs the experiment, code and python dependencies with pip
 mate install oalee/big_transfer/experiments/bit -y pip
@@ -157,9 +157,6 @@ Maté enforces a project structure that is modular and easy to navigate. The pro
 All independent sub modules (meaning they don't import from each other) should be placed in their respective folders. For example, a model should be placed in the models folder, a trainer should be placed in the trainers folder, and a data loader should be placed in the data folder. This allows for out-of-the-box sharing of models, data loaders, and trainers.
 
 
-### Experiment Definition
-An experiment is a combination of a model, trainer, and data loader. An experiment is defined in the experiments module. 
-
 ### Maté Environment
 The Maté Environment API is a tool for managing your environment variables. It offers a convenient way to set, retrieve and manage these variables throughout your project. The API first searches for an env.json file to find the environment variables, and if it doesn't find one, it then looks to the operating system's environment variables. With the Maté Environment API, you can easily store and access environment-specific information such as API keys, database URLs, and more, ensuring that your application runs smoothly no matter the environment.
 
@@ -195,13 +192,72 @@ export data=/home/user/data
 export results=/home/user/results
 ```
 
-The action (train/test/etc) is automatically set by the CLI and can be accessed in the environment variable:
+The action (train/test/etc) in `env.{action}` is automatically set to `True` from the CLI command and can be accessed in the environment variable:
 ```
 mate {train/test/etc} experiment my_experiment
 python -m my_project.experiment.my_experiment {train/test/etc}
 ```
 
 
+### Experiment Definition
+An experiment is a combination of a model, trainer, and data loader. An experiment is defined in the experiments module. 
+```python
+from ...data.cifar10 import CifarLightningDataModule
+from ...trainers.classification import LightningClassificationModule
+from ...models.resnet import ResNetTuneModel
+from torchvision.models import resnet18, resnet34
+import sys, os, torch, pytorch_lightning as pl, yerbamate 
+
+env = yerbamate.Environment()
+network = ResNetTuneModel(
+    resnet34(pretrained=True), num_classes=10, update_all_params=True
+)
+optimizer = torch.optim.Adam(network.parameters(), lr=0.0004, betas=[0.9, 0.999])
+lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    optimizer,
+    mode="min",
+    factor=0.5,
+    patience=2,
+    verbose=True,
+    threshold=1e-06,
+)
+optimizer = {
+    "optimizer": optimizer,
+    "lr_scheduler": lr_scheduler,
+    "monitor": "val_loss",
+}
+
+pl_module = LightningClassificationModule(network, optimizer)
+data_module = CifarLightningDataModule(env["DATA_PATH"], batch_size=128, image_size=[32, 32])
+logger = pl.loggers.TensorBoardLogger(env["logs"], env.name) 
+callbacks = [
+    pl.callbacks.ModelCheckpoint(
+        monitor="val_accuracy",
+        save_top_k=1,
+        mode="max",
+        dirpath= env["results"],
+        save_last=True,
+    ),
+    pl.callbacks.EarlyStopping(monitor="val_loss", patience=10, mode="min"),
+]
+pl_trainer = pl.Trainer(
+    accelerator="gpu",
+    max_epochs=100,
+    logger=logger,
+    callbacks=callbacks,
+    precision=16,
+    gradient_clip_val=0.5,
+)
+if env.train:
+    pl_trainer.fit(pl_module, data_module)
+if env.restart:
+    pl_trainer.fit(
+        pl_module, data_module, ckpt_path=os.path.join( env["results"], "last.ckpt")
+    )
+elif env.test: 
+    pl_trainer.test(pl_module, data_module, ckpt_path=os.path.join( env["results"], "last.ckpt"))
+
+```
 
 <!-- Please check out the [documentation](https://yerba-mate.readthedocs.io/en/latest/). -->
 
