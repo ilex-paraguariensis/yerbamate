@@ -187,7 +187,7 @@ complete experiment.
 
 ## Example Projects 📚
 
-Please check out the [transfer learning](https://github.com/oalee/big-transfer),
+Please check out the [transfer learning](https://github.com/oalee/big_transfer),
 [vision models](https://github.com/oalee/deep-vision), and
 [lightweight gan](https://github.com/oalee/lightweight-gan).
 
