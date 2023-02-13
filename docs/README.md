@@ -526,11 +526,13 @@ Install module support the following formats:
 - ``mate install {user}/{repo|root_module}/{module}``
 
 Args:
-    -    url: Url of the git repository.
-    -    -y: Skips confirmation and installs python dependencies
-    -    -n: Skips installing python dependencies
-    -    -o: Overwrites existing code modules
-    -    pm: Package manager to use. Defaults to asking the user.
+
+    url: Url of the git repository.
+    -y: Skips confirmation and installs python dependencies
+    -n: Skips installing python dependencies
+    -o: Overwrites existing code modules
+    pm: Package manager to use. Defaults to asking the user.
+
 
 Example Installing a module from structured git repository (recommended):
 
