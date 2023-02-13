@@ -1,39 +1,67 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span> - AI Project and Experiment Manager</h1>
 
-Maté is a python AI project, package and experiment manager. Whether you are a
+Maté is a python project, package and experiment manager. Whether you are a
 seasoned deep learning researcher or just starting out, Maté provides you with
 the tools to easily add source code and dependencies of models, trainers, and
 data loaders to your projects. With Maté, you can also evaluate, train, and keep
-track of your experiments with ease. By including the source code of
-dependencies directly in your project. Maté ensures full customizability and
-reproducibility of your results. Get started with Maté today and elevate your
-deep learning experience! 🚀
+track of your experiments with ease 🚀
 
 ## Features 🎉
-* Seamless integration with popular deep learning libraries such as PyTorch, TensorFlow, and JAX.
-* Easy to use interface to add source code of models, trainers, and data loaders to your projects.
-* Support for full customizability and reproducibility of results through the inclusion of source code dependencies in your project.
-* Modular project structure that enforces a clean and organized codebase.
-* Convenient environment management through the Maté Environment API.
-* Support for pip and conda for dependency management.
-* Works with Colab.
+
+- Seamless integration with popular deep learning libraries such as PyTorch,
+  TensorFlow, and JAX.
+- Easy to use interface to add source code of models, trainers, and data loaders
+  to your projects.
+- Support for full customizability and reproducibility of results through the
+  inclusion of source code dependencies in your project.
+- Modular project structure that enforces a clean and organized codebase.
+- Convenient environment management through the Maté Environment API.
+- Support for pip and conda for dependency management.
+- Works with Colab.
 
 ## Table of Contents
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
 - [Example Projects](#example-projects)
-- [Documentation](#documentation) 
-- [Contributing](#contributing) 
-- [FAQ](#faq) 
-
-
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [FAQ](#faq)
 
 ## Installation 🔌
 
 ```bash
 pip install yerbamate
 ```
+
+## Project Structure 📁
+
+Maté projects are organized into the following structure with modularity in
+mind. This offers a clean and organized codebase that is easy to maintain and is
+sharable out-of-the-box.
+
+```bash
+/
+|-- models/
+|   |-- __init__.py
+|-- experiments/
+|   |-- __init__.py
+|-- trainers/
+|   |-- __init__.py
+|-- data/
+|   |-- __init__.py
+```
+
+### Modularity
+
+Modularity is a software design principle that focuses on creating
+self-contained, reusable and interchangeable components. In the context of a
+deep learning project, modularity means creating three independent standalone
+modules for models, trainers and data. This allows for a more organized,
+maintainable and sharable project structure. The forth module, experiments, is
+not independent, but rather combines the three modules together to create a
+complete experiment.
 
 ## Quick Start ⚡
 
@@ -59,7 +87,8 @@ This will generate the following structure:
 
 ### **Install an experiment**
 
-To install an experiment, you can use `mate install` to install a module from a github repository:
+To install an experiment, you can use `mate install` to install a module from a
+github repository:
 
 ```bash
 mate install oalee/big_transfer/experiments/bit -yo pip
@@ -345,15 +374,11 @@ elif env.test:
 
 <!-- Please check out the [documentation](https://yerba-mate.readthedocs.io/en/latest/). -->
 
-
-
-
 ## Contributing 🤝
 
 We welcome contributions from the community! Please check out our
 [contributing](https://github.com/oalee/yerbamate/blob/main/CONTRIBUTING.md)
 guide for more information on how to get started.
-
 
 ## Contact 🤝
 
