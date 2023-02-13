@@ -15,7 +15,7 @@ track of your experiments with ease 🚀
 - Support for full customizability and reproducibility of results through the
   inclusion of dependencies in your project.
 - Modular project structure that enforces a clean and organized codebase.
-- Fully compatible with python. No need to use `mate` commands to run your
+- Fully compatible with python. No need to use mate commands to run your
   experiments. 
 - Convenient environment management through the Maté Environment API.
 - Support for pip and conda for dependency management.

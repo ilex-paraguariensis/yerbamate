@@ -1,10 +1,10 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span> your friendly AI project and experiment manager</h1>
 
-Maté is a python project, package and experiment manager. Whether you are a
+[Maté🧉](https://github.com/oalee/yerbamate) is a python project, package and experiment manager. Whether you are a
 seasoned deep learning researcher or just starting out, Maté provides you with
 the tools to easily add source code and dependencies of models, trainers, and
 data loaders to your projects. With Maté, you can also evaluate, train, and keep
-track of your experiments with ease 🚀
+track of your experiments with ease 🚀 
 
 ## Features 🎉
 
