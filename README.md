@@ -1,4 +1,4 @@
-<h1 style="color:green"><span style="color:green">Maté 🧉</span> - AI Project and Experiment Manager</h1>
+<h1 style="color:green"><span style="color:green">Maté 🧉</span>, your friendly AI project and experiment manager</h1>
 
 Maté is a python project, package and experiment manager. Whether you are a
 seasoned deep learning researcher or just starting out, Maté provides you with
@@ -102,6 +102,9 @@ List all your models, trainers, data and experiments modules:
 mate list
 ```
 
+### **Setting up environment**
+Take a look at [Environment API](#maté-environment-api) and set up your environment before running your experiments.
+
 ### **Train a model**
 
 To train a model, you can use the `mate train` command. This command will train
@@ -113,8 +116,6 @@ mate train bit learn
 # or alternatively use python
 python -m train deepnet.experiments.bit.learn
 ```
-
-
 
 ### **Export a module**
 
@@ -224,9 +225,6 @@ mate clone resnet my_resnet
 Please check out the [transfer learning](https://github.com/oalee/big-transfer),
 [vision models](https://github.com/oalee/deep-vision), and
 [lightweight gan](https://github.com/oalee/lightweight-gan).
-
-## Documentation 📚
-
 
 ### Maté Environment API
 
@@ -343,6 +341,10 @@ elif env.test:
 ```
 
 <!-- Please check out the [documentation](https://yerba-mate.readthedocs.io/en/latest/). -->
+
+## Guides 📖
+
+For more information on modularity, please check out this [guide]().
 
 ## Contributing 🤝
 
