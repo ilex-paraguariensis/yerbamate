@@ -30,7 +30,6 @@ track of your experiments with ease 🚀
 - [Experiment Definition](#experiment-definition)
 - [Command Line Interface](#command-line-interface-📝)
 
-
 ## Installation 🔌
 
 ```bash
@@ -95,9 +94,9 @@ python -m train deepnet.experiments.bit.learn
 
 ## Project Structure 📁
 
-Deep learning projects can be organized into the following structure with modularity and seperation of concerns in
-mind. This offers a clean and organized codebase that is easy to maintain and is
-sharable out-of-the-box.
+Deep learning projects can be organized into the following structure with
+modularity and seperation of concerns in mind. This offers a clean and organized
+codebase that is easy to maintain and is sharable out-of-the-box.
 
 ```bash
 /
@@ -121,7 +120,7 @@ maintainable and sharable project structure. The forth module, experiments, is
 not independent, but rather combines the three modules together to create a
 complete experiment.
 
-### Example Projects
+### Example Project Structure
 
 ```bash
 .
@@ -166,17 +165,15 @@ complete experiment.
 11 directories, 27 files
 ```
 
-
 ## Example Projects 📚
 
 Please check out the [transfer learning](https://github.com/oalee/big-transfer),
 [vision models](https://github.com/oalee/deep-vision), and
 [lightweight gan](https://github.com/oalee/lightweight-gan).
 
-
 ## Module Installation 📦
 
-Maté supports the installation of code modules from github repositories. 
+Maté supports the installation of code modules from github repositories.
 
 ### **Install a module**
 
@@ -197,11 +194,13 @@ mate install oalee/big_transfer/experiments/bit
 
 ### **Install dependencies**
 
-Maté supports both pip and conda for dependency management when `requirements.txt` and `dependencies.json` are exported (see [Export](export-a-module)). To install
-dependencies, you can use `mate install` with the `-y {option}` flag to install
-dependencies. Options include `pip` and `conda`. The -o flag will overwrite the
-code dependencies if it already exists. For example, to install the big transfer
-experiment with pip dependencies, you can use the following command:
+Maté supports both pip and conda for dependency management when
+`requirements.txt` and `dependencies.json` are exported (see
+[Export](export-a-module)). To install dependencies, you can use `mate install`
+with the `-y {option}` flag to install dependencies. Options include `pip` and
+`conda`. The -o flag will overwrite the code dependencies if it already exists.
+For example, to install the big transfer experiment with pip dependencies, you
+can use the following command:
 
 ```bash
 mate install oalee/big_transfer/experiments/bit -yo pip
@@ -235,8 +234,6 @@ mate export
 
 This command will generate `requirements.txt` and `dependencies.json` for
 sharing, dependency management and reprodiciblity.
-
-
 
 ### **Examples**
 
@@ -276,7 +273,6 @@ mate install oalee/deep-vision/deepnet/trainers/pl_classification
 # installs pytorch lightning gan training module from lightweight-gan repo
 mate install oalee/lightweight-gan/lgan/trainers/lgan
 ```
-
 
 ## Maté Environment API
 
@@ -336,8 +332,9 @@ python -m my_project.experiment.my_experiment {train/test/etc}
 
 ## Experiment Definition
 
-An experiment is a combination of a model, trainer, and data loader. An
-experiment is defined in the experiments module.
+Maté uses python to define hyperparameters of an experiment. An experiment is a
+combination of a model, trainer, and data loader. An experiment is defined in
+the experiments module.
 
 ```python
 from ...data.cifar10 import CifarLightningDataModule
@@ -395,8 +392,6 @@ if env.restart:
 elif env.test: 
     pl_trainer.test(pl_module, data_module, ckpt_path=os.path.join( env["results"], "last.ckpt"))
 ```
-
-
 
 ## Command line interface 📝
 
@@ -495,8 +490,6 @@ Example Installing a module from unstructured git repository:
     Take into account that this will install only the code and not the python dependencies.
 
 ---
-
-
 
 ### list
 
