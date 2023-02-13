@@ -99,12 +99,12 @@ def method_to_md(method_name, member: Optional[Callable] = None):
 
 def generate_help_md() -> str:
 
-    doc = remove_indent(str(MateCLI.__doc__)) + "\n --- \n"
+    doc = remove_indent(str(Mate.__doc__)) + "\n --- \n"
     current_docstring = str(sys.modules[__name__].__doc__)
     doc += current_docstring + "\n --- \n"
     members = [
         (k, v)
-        for (k, v) in inspect.getmembers(MateCLI, predicate=inspect.isfunction)
+        for (k, v) in inspect.getmembers(Mate, predicate=inspect.isfunction)
         if not k.startswith("_")
     ]
     for name, val in members:
@@ -114,18 +114,38 @@ def generate_help_md() -> str:
 
 class MateHelp:
     def __init__(self):
-        self.help_options = ("init", "train", "test", "clone", "auto")
+        self.help_options = ("init", "install", "train", "auto", "export")
+        self.help_comments = (
+            "Initialize a new project",
+            "Install dependencies",
+            "Train a model",
+            "Various commands to help with the development proces",
+            "Export dependencies",
+        )
+
+
+
+        self._full_docs, self._methods = self.get_full_docs(Mate)
 
     def get_index(self):
         nl = "\n"
+        # return self._full_docs
+
+        helps = [
+            f"`{option}` : {comment}"
+            for option, comment in zip(self.help_options, self.help_comments)
+        ]
         return remove_indent(
             f"""
         # Help Index
+
+        Mate, your friendly ML project manager.
+        
         Type `mate help <option>` to get more information about a topic.
 
         Available options are:
 
-        {'- ' + (nl + ' - ').join(self.help_options)}
+        {'- ' + (nl + ' - ').join(helps)}
         """
         )
 
@@ -142,32 +162,50 @@ class MateHelp:
             header = f"### `{class_value.__name__ if is_static else class_value.__name__.lower()}.{method_name}({annotations}) -> {signature.return_annotation if signature.return_annotation != inspect._empty else None}`\n"
             return header + doc + "\n --- \n"
 
-        methods = [
-            get_method_doc(method_name, method)
+        # methods = [
+        #     get_method_doc(method_name, method)
+        #     for method_name, method in inspect.getmembers(
+        #         class_value, inspect.isfunction
+        #     )
+        #     if not method_name.startswith("_") and method.__doc__ is not None
+        # ]
+
+        method_dict = {
+            method_name: get_method_doc(method_name=method_name, method=method)
             for method_name, method in inspect.getmembers(
                 class_value, inspect.isfunction
             )
             if not method_name.startswith("_") and method.__doc__ is not None
-        ]
+        }
+
         nl = "\n"
-        return f"{header}\n\n{remove_indent(nl.join(methods))}"
+        return (
+            f"{header}\n\n{remove_indent(nl.join(method_dict.values()))}",
+            method_dict,
+        )
 
     def print_help(self, what: str = "") -> None:
-        if what == "cli":
-            print(generate_help_md())
-            print_markdown(generate_help_md())
-        elif what == "mate":
-            test = self.get_full_docs(Mate)
-            print_markdown(test)
-        # elif what == "config":
-        #     print_markdown(MateConfig.__doc__)
-        # elif what == "project":
-        #     print_markdown(MateProject.__doc__)
-        # elif what == "experiment":
-        #     print_markdown(Experiment.__doc__)
+
+        if what in self.help_options:
+            # ipdb.set_trace()
+            print_markdown(self._methods[what])
         else:
-            # print_markdown(generate_help_md())
             print_markdown(self.get_index())
+        # if what == "cli":
+        #     print(generate_help_md())
+        #     print_markdown(generate_help_md())
+        # elif what == "mate":
+        #     test = self.get_full_docs(Mate)
+        #     print_markdown(test)
+        # # elif what == "config":
+        # #     print_markdown(MateConfig.__doc__)
+        # # elif what == "project":
+        # #     print_markdown(MateProject.__doc__)
+        # # elif what == "experiment":
+        # #     print_markdown(Experiment.__doc__)
+        # else:
+        #     # print_markdown(generate_help_md())
+        #     print_markdown(self.get_index())
 
     def get_help_md(self, what: str = "cli") -> str:
         if what == "cli":
@@ -254,7 +292,8 @@ def main():
     help_args = ("help", "--help", "-h")
     actions = tuple(method.replace("_", "-") for method in methods) + help_args
     help = MateHelp()
-    if len(args) == 0  or args[0] in help_args:
+    # ipdb.set_trace()
+    if len(args) == 0 or args[0] in help_args:
         if len(args) > 1:
             help.print_help(args[1])
         else:

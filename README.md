@@ -114,6 +114,8 @@ mate train bit learn
 python -m train deepnet.experiments.bit.learn
 ```
 
+
+
 ### **Export a module**
 
 To export, share your modules (models/trainers/data/experiments) you can use the
@@ -225,40 +227,8 @@ Please check out the [transfer learning](https://github.com/oalee/big-transfer),
 
 ## Documentation 📚
 
-### Modularity
 
-Modularity is a software design principle that focuses on creating
-self-contained, reusable and interchangeable components. In the context of a
-deep learning project, modularity means creating three independent standalone
-modules for models, trainers and data. This allows for a more organized,
-maintainable and scalable project structure. The forth module, experiments, is
-not independent, but rather combines the three modules together to create a
-complete experiment.
-
-### Project Structure
-
-Maté enforces a project structure that is modular and easy to navigate. The
-project structure is shown below:
-
-```bash
-/
-|-- models/
-|   |-- __init__.py
-|-- experiments/
-|   |-- __init__.py
-|-- trainers/
-|   |-- __init__.py
-|-- data/
-|   |-- __init__.py
-```
-
-All independent sub modules (meaning they don't import from each other) should
-be placed in their respective folders. For example, a model should be placed in
-the models folder, a trainer should be placed in the trainers folder, and a data
-loader should be placed in the data folder. This allows for out-of-the-box
-sharing of models, data loaders, and trainers.
-
-### Maté Environment
+### Maté Environment API
 
 The Maté Environment API is a tool for managing your environment variables. It
 offers a convenient way to set, retrieve and manage these variables throughout

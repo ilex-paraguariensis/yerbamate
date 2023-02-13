@@ -14,9 +14,10 @@ from typing import Optional
 from .mate_config import MateConfig
 
 
-
 class Mate:
-
+    """
+    Mate, your friendly ML project manager.
+    """
 
     def __init__(self, init=False):
         self.root_folder = ""
@@ -27,13 +28,40 @@ class Mate:
         self.api = MateAPI(self.config)
         self.run_params = None
 
- 
     @staticmethod
     def init(project_name: str, *args, **kwargs):
+        """
+        Initializes a new project.
+        This will create the following structure:
+        ```
+        /
+        |-- models/
+        |   |-- __init__.py
+        |-- experiments/
+        |   |-- __init__.py
+        |-- trainers/
+        |   |-- __init__.py
+        |-- data/
+        |   |-- __init__.py
+        ```
+
+        Args:
+            project_name: Name of the project.
+
+        Example:
+
+            `mate init my_project`
+
+        """
         MateAPI.init_project(project_name, *args, **kwargs)
- 
 
     def export(self):
+        """
+        Generates requirements.txt and dependencies.json files for sharing and reproducibility.
+
+        Example:
+            `mate export`
+        """
         self.api.auto("export")
 
     def list(
@@ -41,32 +69,49 @@ class Mate:
         module_name: str = None,
         output_json: bool = True,
     ):
+        """
+        Lists all available modules.
+        module_name: models, experiments, trainers, data
+        """
+
         li = self.api.list(module_name)
         if output_json:
             print(json.dumps(li, indent=4))
         else:
             print(li)
 
-
     def auto(self, command: str):
         """
-        auto init -> creates __init__.py recursively
-        auto export -> creates requirements.txt for export
+        Various commands to help with the development process.
+
+        - `export`: Creates a requirements.txt and dependencies.json files for sharing and reproducibility.
+        - `init`: Automatically creates `__init__.py` files in the project structure.
+
+        Example:
+
+
+            `mate auto export`
+
+
+            `mate auto init`
         """
         self.api.auto(command)
 
-
     def summary(self, output_json: bool = True):
+        """
+        Prints a summary of the project modules.
+        """
+
         print(json.dumps(self.api.summary(), indent=4))
 
     def clone(self, module: str, name: str, dest: str):
-        
+
         # check if module exists
         module_path = os.path.join(self.root_folder, module, name)
         if not os.path.exists(module_path):
             print(f"Module {module}/{name} does not exist")
             sys.exit(1)
-        
+
         # check if destination exists
         dest_path = os.path.join(self.root_folder, module, dest)
         if os.path.exists(dest_path):
@@ -77,26 +122,42 @@ class Mate:
                 shutil.rmtree(dest_path)
             else:
                 sys.exit(1)
-        else:        
+        else:
             os.makedirs(dest_path)
         # copy module to destination
         shutil.copytree(module_path, dest_path)
 
         print(f"Module {module}/{name} cloned to {dest}")
 
-
     def snapshot(self, model_name: str):
         pass
 
-    def train(self, model: str, exp: str , *args, **kwargs):
+    def train(self, exp_module: str, exp: str, *args, **kwargs):
+        """
+        Runs an experiment.
+
+        Args:
+
+            exp_module: Name of the module where the experiment is located.
+
+            exp: Name of the experiment.
+
+        Example:
+            `
+            mate train experiments my_experiment`
+
+        This will run the experiment `my_experiment` located in the `experiments` module.
+        Equivalent to `python -m experiments.my_experiment`
+        """
+
         # ipdb.set_trace()
-        module = [self.config.project, "experiments", model, exp]
+        module = [self.config.project, "experiments", exp_module, exp]
         module = ".".join(module)
 
         try:
             __import__(module)
         except Exception as e:
-            print(f"Error in loading {model}/{exp}")
+            print(f"Error in loading {exp_module}/{exp}")
             print("Available experiments:")
             self.list("experiments")
             traceback.print_exc()
@@ -104,11 +165,40 @@ class Mate:
             # print(e)
             sys.exit(1)
 
-
-
     def install(self, url: str, *args, **kwargs):
         """
-        Adds a dependency to a model.
+        Intalls a module from a git repository.
+
+        Usage: ``mate install {url} -{y|n|o} {pm}``
+
+        Install module support the following formats:
+        - ``mate install {complete_url}``
+        - ``mate install {user}/{repo}/{root_module}/{module}``
+        - ``mate install {user}/{repo|root_module}/{module}``
+
+        Args:
+        -    url: Url of the git repository.
+        -    -y: Skips confirmation and installs python dependencies
+        -    -n: Skips installing python dependencies
+        -    -o: Overwrites existing module
+        -    pm: Package manager to use. Defaults to asking the user.
+
+        Example Installing a module from structured git repository (recommended):
+            
+
+            `mate install oalee/deep-vision/deepnet/models/torch_vit -yo pip`
+
+            This will install the module `torch_vit` from the repository `oalee/deep-vision` in to your `models` folder.
+            The `yo` flags will skip confirmation and install python dependencies using pip.
+
+        Example Installing a module from unstructured git repository:
+            
+            
+            `mate install https://github.com/rwightman/pytorch-image-models/tree/main/timm`
+
+
+            This will install the module `timm` from the repository as a sister module to your root module.
+            Take into account that this will install only the code and not the python dependencies.
         """
         self.api.install_url(url, *args, **kwargs)
 
