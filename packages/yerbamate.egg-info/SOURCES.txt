@@ -10,7 +10,6 @@ packages/yerbamate/__init__.py
 packages/yerbamate/constants.py
 packages/yerbamate/environment.py
 packages/yerbamate/mate.py
-packages/yerbamate/mate_cli copy.py
 packages/yerbamate/mate_cli.py
 packages/yerbamate/mate_config.py
 packages/yerbamate.egg-info/PKG-INFO

@@ -260,8 +260,10 @@ class ModuleRepository:
 
     def __generate_pip_requirements(self, path):
 
+        # ipdb.set_trace()
         imports = pipreqs.get_all_imports(path)
         # import_info_remote = pipreqs.get_imports_info(imports)
+        
         import_info_local = pipreqs.get_import_local(imports)
 
         self.__generate_mate_dependencies(path)

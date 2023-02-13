@@ -58,13 +58,10 @@ This will generate the following structure:
 |   |-- __init__.py
 ```
 
-
-
 ### **Install an experiment**
 
-To install an experiment, you can use `mate install` to install a module and its dependencies from a
-github repository. See [Install](#install) for more details.
-
+To install an experiment, you can use `mate install` to install a module and its
+dependencies from a github repository. See [Install](#install) for more details.
 
 ```bash
 # Short version of GitHub URL https://github.com/oalee/big_transfer/tree/master/big_transfer/experiments/bit
@@ -75,7 +72,10 @@ mate install oalee/deep-vision/deepnet/experiments/resnet -yo pip
 ```
 
 ### **Install a module**
-You can install independant modules such as models, trainers, and data loaders from github projects that follow the [Independent modular project structure](https://oalee.github.io/yerbamate/#/?id=project-structure-%f0%9f%93%81).
+
+You can install independant modules such as models, trainers, and data loaders
+from github projects that follow the
+[Independent modular project structure](https://oalee.github.io/yerbamate/#/?id=project-structure-%f0%9f%93%81).
 
 ```bash
 mate install oalee/lightweight-gan/lgan/trainers/lgan 
@@ -83,7 +83,6 @@ mate install oalee/big_transfer/models/bit -yo pip
 mate install oalee/deep-vision/deepnet/models/vit_pytorch -yo pip
 mate install oalee/deep-vision/deepnet/trainers/classification -yo pip
 ```
-
 
 ### **List all modules**
 
@@ -351,8 +350,8 @@ python -m my_project.experiment.my_experiment {train/test/etc}
 ## Experiment Definition
 
 Maté uses python to define hyperparameters of an experiment. An experiment is a
-combination of a model, trainer, and data loader and is defined in
-the experiments module.
+combination of a model, trainer, and data loader and is defined in the
+experiments module.
 
 ```python
 from ...data.cifar10 import CifarLightningDataModule
@@ -520,15 +519,13 @@ Examples: `mate list models`
 
     `mate list`
 
- --- 
+---
 
 ### `mate` clone
 
 `mate clone {module} {name} {dest}`
 
-Clones a module to a destination.
-Args:
-    module: Module to clone.
+Clones a module to a destination. Args: module: Module to clone.
 
     name: Name of the module to clone.
 
@@ -538,8 +535,7 @@ Example:
 
     `mate clone models torch_vit my_vit`
 
- --- 
-
+---
 
 ### train
 
@@ -564,7 +560,11 @@ Equivalent to `python -m root_module.experiments.my_experiment`
 
 ## Guides 📖
 
-For more information on modularity, please check out this [guide]().
+For more information on modularity, please check out this
+[guide](https://medium.com/@alee.rmi/the-ultimate-deep-learning-project-structure-a-software-engineers-guide-into-the-land-of-ai-c383f234fd2f).
+
+For running experiments on Google Colab, please check out this
+[example](https://colab.research.google.com/gist/oalee/5f5c2b3bb2da4ec3168f3edd4a52056a/deep-learning.ipynb)
 
 ## Contributing 🤝
 

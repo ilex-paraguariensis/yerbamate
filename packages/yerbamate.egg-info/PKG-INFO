@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: yerbamate
-Version: 0.9.19
+Version: 0.9.20
 Summary:  A python module and experiment manager for deep learning
 Home-page: https://github.com/oalee/yerbamate
 Author: Giulio Zani, Ali Rahimi
@@ -16,10 +16,35 @@ Requires-Python: >=3.9
 Description-Content-Type: text/markdown
 License-File: LICENSE
 
-<h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
+<h1 style="color:green"><span style="color:green">Maté 🧉</span> your friendly AI project and experiment manager</h1>
 
-Maté is a deep learning framework compatible with pytorch(lightning), tensorflow(keras), and jax(flax). It is a package and experiment manager for deep learning. As a package manager you can add AI models, trainers and data loaders to your projects. As a project manager, Maté evaluates, trains, and keeps track of your experiments. Maté adds the source code of the dependencies to your project, making it fully customizable and reproducible.
+Maté is a python project, package and experiment manager. Whether you are a
+seasoned deep learning researcher or just starting out, Maté provides you with
+the tools to easily add source code and dependencies of models, trainers, and
+data loaders to your projects. With Maté, you can also evaluate, train, and keep
+track of your experiments with ease 🚀
 
+## Features 🎉
+
+- Seamless integration with popular deep learning libraries such as PyTorch,
+  TensorFlow, and JAX.
+- Easy to use interface to add source code of models, trainers, and data loaders
+  to your projects.
+- Support for full customizability and reproducibility of results through the
+  inclusion of source code dependencies in your project.
+- Modular project structure that enforces a clean and organized codebase.
+- Convenient environment management through the Maté Environment API.
+- Support for pip and conda for dependency management.
+- Works with Colab.
+
+## Table of Contents
+
+- [Installation](#installation-🔌)
+- [Quick Start](#quick-start-⚡)
+- [Project Structure](#project-structure-📁)
+- [Example Projects](#example-projects-📚)
+- [Documentation](https://oalee.github.io/yerbamate/)
+- [Contribution](#Contribution-🤝)
 
 ## Installation 🔌
 
@@ -27,172 +52,171 @@ Maté is a deep learning framework compatible with pytorch(lightning), tensorflo
 pip install yerbamate
 ```
 
-## Examples
-
-Please check out the [examples repo](https://github.com/ilex-paraguariensis/examples/) for examples of pytorch lightning, keras and jax.
-
 ## Quick Start ⚡
 
-**Train a model**
+### **Initialize a project**
 
 ```bash
-mate train my_experiment
+mate init deepnet
 ```
 
-**Evaluate a model**
+This will generate the following empty project structure:
 
 ```bash
-mate test my_experiment
+/
+|-- models/
+|   |-- __init__.py
+|-- experiments/
+|   |-- __init__.py
+|-- trainers/
+|   |-- __init__.py
+|-- data/
+|   |-- __init__.py
 ```
 
-**Run a model**
+### **Install an experiment**
+
+To install an experiment, you can use `mate install` to install a module and its dependencies from a
+github repository. See [docs](https://oalee.github.io/yerbamate/#/?id=install) for more details.
+
 
 ```bash
-mate run feature_extraction my_experiment
+
+# Short version of GitHub URL https://github.com/oalee/big_transfer/tree/master/big_transfer/experiments/bit
+mate install oalee/big_transfer/experiments/bit -yo pip
+
+# Short version of GitHub URL https://github.com/oalee/deep-vision/tree/main/deepnet/experiments/resnet
+mate install oalee/deep-vision/deepnet/experiments/resnet -yo pip
 ```
 
-**Clone a model**
+### **Install a module**
+You can install independant modules such as models, trainers, and data loaders from github projects that follow the [Independent modular project structure](https://oalee.github.io/yerbamate/#/?id=project-structure-%f0%9f%93%81).
 
 ```bash
-mate clone resnet my_resnet
+mate install oalee/lightweight-gan/lgan/trainers/lgan 
+mate install oalee/big_transfer/models/bit -yo pip
+mate install oalee/deep-vision/deepnet/models/vit_pytorch -yo pip
+mate install oalee/deep-vision/deepnet/trainers/classification -yo pip
 ```
 
-More features coming soon!
+### **Setting up environment**
 
-## Comparison to familiar tools
+Take a look at
+[Environment API](https://oalee.github.io/yerbamate#maté-environment-api) and
+set up your environment before running your experiments.
 
-- *Weights & Biases* wandb is a logger and allows model weights sharing as well
-- *Tensorboard* This is a logger and can be integrated into mate
-- *[Monai](https://github.com/Project-MONAI/MONAI)*
-- *[Ivy](https://github.com/unifyai/ivy)*
-- *[THINGSvision](https://github.com/ViCCo-Group/thingsvision)*
+### **Train a model**
 
+To train a model, you can use the `mate train` command. This command will train
+the model with the specified experiment. For example, to train the an experiment
+called `learn` in the `bit` module, you can use the following command:
 
-
-## What is the Maté standard?
-Mate enforces modularity and seperation of three basic components of a deep learning project: models, trainers, and data loaders. Each model, data loader, and trainer. Each model, data loader and trainer should be a module inside its respective folder. This allows for out-of-the-box sharing of models, data loaders, and trainers. 
-
-An example of a the foolder structure of a mate project is shown below:
-
-```
-├── root_project_folder
-│   ├── data
-│   │   ├── __init__.py
-│   │   ├── cifar
-│   │   │   ├── __init__.py
-│   │   │   ├── cifar10.py
-|
-│   ├── models
-│   │   ├── __init__.py
-│   │   ├── resnet
-│   │   │   ├── __init__.py
-│   │   │   ├── resnet.py
-|
-│   ├── trainers
-│   │   ├── __init__.py
-│   │   ├── classifier
-│   │   │   ├── __init__.py
-│   │   │   ├── classifier.py
-|
-│   ├── experiments
-│   │   ├── resnet18_cifar10.json
-│   │   ├── resnet34_cifar10.json
-
+```bash
+mate train bit learn
+# or alternatively use python
+python -m train deepnet.experiments.bit.learn
 ```
 
+## Project Structure 📁
 
+Deep learning projects can be organized into the following structure with modularity and seperation of concerns in
+mind. This offers a clean and organized codebase that is easy to maintain and is
+sharable out-of-the-box.
 
-
-
-## For Coders
-Dear coders, we try our best to not get in your way and in fact, you do not have to integrate or import any mate class to your projects. Mate simply parses the configuration. To make your project mate compatible, you need to move a few files and make a Bombilla configuration file. 
-
-### Mate configuration (AKA Bombilla 🧉)
-Mate defines an experiment with a configuration file, aka Bombilla, that is a ordered dictionary describing arguments and python objects in plain json. Bombilla supports any python module; including all the local project level modules and installed py packages (eg., tensorflow, pytorch, x_transformers, torchvision, vit_pytorch). Mate generates objects in a Bombilla with DFS search. 
-
-**Note that all the arguments are directly passed to the object constructor, so you can use any argument that is accepted by the fucntion call.**
-
-Here you can see some examples of objects in Bombilla format:
-* custom neural network that fine tunes a pretrained resnet:
-```
-            "classifier": {
-                "module": "modules.resnet.fine_tune",
-                "class": "ResNetTuneModel",
-                "object_key": "classifier",
-                "params": {
-                    "num_classes": 10,
-                    "resnet": {
-                        "module": "torchvision.models",
-                        "class": "resnet18",
-                        "params": {
-                            "pretrained": true
-                        }
-                    }
-                }
-            },
-
-
-```
-* **Pytorch lightning trainer**
-
-```
-    "trainer": {
-        "module": "pytorch_lightning",
-        "class": "Trainer",
-        "params": {
-            "gpus": 1,
-            "max_epochs": 100,
-            "precision": 16,
-            "gradient_clip_val": 0.5,
-            "enable_checkpointing": true,
-            "callbacks": [
-                {
-                    "module": "pytorch_lightning.callbacks",
-                    "class": "EarlyStopping",
-                    "params": {
-                        "monitor": "val_loss",
-                        "patience": 10,
-                        "mode": "min"
-                    }
-                },
-                {
-                    "module": "pytorch_lightning.callbacks",
-                    "class": "ModelCheckpoint",
-                    "params": {
-                        "dirpath": "{save_dir}/checkpoints",
-                        "monitor": "val_loss",
-                        "save_top_k": 1,
-                        "verbose": true,
-                        "save_last": true,
-                        "mode": "min"
-                    }
-                }
-            ],
-            "logger": {
-                "module": "pytorch_lightning.loggers",
-                "class": "WandbLogger",
-                "params": {
-                    "project": "cifar10",
-                    "name": "vit_vanilla",
-                    "save_dir": "./logs",
-                    "log_model": false
-                }
-            }
-        }
-    
+```bash
+/
+|-- models/
+|   |-- __init__.py
+|-- experiments/
+|   |-- __init__.py
+|-- trainers/
+|   |-- __init__.py
+|-- data/
+|   |-- __init__.py
 ```
 
+### Modularity
 
-**More tutorials and examples will be added soon!!**
+Modularity is a software design principle that focuses on creating
+self-contained, reusable and interchangeable components. In the context of a
+deep learning project, modularity means creating three independent standalone
+modules for models, trainers and data. This allows for a more organized,
+maintainable and sharable project structure. The forth module, experiments, is
+not independent, but rather combines the three modules together to create a
+complete experiment.
+
+### Sample Modular Project Structure
+
+This structure highlights modularity and seperation of concerns. The `models`,
+`data` and `trainers` modules are independent and can be used in any project.
+The `experiments` module is not independent, but rather combines the three
+modules together to create a complete experiment.
 
 
+```bash
+.
+├── mate.json
+└── deepnet
+    ├── data
+    │   ├── bit
+    │   │   ├── fewshot.py
+    │   │   ├── __init__.py
+    │   │   ├── minibatch_fewshot.py
+    │   │   ├── requirements.txt
+    │   │   └── transforms.py
+    │   └── __init__.py
+    ├── experiments
+    │   ├── bit
+    │   │   ├── aug.py
+    │   │   ├── dependencies.json
+    │   │   ├── __init__.py
+    │   │   ├── learn.py
+    │   │   └── requirements.txt
+    │   └── __init__.py
+    ├── __init__.py
+    ├── models
+    │   ├── bit_torch
+    │   │   ├── downloader
+    │   │   │   ├── downloader.py
+    │   │   │   ├── __init__.py
+    │   │   │   ├── requirements.txt
+    │   │   │   └── utils.py
+    │   │   ├── __init__.py
+    │   │   ├── models.py
+    │   │   └── requirements.txt
+    │   └── __init__.py
+    └── trainers
+        ├── bit_torch
+        │   ├── __init__.py
+        │   ├── lbtoolbox.py
+        │   ├── logger.py
+        │   ├── lr_schduler.py
+        │   ├── requirements.txt
+        │   └── trainer.py
+        └── __init__.py
+```
 
-## FAQ
-**Q: Does Maté work with colab?**
+## Example Projects 📚
 
-**A**: Yes! Maté works with colab as any Maté project is exportable to a juypter notebook.
+Please check out the [transfer learning](https://github.com/oalee/big-transfer),
+[vision models](https://github.com/oalee/deep-vision), and
+[lightweight gan](https://github.com/oalee/lightweight-gan).
 
-## Contact 🤝 
+## Documentation 📚
+
+Please check out the [documentation](https://oalee.github.io/yerbamate).
+
+## Guides 📖
+
+For more information on modularity, please check out this [guide]().
+
+## Contribution 🤝
+
+We welcome contributions from the community! Please check out our
+[contributing](https://github.com/oalee/yerbamate/blob/main/CONTRIBUTING.md)
+guide for more information on how to get started.
+
+## Contact 🤝
 
 For questions please contact:
 
