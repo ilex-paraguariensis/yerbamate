@@ -63,7 +63,7 @@ This will generate the following structure:
 ### **Install an experiment**
 
 To install an experiment, you can use `mate install` to install a module and its dependencies from a
-github repository. See [docs](https://oalee.github.io/yerbamate/#/?id=install) for more details.
+github repository. See [Install](#install) for more details.
 
 
 ```bash
@@ -313,8 +313,8 @@ import yerbamate
 
 env = yerbamate.Environment()
 
-env.name # Automatically parses the name of the experiment from experiment_module.exp_name
-env.results # Automatically addes "experiment_module/exp_name" to the results directory passed from environment variables
+env.name # Automatically assigns the name of the experiment as "experiment_module.exp_name"
+env.results # Automatically appends "experiment_module/exp_name" to the results directory passed from environment variables
 
 
 # access environment variables
@@ -354,7 +354,7 @@ python -m my_project.experiment.my_experiment {train/test/etc}
 ## Experiment Definition
 
 Maté uses python to define hyperparameters of an experiment. An experiment is a
-combination of a model, trainer, and data loader. An experiment is defined in
+combination of a model, trainer, and data loader and is defined in
 the experiments module.
 
 ```python
