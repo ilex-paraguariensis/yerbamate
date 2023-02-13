@@ -8,14 +8,15 @@ track of your experiments with ease 🚀
 
 ## Features 🎉
 
-- Seamless integration with any installed python library such as PyTorch/Lightning,
+- Seamless integration with any python library such as PyTorch/Lightning,
   TensorFlow/Keras, JAX/Flax, Huggingface/transformers.
 - Easy to use interface to add source code of models, trainers, and data loaders
   to your projects.
 - Support for full customizability and reproducibility of results through the
   inclusion of dependencies in your project.
 - Modular project structure that enforces a clean and organized codebase.
-- Fully compatible with python. 
+- Fully compatible with python. No need to use `mate` commands to run your
+  experiments. 
 - Convenient environment management through the Maté Environment API.
 - Support for pip and conda for dependency management.
 - Works with Colab.

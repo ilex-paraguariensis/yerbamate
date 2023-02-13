@@ -12,7 +12,7 @@ setup(
     author_email="yerba.mate.dl@proton.me",
     url="https://github.com/oalee/yerbamate",
     python_requires=">=3.9",
-    version="0.9.20",
+    version="0.9.21",
     packages=find_packages("packages", exclude=["tests"]),
     include_package_data=True,
     package_dir={"": "packages/"},

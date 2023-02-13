@@ -80,7 +80,3 @@ packages/yerbamate/yerbamate.egg-info/PKG-INFO
 packages/yerbamate/yerbamate.egg-info/SOURCES.txt
 packages/yerbamate/yerbamate.egg-info/dependency_links.txt
 packages/yerbamate/yerbamate.egg-info/top_level.txt
-packages/ymdl.egg-info/PKG-INFO
-packages/ymdl.egg-info/SOURCES.txt
-packages/ymdl.egg-info/dependency_links.txt
-packages/ymdl.egg-info/top_level.txt
