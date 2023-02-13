@@ -1,6 +1,6 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 
-Welcome to Maté - the versatile and efficient deep learning framework! Maté is a package and experiment manager that seamlessly integrates with popular deep learning libraries such as PyTorch, TensorFlow, and JAX. Whether you are a seasoned deep learning researcher or just starting out, Maté provides you with the tools to easily add models, trainers, and data loaders to your projects. With Maté, you can also evaluate, train, and keep track of your experiments with ease. By including the source code of dependencies directly in your project, Maté ensures full customizability and reproducibility of your results. Get started with Maté today and elevate your deep learning experience! 🚀
+Welcome to Maté - the versatile and efficient deep learning framework! Maté is a package and experiment manager that seamlessly integrates with popular deep learning libraries such as PyTorch, TensorFlow, and JAX. Whether you are a seasoned deep learning researcher or just starting out, Maté provides you with the tools to easily add models, trainers, and data loaders to your projects. With Maté, you can also evaluate, train, and keep track of your experiments with ease. By including the source code of dependencies directly in your project.  Maté ensures full customizability and reproducibility of your results. Get started with Maté today and elevate your deep learning experience! 🚀
 
 ## Installation 🔌
 
@@ -9,11 +9,6 @@ pip install yerbamate
 ```
 
 
-
-## Examples 📚
-
-Please check out the [transfer learning](https://github.com/oalee/big-transfer), [vision models](https://github.com/oalee/deep-vision),
-and [lightweight gan](https://github.com/oalee/lightweight-gan).
 
 ## Quick Start ⚡
 
@@ -37,8 +32,35 @@ mate train experiment my_experiment
 python -m train my_project.experiment.my_experiment
 ```
 
+**Export a module**
+To share your modules (models/trainers/data/experiments) you can use the following command, then push and share the module with others:
+```bash
+mate export
+```
+This command will generate `requirements.txt` and `dependencies.json` for sharing, dependency management and reprodiciblity.
+
 **Install a module**
 
+To install a module, you can use `mate install` to install a module from a github repo with the full path to the module.
+
+All modules inside a project that follow modularity can be independently installed. For example, to install the big transfer experiment, you can use the following command to install the experiment, code, and python dependencies with pip:
+```bash
+mate install https://github.com/oalee/big_transfer/tree/master/big_transfer/experiments/bit -y pip
+```
+This will install the big transfer experiment into your project. You can also use the shorthand version of the command:
+```bash
+mate install oalee/big_transfer/experiments/bit
+```
+
+** Install python module **
+To install a python module, you can use `mate install` to install a module from a github repo with the full path to the module.
+This way, you can install any python module into your project. For example, to install the pytorch image module, you can use the following command:
+```bash
+mate install https://github.com/rwightman/pytorch-image-models/tree/main/timm
+```
+The module will be installed into your project, However python module dependencies will not be installed. To install the python module dependencies, you can use either manually install the dependencies or simply use `pip install module` to make sure dependencies are installed.
+
+** Examples **
 ```bash
 # Installs the experiment, code and python dependencies with pip
 mate install oalee/big_transfer/experiments/bit -y pip
@@ -77,12 +99,16 @@ mate install oalee/lightweight-gan/lgan/trainers/lgan
 ```
 
 
-
 **Clone a model**
 
 ```bash
 mate clone resnet my_resnet
 ```
+
+## Example Projects 📚
+
+Please check out the [transfer learning](https://github.com/oalee/big-transfer), [vision models](https://github.com/oalee/deep-vision),
+and [lightweight gan](https://github.com/oalee/lightweight-gan).
 
 
 ## Documentation 📚
