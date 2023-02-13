@@ -114,13 +114,14 @@ def generate_help_md() -> str:
 
 class MateHelp:
     def __init__(self):
-        self.help_options = ("init", "install", "train", "auto", "export")
+        self.help_options = ("init", "install", "train", "auto", "export", "clone")
         self.help_comments = (
             "Initialize a new project",
             "Install dependencies",
             "Train a model",
             "Various commands to help with the development proces",
             "Export dependencies",
+            "Clones internal modules",
         )
 
 

@@ -121,6 +121,21 @@ class Mate:
         print(json.dumps(self.api.summary(), indent=4))
 
     def clone(self, module: str, name: str, dest: str):
+        """
+        `mate clone {module} {name} {dest}`
+
+        Clones a module to a destination.
+        Args:
+            module: Module to clone.
+
+            name: Name of the module to clone.
+
+            dest: Destination to clone the module to.
+
+        Example:
+
+            `mate clone models torch_vit my_vit`
+        """
 
         # check if module exists
         module_path = os.path.join(self.root_folder, module, name)
@@ -138,12 +153,13 @@ class Mate:
                 shutil.rmtree(dest_path)
             else:
                 sys.exit(1)
-        else:
-            os.makedirs(dest_path)
+        # else:
+        #     ipdb.set_trace()
+        #     os.makedirs(dest_path, exist_ok=True)
         # copy module to destination
         shutil.copytree(module_path, dest_path)
 
-        print(f"Module {module}/{name} cloned to {dest}")
+        print(f"Module {module}/{name} cloned to {dest_path}")
 
     def snapshot(self, model_name: str):
         pass

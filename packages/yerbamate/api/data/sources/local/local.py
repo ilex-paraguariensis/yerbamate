@@ -106,7 +106,7 @@ class LocalDataSource(DataSource):
         self.map = {
             "models": self.models,
             "trainers": self.trainers,
-            "data_loaders": self.data_loaders,
+            "data": self.data_loaders,
             "experiments": self.experiments,
         }
         self.map = {k: v for k, v in self.map.items()}
