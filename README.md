@@ -1,4 +1,4 @@
-<h1 style="color:green"><span style="color:green">Maté 🧉</span>, your friendly AI project and experiment manager</h1>
+<h1 style="color:green"><span style="color:green">Maté 🧉</span> your friendly AI project and experiment manager</h1>
 
 Maté is a python project, package and experiment manager. Whether you are a
 seasoned deep learning researcher or just starting out, Maté provides you with
