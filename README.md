@@ -40,12 +40,12 @@ mate list
 
 ### **Train a model**
 
-To train a model, you can use the `mate train` command. This command will train the model with the specified experiment. For example, to train the big transfer experiment, you can use the following command:
+To train a model, you can use the `mate train` command. This command will train the model with the specified experiment. For example, to train the an experiment called `big` in the `my_experiment` module, you can use the following command:
 
 ```bash
-mate train experiment my_experiment
+mate train my_experiment big
 # or alternatively use python
-python -m train my_project.experiment.my_experiment
+python -m train my_project.experiments.my_experiment.big
 ```
 
 ### **Export a module**
