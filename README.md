@@ -1,6 +1,6 @@
 <h1 style="color:green"><span style="color:green">Maté 🧉</span></h1>
 
-Welcome to Maté - the versatile and efficient deep learning framework! Maté is a package and experiment manager that seamlessly integrates with popular deep learning libraries such as PyTorch, TensorFlow, and JAX. Whether you are a seasoned deep learning researcher or just starting out, Maté provides you with the tools to easily add models, trainers, and data loaders to your projects. With Maté, you can also evaluate, train, and keep track of your experiments with ease. By including the source code of dependencies directly in your project.  Maté ensures full customizability and reproducibility of your results. Get started with Maté today and elevate your deep learning experience! 🚀
+Maté is a package and experiment manager that seamlessly integrates with popular deep learning libraries such as PyTorch, TensorFlow, and JAX. Whether you are a seasoned deep learning researcher or just starting out, Maté provides you with the tools to easily add models, trainers, and data loaders to your projects. With Maté, you can also evaluate, train, and keep track of your experiments with ease. By including the source code of dependencies directly in your project.  Maté ensures full customizability and reproducibility of your results. Get started with Maté today and elevate your deep learning experience! 🚀
 
 ## Installation 🔌
 
@@ -18,11 +18,6 @@ pip install yerbamate
 mate init my_project
 ```
 
-### **List all modules**
-
-```bash
-mate list 
-```
 This will generate the following structure:
 ```bash
 /
@@ -36,7 +31,16 @@ This will generate the following structure:
 |   |-- __init__.py
 ```
 
+### **List all modules**
+
+List all your models, trainers, data and experiments modules:
+```bash
+mate list 
+```
+
 ### **Train a model**
+
+To train a model, you can use the `mate train` command. This command will train the model with the specified experiment. For example, to train the big transfer experiment, you can use the following command:
 
 ```bash
 mate train experiment my_experiment
@@ -44,26 +48,34 @@ mate train experiment my_experiment
 python -m train my_project.experiment.my_experiment
 ```
 
-**Export a module**
+### **Export a module**
 
-To share your modules (models/trainers/data/experiments) you can use the following command, then push and share the module with others:
+To export, share your modules (models/trainers/data/experiments) you can use the following command, then push and share the module with others:
 ```bash
 mate export
 ```
 This command will generate `requirements.txt` and `dependencies.json` for sharing, dependency management and reprodiciblity.
 
+
 ### **Install a module**
 
-To install a module, you can use `mate install` to install a module from a github repository.
+To install a module, you can use `mate install` to install a module from a github repository. All modules inside a project that follow modularity can be independently installed. 
 
-All modules inside a project that follow modularity can be independently installed. For example, to install the big transfer experiment, you can use the following command to install the experiment, code, and python dependencies with pip:
 ```bash
-mate install https://github.com/oalee/big_transfer/tree/master/big_transfer/experiments/bit -y pip
+mate install https://github.com/oalee/big_transfer/tree/master/big_transfer/experiments/bit 
 ```
 This will install the big transfer experiment into your project. You can also use the shorthand version of the command:
 ```bash
 mate install oalee/big_transfer/experiments/bit
 ```
+
+### ** Install dependencies **
+Maté supports both pip and conda for dependency management. To install dependencies, you can use `mate install` with the `-y {option}` flag to install dependencies. Options include `pip` and `conda`. The -o flag will overwrite the code dependencies if it already exists. For example, to install the big transfer experiment with pip dependencies, you can use the following command:
+```bash
+mate install oalee/big_transfer/experiments/bit -yo pip
+mate install oalee/big_transfer/experiments/bit -yo conda
+```
+
 
 ### ** Install python module **
 To install a python module, you can use `mate install` to install a module from a github repo with the full path to the module.
