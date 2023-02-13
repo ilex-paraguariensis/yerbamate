@@ -39,7 +39,7 @@ pip install yerbamate
 
 ## Project Structure 📁
 
-Maté projects are organized into the following structure with modularity in
+Deep learning projects can be organized into the following structure with modularity and seperation of concerns in
 mind. This offers a clean and organized codebase that is easy to maintain and is
 sharable out-of-the-box.
 
@@ -64,6 +64,50 @@ modules for models, trainers and data. This allows for a more organized,
 maintainable and sharable project structure. The forth module, experiments, is
 not independent, but rather combines the three modules together to create a
 complete experiment.
+
+### Example Projects
+```bash
+.
+├── deepcnn
+│   ├── data
+│   │   ├── cifar10
+│   │   │   ├── data_loader.py
+│   │   │   ├── __init__.py
+│   │   │   └── requirements.txt
+│   │   └── __init__.py
+│   ├── experiments
+│   │   ├── __init__.py
+│   │   └── resnet
+│   │       ├── cifar_10_resnet_fine_tune.py
+│   │       ├── cifar_10_resnet.py
+│   │       ├── dependencies.json
+│   │       ├── __init__.py
+│   │       ├── requirements.txt
+│   │       ├── tune_clean.py
+│   │       └── tune.py
+│   ├── __init__.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   └── resnet
+│   │       ├── __init__.py
+│   │       ├── requirements.txt
+│   │       └── resnet
+│   │           ├── COPYRIGHT
+│   │           ├── fine_tune.py
+│   │           ├── __init__.py
+│   │           ├── LICENSE
+│   │           ├── requirements.txt
+│   │           └── resnet.py
+│   └── trainers
+│       ├── classification
+│       │   ├── __init__.py
+│       │   ├── pl_classification.py
+│       │   └── requirements.txt
+│       └── __init__.py
+└── mate.json
+
+11 directories, 27 files
+```
 
 ## Quick Start ⚡
 

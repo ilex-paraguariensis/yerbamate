@@ -23,7 +23,7 @@ track of your experiments with ease 🚀
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [Project Structure](#project-structure)
+- [Project Structure](https://oalee.github.io/yerbamate/#/?id=project-structure-%f0%9f%93%81)
 - [Example Projects](#example-projects)
 - [Documentation](https://oalee.github.io/yerbamate/)
 - [Contributing](#contributing)
@@ -67,7 +67,7 @@ mate install oalee/big_transfer/experiments/bit -yo pip
 ```
 
 ### **Install a module**
-You can install independant modules such as models, trainers, and data loaders from github projects that follow the [Maté module structure](https://oalee.github.io/yerbamate#maté-module-structure).
+You can install independant modules such as models, trainers, and data loaders from github projects that follow the [Maté modular project structure](https://oalee.github.io/yerbamate#project-structure).
 
 ```bash
 mate install oalee/lightweight-gan/lgan/trainers/lgan 
@@ -96,7 +96,7 @@ python -m train deepnet.experiments.bit.learn
 
 ## Project Structure 📁
 
-Maté projects are organized into the following structure with modularity in
+Deep learning projects can be organized into the following structure with modularity and seperation of concerns in
 mind. This offers a clean and organized codebase that is easy to maintain and is
 sharable out-of-the-box.
 
