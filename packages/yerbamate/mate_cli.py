@@ -128,9 +128,9 @@ class MateHelp:
         self._full_docs, self._methods = self.get_full_docs(Mate)
 
         # save full docs to file
-        with open("docs.md", "w") as f:
-            f.write(self._full_docs)
-            
+        # with open("docs.md", "w") as f:
+        #     f.write(self._full_docs)
+
 
     def get_index(self):
         nl = "\n"
@@ -164,7 +164,7 @@ class MateHelp:
             is_static = args[0].name != "self"
             args = [arg for arg in args if arg.name != "self"]
             annotations = ", ".join([str(a) for a in list(args)])
-            header = f"### `{class_value.__name__ if is_static else class_value.__name__.lower()}.{method_name}({annotations}) -> {signature.return_annotation if signature.return_annotation != inspect._empty else None}`\n"
+            header = f"### `mate` {method_name}\n"
             return header + doc + "\n --- \n"
 
         # methods = [

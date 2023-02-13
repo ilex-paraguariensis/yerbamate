@@ -205,7 +205,7 @@ class Mate:
         Example Installing a module from structured git repository (recommended):
             
 
-            `mate install oalee/deep-vision/deepnet/models/torch_vit -yo pip`
+            mate install oalee/deep-vision/deepnet/models/torch_vit -yo pip
 
             This will install the module `torch_vit` from the repository `oalee/deep-vision` in to your `models` folder.
             The `yo` flags will skip confirmation and install python dependencies using pip.
@@ -213,7 +213,7 @@ class Mate:
         Example Installing a module from unstructured git repository:
             
 
-            `mate install https://github.com/rwightman/pytorch-image-models/tree/main/timm`
+            mate install https://github.com/rwightman/pytorch-image-models/tree/main/timm
 
 
             This will install the module `timm` from the repository as a sister module to your root module.
