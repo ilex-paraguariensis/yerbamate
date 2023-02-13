@@ -58,14 +58,35 @@ This will generate the following structure:
 |   |-- __init__.py
 ```
 
+
+
 ### **Install an experiment**
 
-To install an experiment, you can use `mate install` to install a module from a
-github repository:
+To install an experiment, you can use `mate install` to install a module and its dependencies from a
+github repository. See [docs](https://oalee.github.io/yerbamate/#/?id=install) for more details.
+
 
 ```bash
+
+# Short version of GitHub URL https://github.com/oalee/big_transfer/tree/master/big_transfer/experiments/bit
+
 mate install oalee/big_transfer/experiments/bit -yo pip
+
+# Short version of GitHub URL https://github.com/oalee/deep-vision/tree/main/deepnet/experiments/resnet
+
+mate install oalee/deep-vision/deepnet/experiments/resnet -yo pip
 ```
+
+### **Install a module**
+You can install independant modules such as models, trainers, and data loaders from github projects that follow the [Independent modular project structure](https://oalee.github.io/yerbamate/#/?id=project-structure-%f0%9f%93%81).
+
+```bash
+mate install oalee/lightweight-gan/lgan/trainers/lgan 
+mate install oalee/big_transfer/models/bit -yo pip
+mate install oalee/deep-vision/deepnet/models/vit_pytorch -yo pip
+mate install oalee/deep-vision/deepnet/trainers/classification -yo pip
+```
+
 
 ### **List all modules**
 
