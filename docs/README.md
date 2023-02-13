@@ -296,6 +296,10 @@ import yerbamate
 
 env = yerbamate.Environment()
 
+env.name # Automatically parses the name of the experiment from experiment_module.exp_name
+env.results # Automatically addes "experiment_module/exp_name" to the results directory passed from environment variables
+
+
 # access environment variables
 data_dir = env["data"]
 results = env["results]
