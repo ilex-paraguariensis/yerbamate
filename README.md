@@ -25,7 +25,7 @@ track of your experiments with ease 🚀
 - [Quick Start](#quick-start)
 - [Project Structure](#project-structure)
 - [Example Projects](#example-projects)
-- [Documentation](#documentation)
+- [Documentation](https://oalee.github.io/yerbamate/)
 - [Contributing](#contributing)
 - [FAQ](#faq)
 
@@ -34,34 +34,6 @@ track of your experiments with ease 🚀
 ```bash
 pip install yerbamate
 ```
-
-## Project Structure 📁
-
-Maté projects are organized into the following structure with modularity in
-mind. This offers a clean and organized codebase that is easy to maintain and is
-sharable out-of-the-box.
-
-```bash
-/
-|-- models/
-|   |-- __init__.py
-|-- experiments/
-|   |-- __init__.py
-|-- trainers/
-|   |-- __init__.py
-|-- data/
-|   |-- __init__.py
-```
-
-### Modularity
-
-Modularity is a software design principle that focuses on creating
-self-contained, reusable and interchangeable components. In the context of a
-deep learning project, modularity means creating three independent standalone
-modules for models, trainers and data. This allows for a more organized,
-maintainable and sharable project structure. The forth module, experiments, is
-not independent, but rather combines the three modules together to create a
-complete experiment.
 
 ## Quick Start ⚡
 
@@ -94,8 +66,21 @@ github repository:
 mate install oalee/big_transfer/experiments/bit -yo pip
 ```
 
+### **Install a module**
+You can install independant modules such as models, trainers, and data loaders from github projects that follow the [Maté module structure](https://oalee.github.io/yerbamate#maté-module-structure).
+
+```bash
+mate install oalee/lightweight-gan/lgan/trainers/lgan 
+mate install oalee/big_transfer/models/bit -yo pip
+mate install oalee/deep-vision/deepnet/models/vit_pytorch -yo pip
+mate install oalee/deep-vision/deepnet/trainers/classification -yo pip
+```
+
 ### **Setting up environment**
-Take a look at [Environment API](https://oalee.github.io/yerbamate#maté-environment-api) and set up your environment before running your experiments.
+
+Take a look at
+[Environment API](https://oalee.github.io/yerbamate#maté-environment-api) and
+set up your environment before running your experiments.
 
 ### **Train a model**
 
@@ -109,6 +94,84 @@ mate train bit learn
 python -m train deepnet.experiments.bit.learn
 ```
 
+## Project Structure 📁
+
+Maté projects are organized into the following structure with modularity in
+mind. This offers a clean and organized codebase that is easy to maintain and is
+sharable out-of-the-box.
+
+```bash
+/
+|-- models/
+|   |-- __init__.py
+|-- experiments/
+|   |-- __init__.py
+|-- trainers/
+|   |-- __init__.py
+|-- data/
+|   |-- __init__.py
+```
+
+### Modularity
+
+Modularity is a software design principle that focuses on creating
+self-contained, reusable and interchangeable components. In the context of a
+deep learning project, modularity means creating three independent standalone
+modules for models, trainers and data. This allows for a more organized,
+maintainable and sharable project structure. The forth module, experiments, is
+not independent, but rather combines the three modules together to create a
+complete experiment.
+
+### Sample Project Structure
+
+This structure highlights modularity and seperation of concerns. The `models`,
+`data` and `trainers` modules are independent and can be used in any project.
+The `experiments` module is not independent, but rather combines the three
+modules together to create a complete experiment.
+
+
+```bash
+.
+├── mate.json
+└── deepnet
+    ├── data
+    │   ├── bit
+    │   │   ├── fewshot.py
+    │   │   ├── __init__.py
+    │   │   ├── minibatch_fewshot.py
+    │   │   ├── requirements.txt
+    │   │   └── transforms.py
+    │   └── __init__.py
+    ├── experiments
+    │   ├── bit
+    │   │   ├── aug.py
+    │   │   ├── dependencies.json
+    │   │   ├── __init__.py
+    │   │   ├── learn.py
+    │   │   └── requirements.txt
+    │   └── __init__.py
+    ├── __init__.py
+    ├── models
+    │   ├── bit_torch
+    │   │   ├── downloader
+    │   │   │   ├── downloader.py
+    │   │   │   ├── __init__.py
+    │   │   │   ├── requirements.txt
+    │   │   │   └── utils.py
+    │   │   ├── __init__.py
+    │   │   ├── models.py
+    │   │   └── requirements.txt
+    │   └── __init__.py
+    └── trainers
+        ├── bit_torch
+        │   ├── __init__.py
+        │   ├── lbtoolbox.py
+        │   ├── logger.py
+        │   ├── lr_schduler.py
+        │   ├── requirements.txt
+        │   └── trainer.py
+        └── __init__.py
+```
 
 ## Example Projects 📚
 
@@ -116,8 +179,8 @@ Please check out the [transfer learning](https://github.com/oalee/big-transfer),
 [vision models](https://github.com/oalee/deep-vision), and
 [lightweight gan](https://github.com/oalee/lightweight-gan).
 
-
 ## Documentation 📚
+
 Please check out the [documentation](https://oalee.github.io/yerbamate).
 
 ## Guides 📖
