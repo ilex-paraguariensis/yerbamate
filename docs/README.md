@@ -26,7 +26,7 @@ track of your experiments with ease 🚀
 - [Project Structure](#project-structure-📁)
 - [Example Projects](#example-projects-📚)
 - [Module Installation](#module-installation-📦)
-- [Maté Environment API](#mate-environment-api)
+- [Maté Environment API](#maté-environment-api)
 - [Experiment Definition](#experiment-definition)
 - [Command Line Interface](#command-line-interface-📝)
 
