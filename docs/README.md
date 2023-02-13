@@ -249,7 +249,7 @@ following command, then push and share the module with others:
 mate export
 ```
 
-This command will generate `requirements.txt` and `dependencies.json` for
+This command will generate `requirements.txt`, `dependencies.json` and `export.md` for
 sharing, dependency management and reprodiciblity.
 
 ### **Examples**
@@ -415,42 +415,79 @@ elif env.test:
 Mate provides a command line interface to manage your projects. The following
 commands are available:
 
----
 
-### auto
+ --- 
+
+
+### `mate` auto
+
 
 `mate auto {command}`
 
 Various commands to help with the development process.
 
-commands:
 
-- `export`: Creates a requirements.txt and dependencies.json files for sharing
-  and reproducibility.
+commands:
+- `export`: Creates a requirements.txt and dependencies.json files for sharing and reproducibility.
 - `init`: Automatically creates `__init__.py` files in the project structure.
 
 Example:
 
-    `mate auto export`
-    `mate auto init`
 
----
+    mate auto export
+    mate auto init
 
-### export
+ --- 
 
-Generates requirements.txt and dependencies.json files for sharing and
-reproducibility.
+### `mate` clone
 
-Example: `mate export`
+`mate clone {module} {name} {dest} {-o}`
 
----
+Clones a source code module to a new destination.
 
-### init
+Args:
+
+    module: Module to clone.
+
+    name: Name of the module to clone.
+
+    dest: Destination to clone the module to.
+
+    -o: Overwrite destination if it exists.
+
+Example:
+
+`mate clone models torch_vit my_vit`
+
+ --- 
+
+### `mate` export
+
+Generates requirements.txt, dependencies.json and exports.md for sharing and reproducibility.
+
+Example:
+`mate export`
+
+Output:
+```
+Generated requirements.txt for gan/models/lgan
+Generated dependencies.json for gan/experiments/lwgan
+Generated requirements.txt for gan/experiments/lwgan
+Generated requirements.txt for gan/trainers/lgan
+Generated requirements.txt for gan/data/cars
+Exported to export.md
+```
+
+
+ --- 
+
+### `mate` init
+
 
 `mate init {project_name}`
 
-Initializes a new project. This will create the following structure:
-
+Initializes a new project.
+This will create the following structure:
 ```
 /
 |-- models/
@@ -463,35 +500,37 @@ Initializes a new project. This will create the following structure:
 |   |-- __init__.py
 ```
 
-Args: project_name: Name of the project.
+Args:
+    
+    project_name: Name of the project.
 
 Example:
 
-    `mate init my_project`
+    mate init my_project
 
----
 
-### install
+ --- 
+
+### `mate` install
 
 Intalls a module from a git repository.
 
-Usage: `mate install {url} -{y|n|o} {pm}`
+Usage: ``mate install {url} {-y|n|o} {pm}``
 
 Install module support the following formats:
-
-- `mate install {complete_url}`
-- `mate install {user}/{repo}/{root_module}/{module}`
-- `mate install {user}/{repo|root_module}/{module}`
+- ``mate install {complete_url}``
+- ``mate install {user}/{repo}/{root_module}/{module}``
+- ``mate install {user}/{repo|root_module}/{module}``
 
 Args:
-
-- url: Url of the git repository.
-- -y: Skips confirmation and installs python dependencies
-- -n: Skips installing python dependencies
-- -o: Overwrites existing code module
-- pm: Package manager to use. Defaults to asking the user.
+    -    url: Url of the git repository.
+    -    -y: Skips confirmation and installs python dependencies
+    -    -n: Skips installing python dependencies
+    -    -o: Overwrites existing code modules
+    -    pm: Package manager to use. Defaults to asking the user.
 
 Example Installing a module from structured git repository (recommended):
+
 
     mate install oalee/deep-vision/deepnet/models/torch_vit -yo pip
 
@@ -500,48 +539,43 @@ Example Installing a module from structured git repository (recommended):
 
 Example Installing a module from unstructured git repository:
 
+
     mate install https://github.com/rwightman/pytorch-image-models/tree/main/timm
 
 
     This will install the module `timm` from the repository as a sister module to your root module.
     Take into account that this will install only the code and not the python dependencies.
 
----
+ --- 
 
-### list
+### `mate` list
+
+
 
 Lists all available modules.
 
-Args: module_name: Name of the module to list. If not specified, all modules
-will be listed.
+Args:
+    module_name: Name of the module to list. If not specified, all modules will be listed.
 
-Examples: `mate list models`
+Examples:
+    mate list models
 
-    `mate list`
+    mate list
 
----
 
-### `mate` clone
+ --- 
 
-`mate clone {module} {name} {dest}`
+### `mate` summary
 
-Clones a module to a destination. Args: module: Module to clone.
+Prints a summary of the project modules. Same as `mate list`
 
-    name: Name of the module to clone.
+ --- 
 
-    dest: Destination to clone the module to.
-
-Example:
-
-    `mate clone models torch_vit my_vit`
-
----
-
-### train
+### `mate` test
 
 Executes an experiment.
 
-Usage: `mate train {module} {experiment}`
+Usage: ``mate test {module} {experiment}``
 
 Args:
 
@@ -549,14 +583,38 @@ Args:
 
     exp: Name of the experiment.
 
-Example: `mate train experiments my_experiment`
+Example:
+    `
+    mate test experiments my_experiment`
 
-This will run the experiment `my_experiment` located in the `experiments`
-module.
+This will run the experiment `my_experiment` located in the `experiments` module.
 
-Equivalent to `python -m root_module.experiments.my_experiment`
+Equivalent to `python -m root_module.experiments.my_experiment test`
 
----
+ --- 
+
+### `mate` train
+
+Executes an experiment.
+
+Usage: ``mate train {module} {experiment}``
+
+Args:
+
+    exp_module: Name of the module where the experiment is located.
+
+    exp: Name of the experiment.
+
+Example:
+    `
+    mate train experiments my_experiment`
+
+This will run the experiment `my_experiment` located in the `experiments` module.
+
+Equivalent to `python -m root_module.experiments.my_experiment train`
+
+ --- 
+
 
 ## Guides 📖
 

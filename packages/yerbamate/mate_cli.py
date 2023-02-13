@@ -114,7 +114,15 @@ def generate_help_md() -> str:
 
 class MateHelp:
     def __init__(self):
-        self.help_options = ("init", "install", "train", "auto", "export", "clone")
+        self.help_options = (
+            "init",
+            "install",
+            "train",
+            "auto",
+            "export",
+            "clone",
+            "test",
+        )
         self.help_comments = (
             "Initialize a new project",
             "Install dependencies",
@@ -122,16 +130,14 @@ class MateHelp:
             "Various commands to help with the development proces",
             "Export dependencies",
             "Clones internal modules",
+            "Test a model",
         )
-
-
 
         self._full_docs, self._methods = self.get_full_docs(Mate)
 
         # save full docs to file
         # with open("docs.md", "w") as f:
         #     f.write(self._full_docs)
-
 
     def get_index(self):
         nl = "\n"
@@ -313,8 +319,13 @@ def main():
             print_markdown(md)
 
         elif action not in methods:
-            mate = Mate()
-            mate.train(*args[1:])
+            try:
+                mate = Mate()
+                mate.train(*args[1:])
+            except Exception as e:
+                print(e)
+                help.print_help()
+
         else:
             annotations = tuple(
                 param.annotation

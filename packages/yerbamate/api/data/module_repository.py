@@ -3,6 +3,8 @@ import os
 import re
 import sys
 
+import tabulate
+
 from .module_manager import ModuleManager
 from .utils.exp_util import get_relative_imports
 from .utils.git_util import parse_url_from_git
@@ -73,7 +75,7 @@ class ModuleRepository:
 
     def auto(self, command: str, *args):
         if command == "export":
-            self.__generate_sub_pip_reqs()
+            self.__export()
         elif command in ["init", "fix", "i"]:
             self.__generate__init__(self.config.project)
 
@@ -157,14 +159,90 @@ class ModuleRepository:
                     and self.config.project in root_path
                 ):
                     self.__generate_pip_requirements(path)
-                
+
                 self.__generate_deps_in_depth(path)
+
+    def __export(self):
+        self.__generate_sub_pip_reqs()
+
+        modules = self.list()
+
+        table = []
+
+        for key, value in modules.items():
+            if type(value) is list:
+                table.append([{"type": key, "name": name} for name in value])
+            elif type(value) is dict:
+                table.append([{"type": key, "name": name} for name in value.keys()])
+
+        # ipdb.set_trace()
+
+        table = [item for sublist in table for item in sublist]
+
+        # add url to each item in table
+
+        base_url = parse_url_from_git()
+        user_name = base_url.split("/")[3]
+        repo_name = base_url.split("/")[4]
+        for item in table:
+
+            item[
+                "url"
+            ] = f"{base_url}{self.config.project}/{item['type']}/{item['name']}"
+            item[
+                "short_url"
+            ] = f"{user_name}/{repo_name}/{self.config.project}/{item['type']}/{item['name']}"
+
+            # if repo name is same as project name
+            if repo_name == self.config.project:
+                # item["url"] = f"{base_url}/{item['type']}/{item['name']}"
+                # get user name from url
+                item[
+                    "short_url"
+                ] = f"{user_name}/{repo_name}/{item['type']}/{item['name']}"
+
+        # read dependencies
+        for item in table:
+            path = os.path.join(
+                self.config.project, item["type"], item["name"], "requirements.txt"
+            )
+            dep_path = os.path.join(
+                self.config.project, item["type"], item["name"], "dependencies.json"
+            )
+
+            if os.path.exists(path):
+                with open(path, "r") as f:
+                    item["dependencies"] = f.readlines()
+            if os.path.exists(dep_path):
+                with open(dep_path, "r") as f:
+                    if "dependencies" in item:
+                        item["dependencies"] += json.load(f)["dependencies"]
+                    else:
+                        item["dependencies"] = json.load(f)["dependencies"]
+                    # item["module_dependencies"] = json.load(f)
+
+            if "dependencies" in item:
+                item["dependencies"] = [
+                    dep.replace("\n", "") for dep in item["dependencies"]
+                ]
+
+        table = tabulate.tabulate(
+            table,
+            headers="keys",
+            tablefmt="github",
+            showindex="always",
+            disable_numparse=True,
+        )
+
+        # save table to export.md
+        with open("export.md", "w") as f:
+            f.write(table)
+
+        print("Exported to export.md")
 
     def __generate_sub_pip_reqs(self):
 
         root_path = self.config.project
-
-        # path = os.path.join(".", root_path)
         self.__generate_deps_in_depth(root_path)
 
         for dir in os.listdir("."):
@@ -263,7 +341,7 @@ class ModuleRepository:
         # ipdb.set_trace()
         imports = pipreqs.get_all_imports(path)
         # import_info_remote = pipreqs.get_imports_info(imports)
-        
+
         import_info_local = pipreqs.get_import_local(imports)
 
         self.__generate_mate_dependencies(path)

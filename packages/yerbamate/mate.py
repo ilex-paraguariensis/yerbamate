@@ -60,10 +60,21 @@ class Mate:
 
     def export(self):
         """
-        Generates requirements.txt and dependencies.json files for sharing and reproducibility.
+        Generates requirements.txt, dependencies.json and exports.md for sharing and reproducibility.
 
         Example:
             `mate export`
+
+        Output:
+            ```
+            Generated requirements.txt for gan/models/lgan
+            Generated dependencies.json for gan/experiments/lwgan
+            Generated requirements.txt for gan/experiments/lwgan
+            Generated requirements.txt for gan/trainers/lgan
+            Generated requirements.txt for gan/data/cars
+            Exported to export.md
+            ```
+        
         """
         self.api.auto("export")
 
@@ -76,10 +87,10 @@ class Mate:
 
 
         Lists all available modules.
-        
+
         Args:
             module_name: Name of the module to list. If not specified, all modules will be listed.
-        
+
         Examples:
             `mate list models`
 
@@ -95,9 +106,9 @@ class Mate:
 
     def auto(self, command: str):
         """
-        
+
         `mate auto {command}`
-        
+
         Various commands to help with the development process.
 
 
@@ -115,22 +126,26 @@ class Mate:
 
     def summary(self):
         """
-        Prints a summary of the project modules. Same as `mate list` 
+        Prints a summary of the project modules. Same as `mate list`
         """
 
         print(json.dumps(self.api.summary(), indent=4))
 
-    def clone(self, module: str, name: str, dest: str):
+    def clone(self, module: str, name: str, dest: str, *args, **kwargs):
         """
-        `mate clone {module} {name} {dest}`
+        `mate clone {module} {name} {dest} {-o}`
 
-        Clones a module to a destination.
+        Clones a source code module to a new destination.
+
         Args:
+
             module: Module to clone.
 
             name: Name of the module to clone.
 
             dest: Destination to clone the module to.
+
+            -o: Overwrite destination if it exists.
 
         Example:
 
@@ -146,16 +161,19 @@ class Mate:
         # check if destination exists
         dest_path = os.path.join(self.root_folder, module, dest)
         if os.path.exists(dest_path):
-            print(f"Destination {dest} exists")
-            # ask if overwrite
-            overwrite = input("Overwrite? (y/n): ")
-            if overwrite == "y":
+
+            if "-o" in args:
                 shutil.rmtree(dest_path)
+                print(f"Removed {dest_path}")
             else:
-                sys.exit(1)
-        # else:
-        #     ipdb.set_trace()
-        #     os.makedirs(dest_path, exist_ok=True)
+                print(f"Destination {dest} exists")
+                overwrite = input("Overwrite? (y/n): ")
+                if overwrite == "y":
+                    shutil.rmtree(dest_path)
+                    print(f"Removed {dest_path}")
+                else:
+                    sys.exit(1)
+
         # copy module to destination
         shutil.copytree(module_path, dest_path)
 
@@ -181,8 +199,8 @@ class Mate:
             mate train experiments my_experiment`
 
         This will run the experiment `my_experiment` located in the `experiments` module.
-        
-        Equivalent to `python -m root_module.experiments.my_experiment`
+
+        Equivalent to `python -m root_module.experiments.my_experiment train`
         """
 
         # ipdb.set_trace()
@@ -199,6 +217,28 @@ class Mate:
 
             # print(e)
             sys.exit(1)
+
+    def test(self, exp_module: str, exp: str, *args, **kwargs):
+        """
+        Executes an experiment.
+
+        Usage: ``mate test {module} {experiment}``
+
+        Args:
+
+            exp_module: Name of the module where the experiment is located.
+
+            exp: Name of the experiment.
+
+        Example:
+            `
+            mate test experiments my_experiment`
+
+        This will run the experiment `my_experiment` located in the `experiments` module.
+
+        Equivalent to `python -m root_module.experiments.my_experiment test`
+        """
+        self.train(exp_module, exp, *args, **kwargs)
 
     def install(self, url: str, *args, **kwargs):
         """
@@ -219,7 +259,7 @@ class Mate:
         -    pm: Package manager to use. Defaults to asking the user.
 
         Example Installing a module from structured git repository (recommended):
-            
+
 
             mate install oalee/deep-vision/deepnet/models/torch_vit -yo pip
 
@@ -227,7 +267,7 @@ class Mate:
             The `yo` flags will skip confirmation and install python dependencies using pip.
 
         Example Installing a module from unstructured git repository:
-            
+
 
             mate install https://github.com/rwightman/pytorch-image-models/tree/main/timm
 
@@ -237,12 +277,9 @@ class Mate:
         """
         self.api.install_url(url, *args, **kwargs)
 
-
-
     def __findroot(self):
         """
         Method in charge of finding the root folder of the project and reading the content of mate.json
         """
         self.root_folder, self.config = io.find_root()
         self.root_save_folder = self.config.results_folder
-

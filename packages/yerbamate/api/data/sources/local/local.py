@@ -28,49 +28,8 @@ class LocalDataSource(DataSource):
 
         self.__load_data(root_dir)
 
-    def get_all_experiments(self) -> dict[str, Any]:
-        exps = self.list("experiments")
-
-        results = {}
-        for experiment in exps:
-            exp, _ = self.load_experiment(experiment)
-            results[experiment] = exp
-
-        return results
-
-    def assert_experiment_exists(self, experiment):
-        assert experiment in self.experiments, f"Experiment {experiment} does not exist"
-
-    def load_metadata(self, experiment):
-
-        exp = io.read_json(
-            os.path.join(self.root_folder, "experiments", experiment, f"metadata.json")
-        )
-
-        return exp
-
-    def load_experiment(self, experiment: str):
-
-        exp = io.read_experiments(self.config, self.root_folder, experiment)
-        self.save_path = os.path.join(self.config.results_folder, experiment)
-        if not os.path.exists(self.save_path):
-            os.makedirs(self.save_path)
-        return exp, self.save_path
-
     def load_mate_config_and_root(self):
         return self.__findroot()
-
-    def save_toml(self, toml, experiment_name):
-        io.save_toml(self.root_folder, experiment_name, toml)
-
-    def save_metadata(self, experiment, metadata):
-
-        io.save_metadata(self.root_folder, experiment, metadata)
-
-    def save_experiment(self, experiment):
-        save_path = io.get_experiment_path(self.root_folder, experiment)
-        with open(save_path, "w") as f:
-            f.write(json.dumps(experiment, indent=4))
 
     def summary(self):
         self.__load_data(self.root_folder)
@@ -81,35 +40,39 @@ class LocalDataSource(DataSource):
         if self.map != None:
             return
 
-        self.models = self.__filter_regular_folders(
-            os.listdir(os.path.join(root_dir, "models"))
-        )
-        self.trainers = self.__filter_regular_folders(
-            os.listdir(os.path.join(root_dir, "trainers"))
-        )
-        self.data_loaders = self.__filter_regular_folders(
-            os.listdir(os.path.join(root_dir, "data"))
-        )
+        self.map = {}
+        for dir in os.listdir(root_dir):
 
-        self.experiments = {
-            dir: [
-                exp_file
-                for exp_file in os.listdir(os.path.join(root_dir, "experiments", dir))
-                if ".py" in exp_file and exp_file != "__init__.py"
-            ]
-            for dir in os.listdir(os.path.join(root_dir, "experiments"))
-            if os.path.isdir(os.path.join(root_dir, "experiments", dir))
-            and dir != "__pycache__"
-            or (".py" in dir and dir != "__init__.py")
-        }
-
-        self.map = {
-            "models": self.models,
-            "trainers": self.trainers,
-            "data": self.data_loaders,
-            "experiments": self.experiments,
-        }
-        self.map = {k: v for k, v in self.map.items()}
+            if dir == "experiments":
+                self.map["experiments"] = {
+                    dir: [
+                        exp_file
+                        for exp_file in os.listdir(
+                            os.path.join(root_dir, "experiments", dir)
+                        )
+                        if ".py" in exp_file and exp_file != "__init__.py"
+                    ]
+                    for dir in os.listdir(os.path.join(root_dir, "experiments"))
+                    if os.path.isdir(os.path.join(root_dir, "experiments", dir))
+                    and dir != "__pycache__"
+                    or (".py" in dir and dir != "__init__.py")
+                }
+                # self.map["experiments"] =  exps.values
+            else:
+                if os.path.isdir(os.path.join(root_dir, dir)) and dir != "__pycache__":
+                    # see if there is a __init__.py file
+                    if "__init__.py" in os.listdir(os.path.join(root_dir, dir)):
+                        self.map[dir] = [
+                            sub_dir
+                            for sub_dir in os.listdir(os.path.join(root_dir, dir))
+                            if os.path.isdir(os.path.join(root_dir, dir, sub_dir))
+                            and os.path.exists(
+                                os.path.join(root_dir, dir, sub_dir, "__init__.py")
+                            )
+                            and sub_dir != "__pycache__"
+                        ]
+        # ipdb.set_trace()
+        # self.map = {k: v for k, v in self.map.items()}
 
     def __filter_regular_folders(self, names: list[str]):
         return [fn for fn in names if not fn.startswith("__")]

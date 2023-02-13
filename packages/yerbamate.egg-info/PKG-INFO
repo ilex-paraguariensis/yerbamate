@@ -76,12 +76,11 @@ This will generate the following empty project structure:
 
 ### **Install an experiment**
 
-To install an experiment, you can use `mate install` to install a module and its dependencies from a
-github repository. See [docs](https://oalee.github.io/yerbamate/#/?id=install) for more details.
-
+To install an experiment, you can use `mate install` to install a module and its
+dependencies from a github repository. See
+[docs](https://oalee.github.io/yerbamate/#/?id=install) for more details.
 
 ```bash
-
 # Short version of GitHub URL https://github.com/oalee/big_transfer/tree/master/big_transfer/experiments/bit
 mate install oalee/big_transfer/experiments/bit -yo pip
 
@@ -90,7 +89,10 @@ mate install oalee/deep-vision/deepnet/experiments/resnet -yo pip
 ```
 
 ### **Install a module**
-You can install independant modules such as models, trainers, and data loaders from github projects that follow the [Independent modular project structure](https://oalee.github.io/yerbamate/#/?id=project-structure-%f0%9f%93%81).
+
+You can install independant modules such as models, trainers, and data loaders
+from github projects that follow the
+[Independent modular project structure](https://oalee.github.io/yerbamate/#/?id=project-structure-%f0%9f%93%81).
 
 ```bash
 mate install oalee/lightweight-gan/lgan/trainers/lgan 
@@ -119,9 +121,9 @@ python -m train deepnet.experiments.bit.learn
 
 ## Project Structure 📁
 
-Deep learning projects can be organized into the following structure with modularity and seperation of concerns in
-mind. This offers a clean and organized codebase that is easy to maintain and is
-sharable out-of-the-box.
+Deep learning projects can be organized into the following structure with
+modularity and seperation of concerns in mind. This offers a clean and organized
+codebase that is easy to maintain and is sharable out-of-the-box.
 
 ```bash
 /
@@ -151,7 +153,6 @@ This structure highlights modularity and seperation of concerns. The `models`,
 `data` and `trainers` modules are independent and can be used in any project.
 The `experiments` module is not independent, but rather combines the three
 modules together to create a complete experiment.
-
 
 ```bash
 .
@@ -208,7 +209,10 @@ Please check out the [documentation](https://oalee.github.io/yerbamate).
 
 ## Guides 📖
 
-For more information on modularity, please check out this [guide]().
+For more information on modularity, please check out this [guide](https://medium.com/@alee.rmi/the-ultimate-deep-learning-project-structure-a-software-engineers-guide-into-the-land-of-ai-c383f234fd2f).
+
+For running experiments on Google Colab, please check out this
+[example](https://colab.research.google.com/gist/oalee/5f5c2b3bb2da4ec3168f3edd4a52056a/deep-learning.ipynb)
 
 ## Contribution 🤝
 
