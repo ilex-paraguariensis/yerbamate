@@ -18,13 +18,25 @@ pip install yerbamate
 mate init my_project
 ```
 
-**List all modules(trainers/data/models/experiments)**
+### **List all modules**
 
 ```bash
 mate list 
 ```
+This will generate the following structure:
+```bash
+/
+|-- models/
+|   |-- __init__.py
+|-- experiments/
+|   |-- __init__.py
+|-- trainers/
+|   |-- __init__.py
+|-- data/
+|   |-- __init__.py
+```
 
-**Train a model**
+### **Train a model**
 
 ```bash
 mate train experiment my_experiment
@@ -33,15 +45,16 @@ python -m train my_project.experiment.my_experiment
 ```
 
 **Export a module**
+
 To share your modules (models/trainers/data/experiments) you can use the following command, then push and share the module with others:
 ```bash
 mate export
 ```
 This command will generate `requirements.txt` and `dependencies.json` for sharing, dependency management and reprodiciblity.
 
-**Install a module**
+### **Install a module**
 
-To install a module, you can use `mate install` to install a module from a github repo with the full path to the module.
+To install a module, you can use `mate install` to install a module from a github repository.
 
 All modules inside a project that follow modularity can be independently installed. For example, to install the big transfer experiment, you can use the following command to install the experiment, code, and python dependencies with pip:
 ```bash
@@ -52,7 +65,7 @@ This will install the big transfer experiment into your project. You can also us
 mate install oalee/big_transfer/experiments/bit
 ```
 
-** Install python module **
+### ** Install python module **
 To install a python module, you can use `mate install` to install a module from a github repo with the full path to the module.
 This way, you can install any python module into your project. For example, to install the pytorch image module, you can use the following command:
 ```bash
@@ -60,7 +73,7 @@ mate install https://github.com/rwightman/pytorch-image-models/tree/main/timm
 ```
 The module will be installed into your project, However python module dependencies will not be installed. To install the python module dependencies, you can use either manually install the dependencies or simply use `pip install module` to make sure dependencies are installed.
 
-** Examples **
+### ** Examples **
 ```bash
 # Installs the experiment, code and python dependencies with pip
 mate install oalee/big_transfer/experiments/bit -y pip
@@ -99,7 +112,7 @@ mate install oalee/lightweight-gan/lgan/trainers/lgan
 ```
 
 
-**Clone a model**
+### **Clone a model**
 
 ```bash
 mate clone resnet my_resnet
