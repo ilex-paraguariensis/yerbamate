@@ -8,8 +8,8 @@ track of your experiments with ease 🚀
 
 ## Features 🎉
 
-- Seamless integration with any installed python library such as PyTorch,
-  TensorFlow, JAX, Huggingfacehub and etc.
+- Seamless integration with any installed python library such as PyTorch/Lightning,
+  TensorFlow/Keras, JAX/Flax, Huggingface/transformers.
 - Easy to use interface to add source code of models, trainers, and data loaders
   to your projects.
 - Support for full customizability and reproducibility of results through the
