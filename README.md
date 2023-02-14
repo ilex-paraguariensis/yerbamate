@@ -8,7 +8,7 @@ track of your experiments with ease 🚀 -->
 
 Welcome to Maté! 🎉👋🏼
 
-Maté is an open science modular Python framework designed to streamline and simplify the development and management of machine learning projects. 🤖🐍
+Maté is an open science modular Python framework designed to streamline and simplify the development and management of machine learning projects. 🤖🐉
 
 Maté was developed to address the reproducibility crisis in artificial intelligence research by promoting open science and accessible AI. 🌍💻🤝
 
@@ -20,18 +20,14 @@ The straightforward installation, sharing, and training process makes it accessi
 
 ## Features 🎉
 
-- Seamless integration with any python library such as PyTorch/Lightning,
-  TensorFlow/Keras, JAX/Flax, Huggingface/transformers.
-- Easy to use interface to add source code of models, trainers, and data loaders
-  to your projects.
-- Support for full customizability and reproducibility of results through the
-  inclusion of dependencies in your project.
-- Modular project structure that enforces a clean and organized codebase.
-- Fully compatible with python. No need to use mate commands to run your
-  experiments. 
-- Convenient environment management through the Maté Environment API.
-- Support for pip and conda for dependency management.
-- Works with [Colab](https://github.com/oalee/yerbamate/blob/main/deep_learning.ipynb) out of the box.
+- Seamless integration with any python library such as PyTorch/Lightning, TensorFlow/Keras, JAX/Flax, Huggingface/transformers. 🤝🤗🐉
+- Easy to use interface to add source code of models, trainers, and data loaders to your projects. 🎨💻📝
+- Support for full customizability and reproducibility of results through the inclusion of dependencies in your project. 🌟🔍🧪
+- Modular project structure that enforces a clean and organized codebase. 🧱👨‍💻👌
+- Fully compatible with python. No need to use mate commands to run your experiments. 🐍💻🚀
+- Convenient environment management through the Maté Environment API. 🌍👨‍💻🔧
+- Support for pip and conda for dependency management. 📦🔍💻
+- Works with [Colab](https://github.com/oalee/yerbamate/blob/main/deep_learning.ipynb) out of the box.  🎉👌🤖
 
 ## Table of Contents
 

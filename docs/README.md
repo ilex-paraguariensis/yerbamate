@@ -13,35 +13,14 @@ The modular design and separation of concerns simplify the development and maint
 The straightforward installation, sharing, and training process makes it accessible to researchers and practitioners with varying technical expertise, enhancing collaboration and knowledge sharing. 🤝💻🎓📈
 
 ## Features 🎉
-
-- Seamless integration with any python library such as PyTorch/Lightning,
-  TensorFlow/Keras, JAX/Flax, Huggingface/transformers.
-- Easy to use interface to add source code of models, trainers, and data loaders
-  to your projects.
-- Support for full customizability and reproducibility of results through the
-  inclusion of dependencies in your project.
-- Modular project structure that enforces a clean and organized codebase.
-- Fully compatible with python. No need to use mate commands to run your
-  experiments. 
-- Convenient environment management through the Maté Environment API.
-- Support for pip and conda for dependency management.
-- Works with [Colab](https://github.com/oalee/yerbamate/blob/main/deep_learning.ipynb) out of the box.
-
-
-## Features 🎉
-
-- Seamless integration with any python library such as PyTorch/Lightning,
-  TensorFlow/Keras, JAX/Flax, Huggingface/transformers.
-- Easy to use interface to add source code of models, trainers, and data loaders
-  to your projects.
-- Support for full customizability and reproducibility of results through the
-  inclusion of dependencies in your project.
-- Modular project structure that enforces a clean and organized codebase.
-- Fully compatible with python. No need to use mate commands to run your
-  experiments. 
-- Convenient environment management through the Maté Environment API.
-- Support for pip and conda for dependency management.
-- Works with Colab.
+- Seamless integration with any python library such as PyTorch/Lightning, TensorFlow/Keras, JAX/Flax, Huggingface/transformers. 🤝🤗🐉
+- Easy to use interface to add source code of models, trainers, and data loaders to your projects. 🎨💻📝
+- Support for full customizability and reproducibility of results through the inclusion of dependencies in your project. 🌟🔍🧪
+- Modular project structure that enforces a clean and organized codebase. 🧱👨‍💻👌
+- Fully compatible with python. No need to use mate commands to run your experiments. 🐍💻🚀
+- Convenient environment management through the Maté Environment API. 🌍👨‍💻🔧
+- Support for pip and conda for dependency management. 📦🔍💻
+- Works with [Colab](https://github.com/oalee/yerbamate/blob/main/deep_learning.ipynb) out of the box.  🎉👌🤖
 
 ## Table of Contents
 
