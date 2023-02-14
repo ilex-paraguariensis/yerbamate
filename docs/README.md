@@ -1,6 +1,6 @@
 <h1 style="color:green"><a href="https://github.com/oalee/yerbamate"><span style="color:green">Maté</span></a>🧉 your modular AI project and experiment manager</h1>
 
-## Welcome to [Maté](https://github.com/oalee/yerbamate)! 🎉👋🏼
+Welcome to [Maté](https://github.com/oalee/yerbamate)! 🎉👋🏼
 
 Maté is an open science modular Python framework designed to streamline and simplify the development and management of machine learning projects. It was developed to address the reproducibility crisis in artificial intelligence research by promoting open science and accessible AI. 🌍💻
 

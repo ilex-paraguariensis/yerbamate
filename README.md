@@ -5,24 +5,23 @@ seasoned deep learning researcher or just starting out, Maté provides you with
 the tools to easily add source code and dependencies of models, trainers, and
 data loaders to your projects. With Maté, you can also evaluate, train, and keep
 track of your experiments with ease 🚀 -->
-## Welcome to [Maté](https://github.com/oalee/yerbamate)! 🎉👋🏼
+### Welcome to [Maté](https://github.com/oalee/yerbamate)! 🎉👋🏼
 
 Maté is an open science modular Python framework designed to streamline and simplify the development and management of machine learning projects. It was developed to address the reproducibility crisis in artificial intelligence research by promoting open science and accessible AI. 🌍💻
 
-With Maté, you can easily install the source code of open-source projects and adhere to modularity and separation of concerns, making your models and modules sharable out of the box. This means you can collaborate more effectively with others and easily share your work. 📦💻🤝
-
 The framework is built around the best software engineering practices of modularity and separation of concerns, encouraging quality coding, collaboration, and the sharing of models, trainers, data loaders, and knowledge. The modular design and separation of concerns simplify the development and maintenance of machine learning models, leading to an improved developer experience. 🚀💻👨‍💻💬🧠
 
-Maté supports seamless integration with popular Python libraries such as PyTorch/Lightning, TensorFlow/Keras, JAX/Flax, and Huggingface/transformers, making it easy to work with the tools you already know and love. 📚🐍
-
-We've designed Maté to be fully compatible with Python, so there's no need to use complicated mate commands to run your experiments. With our convenient environment management through the Maté Environment API, you can easily manage your dependencies and work on your projects from anywhere. 🌍🔧🐍
+With Maté, you can easily install the source code of open-source projects and adhere to modularity and separation of concerns, making your models and modules sharable out of the box. This means you can collaborate more effectively with others and easily share your work. 📦💻🤝
 
 Thank you for choosing Maté, and we can't wait to see the amazing machine learning projects you'll create with it! 🎉👨‍💻🌟
 
 ## Features 🎉
+- Seamless integration with any python library such as PyTorch/Lightning, TensorFlow/Keras, JAX/Flax, Huggingface/transformers. 🤝🤗🐉
 - Easy to use interface to add source code of models, trainers, and data loaders to your projects. 🎨💻📝
 - Support for full customizability and reproducibility of results through the inclusion of dependencies in your project. 🌟🔍🧪
 - Modular project structure that enforces a clean and organized codebase. 🧱👨‍💻👌
+- Fully compatible with python. No need to use mate commands to run your experiments. 🐍💻🚀
+- Convenient environment management through the Maté Environment API. 🌍👨‍💻🔧
 - Support for pip and conda for dependency management. 📦🔍💻
 - Works with [Colab](https://github.com/oalee/yerbamate/blob/main/deep_learning.ipynb) out of the box.  🎉👌🤖
 
@@ -32,8 +31,9 @@ Thank you for choosing Maté, and we can't wait to see the amazing machine learn
 - [Quick Start](#quick-start-⚡)
 - [Project Structure](#project-structure-📁)
 - [Example Projects](#example-projects-📚)
-- [Documentation](https://oalee.github.io/yerbamate/)
+- [Documentation](#documentation-📚)
 - [Contribution](#Contribution-🤝)
+- [Guides](#guides-📖)
 
 ## Installation 🔌
 
