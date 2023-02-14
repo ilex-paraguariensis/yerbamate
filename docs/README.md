@@ -1,10 +1,31 @@
 <h1 style="color:green"><a href="https://github.com/oalee/yerbamate"><span style="color:green">Maté</span></a>🧉 your friendly AI project and experiment manager</h1>
 
-[Maté](https://github.com/oalee/yerbamate)🧉 is a python project, package and experiment manager. Whether you are a
-seasoned deep learning researcher or just starting out, Maté provides you with
-the tools to easily add source code and dependencies of models, trainers, and
-data loaders to your projects. With Maté, you can also evaluate, train, and keep
-track of your experiments with ease 🚀 
+Welcome to [Maté](https://github.com/oalee/yerbamate)! 🎉👋🏼
+
+Maté is an open science modular Python framework designed to streamline and simplify the development and management of machine learning projects. 🤖🐍
+
+Maté was developed to address the reproducibility crisis in artificial intelligence research by promoting open science and accessible AI. 🌍💻🤝
+
+The framework is built around the best software engineering practices of modularity and separation of concerns, encouraging quality coding, collaboration, and the sharing of models, trainers, data loaders, and knowledge. 🚀💻👨‍💻💬🧠
+
+The modular design and separation of concerns simplify the development and maintenance of machine learning models, leading to an improved developer experience. 💡👨‍💻🧐
+
+The straightforward installation, sharing, and training process makes it accessible to researchers and practitioners with varying technical expertise, enhancing collaboration and knowledge sharing. 🤝💻🎓📈
+
+## Features 🎉
+
+- Seamless integration with any python library such as PyTorch/Lightning,
+  TensorFlow/Keras, JAX/Flax, Huggingface/transformers.
+- Easy to use interface to add source code of models, trainers, and data loaders
+  to your projects.
+- Support for full customizability and reproducibility of results through the
+  inclusion of dependencies in your project.
+- Modular project structure that enforces a clean and organized codebase.
+- Fully compatible with python. No need to use mate commands to run your
+  experiments. 
+- Convenient environment management through the Maté Environment API.
+- Support for pip and conda for dependency management.
+- Works with [Colab](https://github.com/oalee/yerbamate/blob/main/deep_learning.ipynb) out of the box.
 
 
 ## Features 🎉
