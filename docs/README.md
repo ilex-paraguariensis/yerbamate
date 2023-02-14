@@ -99,7 +99,7 @@ mate install oalee/deep-vision/deepnet/experiments/resnet -yo pip
 
 You can install independant modules such as models, trainers, and data loaders
 from github projects that follow the
-[Independent modular project structure](https://oalee.github.io/yerbamate/#/?id=project-structure-%f0%9f%93%81).
+[Independent modular project structure](#project-structure-📁).
 
 ```bash
 mate install oalee/lightweight-gan/lgan/trainers/lgan 
