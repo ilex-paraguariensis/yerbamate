@@ -1,4 +1,4 @@
-<h1 style="color:green"><a href="https://github.com/oalee/yerbamate"><span style="color:green">Maté</span></a>🧉 your friendly AI project and experiment manager</h1>
+<h1 style="color:green"><a href="https://github.com/oalee/yerbamate"><span style="color:green">Maté</span></a>🧉 your modular AI project and experiment manager</h1>
 
 Welcome to [Maté](https://github.com/oalee/yerbamate)! 🎉👋🏼
 
