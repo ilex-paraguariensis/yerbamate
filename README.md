@@ -92,9 +92,17 @@ mate install oalee/deep-vision/deepnet/trainers/classification -yo pip
 
 ### **Setting up environment**
 
-Take a look at
-[Environment API](https://oalee.github.io/yerbamate#maté-environment-api) and
-set up your environment before running your experiments.
+Set up your environment before running your experiments. This can be done by using shell, or `env.json` file in the root of your project. Maté API requires `results` to be set in the environment. For more information, see [docs](https://oalee.github.io/yerbamate/#/?id=mat%c3%a9-environment-api).
+```bash
+DATA_PATH=/path/to/data
+results=/path/to/results
+```
+```json
+{
+    "DATA_PATH": "/path/to/data",
+    "results": "/path/to/results"
+}
+```
 
 ### **Train a model**
 
