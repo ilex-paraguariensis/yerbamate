@@ -27,12 +27,12 @@ Thank you for choosing Maté, and we can't wait to see the amazing machine learn
 
 ## Table of Contents
 
-- [Installation](#installation-🔌)
-- [Quick Start](#quick-start-⚡)
-- [Project Structure](#project-structure-📁)
-- [Example Projects](#example-projects-📚)
-- [Documentation](#documentation-📚)
-- [Contribution](#Contribution-🤝)
+- [Installation](#installation-)
+- [Quick Start](#quick-start-)
+- [Project Structure](#project-structure-)
+- [Example Projects](#example-projects-)
+- [Documentation](#documentation-)
+- [Contribution](#Contribution-)
 - [Guides](#guides-📖)
 
 ## Installation 🔌
