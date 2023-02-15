@@ -67,7 +67,7 @@ This will generate the following empty project structure:
 
 To install an experiment, you can use `mate install` to install a module and its
 dependencies from a github repository. See
-[docs](https://oalee.github.io/yerbamate/#/?id=install) for more details.
+[docs](https://oalee.github.io/yerbamate/#/?id=mate-install) for more details.
 
 ```bash
 # Short version of GitHub URL https://github.com/oalee/big_transfer/tree/master/big_transfer/experiments/bit
