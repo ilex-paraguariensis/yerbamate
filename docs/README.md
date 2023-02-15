@@ -627,7 +627,7 @@ For more information on modularity, please check out this
 [guide](https://medium.com/@alee.rmi/the-ultimate-deep-learning-project-structure-a-software-engineers-guide-into-the-land-of-ai-c383f234fd2f).
 
 For running experiments on Google Colab, please check out this
-[example](https://colab.research.google.com/gist/oalee/5f5c2b3bb2da4ec3168f3edd4a52056a/deep-learning.ipynb)
+[example](https://github.com/oalee/yerbamate/blob/main/deep_learning.ipynb)
 
 ## Contributing 🤝
 
