@@ -121,9 +121,10 @@ python -m deepnet.experiments.bit.learn train
 Deep learning projects can be organized into the following structure with
 modularity and seperation of concerns in mind. This offers a clean and organized
 codebase that is easy to maintain and is sharable out-of-the-box.
+The modular structure of the framework involves organizing the project directory in a hierarchical tree structure, with an arbitrary name given to the root project directory by the user. The project is then broken down into distinct concerns such as models, data, trainers, experiments, analyzers, and simulators, each with its own subdirectory. Within each concern, modules can be defined with their own subdirectories, such as specific models, trainers, data loaders, data augmentations, or loss functions.
 
 ```bash
-/
+/project_name/
 |-- models/
 |   |-- __init__.py
 |-- experiments/
@@ -143,6 +144,14 @@ modules for models, trainers and data. This allows for a more organized,
 maintainable and sharable project structure. The forth module, experiments, is
 not independent, but rather combines the three modules together to create a
 complete experiment.
+
+### Independent Modules
+
+Yerbamate prioritizes the organization of the project into independent modules when applicable. Independent modules only depend on Python dependencies (such as NumPy, PyTorch, TensorFlow, or Hugging Face), and the code inside the module uses relative imports to import within the module. This makes it an independent module that can be re-used when Python dependencies are installed.
+
+### Non-Independent Modules
+In some cases, a combination of independent modules may be necessary for a particular concern. An example of this is the experiment concern, which imports and combines models, data, and trainers to define and create a specific experiment. In such cases, the module is not independent and is designed to combine the previously defined independent modules. In the case of non-independent modules, Yerbamate creates a dependency list of independent modules that can be used to install the code and Python dependencies. This ensures that the necessary modules are installed, and that the code can be run without issue.
+
 
 ### Sample Modular Project Structure
 
