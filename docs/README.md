@@ -32,6 +32,8 @@ Thank you for choosing Maté, and we can't wait to see the amazing machine learn
 - [Maté Environment API](#maté-environment-api)
 - [Experiment Definition](#experiment-definition)
 - [Command Line Interface](#command-line-interface-📝)
+- [Open Science](#open-science-)
+
 
 ## Installation 🔌
 
@@ -651,3 +653,7 @@ guide for more information on how to get started.
 For questions please contact:
 
 oalee(at)proton.me
+
+## Open Science 📖
+
+As an open science work, Yerbamate strives to promote the principles of transparency and collaboration. To this end, the history of the LaTeX files for work are available on GitHub: https://github.com/oalee/os-yerbamate. These open science repositories are open to collaboration and encourage participation from the community to enhance the validity, reproducibility, accessibility, and quality of this work.
