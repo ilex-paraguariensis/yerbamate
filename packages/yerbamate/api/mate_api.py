@@ -3,7 +3,7 @@ import os
 import sys
 
 from time import sleep
-from yerbamate.mate_config import MateConfig
+
 
 
 from .data.module_repository import ModuleRepository
@@ -18,8 +18,8 @@ MATE API
 
 
 class MateAPI:
-    def __init__(self, config: MateConfig):
-        self.config: MateConfig = config
+    def __init__(self, config):
+        # self.config: MateConfig = config
         self.repository = ModuleRepository(config)
 
 

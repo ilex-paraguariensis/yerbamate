@@ -8,7 +8,6 @@ import tabulate
 from .module_manager import ModuleManager
 from .utils.exp_util import get_relative_imports
 from .utils.git_util import parse_url_from_git
-from ...mate_config import MateConfig
 from .sources.remote import RemoteDataSource
 from .sources.local.local import LocalDataSource
 from pipreqs import pipreqs
@@ -19,7 +18,7 @@ import ipdb
 
 
 class ModuleRepository:
-    def __init__(self, config: MateConfig, run_local_api_server: bool = False):
+    def __init__(self, config, run_local_api_server: bool = False):
         self.config = config
         self.package_manager = ModuleManager(config)
         self.remote = RemoteDataSource()
@@ -162,7 +161,8 @@ class ModuleRepository:
 
                 self.__generate_deps_in_depth(path)
 
-    def __export(self):
+    def __export(self, *args, **kwargs):
+
         self.__generate_sub_pip_reqs()
 
         modules = self.list()
@@ -226,6 +226,28 @@ class ModuleRepository:
                     dep.replace("\n", "") for dep in item["dependencies"]
                 ]
 
+        # create latex table
+
+        # ipdb.set_trace()
+        # # l_table = [t for t in table if t["type"] == "models"]
+        # # remove url from table
+        # ltable = table
+        # for item in ltable:
+        #     del item["url"]
+        #     for dep in item["dependencies"]:
+        #         if "--extra" in dep:
+        #             item["dependencies"].remove(dep)
+        #         if "https" in dep:
+
+        
+        latex_table = tabulate.tabulate(
+                  table,
+            headers="keys",
+            tablefmt="latex_booktabs",
+            showindex=False,
+            disable_numparse=False,
+        )
+
         table = tabulate.tabulate(
             table,
             headers="keys",
@@ -235,10 +257,16 @@ class ModuleRepository:
         )
 
         # save table to export.md
+    
         with open("export.md", "w") as f:
             f.write(table)
 
+        with open("export.tex", "w") as f:
+            f.write(latex_table)
+
         print("Exported to export.md")
+
+
 
     def __generate_sub_pip_reqs(self):
 

@@ -11,7 +11,6 @@ from .utils import utils
 import shutil
 from typing import Optional
 
-from .mate_config import MateConfig
 
 
 class Mate:
@@ -23,7 +22,7 @@ class Mate:
         self.root_folder = ""
         self.save_path = ""
         self.current_folder = os.path.dirname(__file__)
-        self.config: Optional[MateConfig] = None
+        self.config = None
         self.__findroot()
         self.api = MateAPI(self.config)
         self.run_params = None
@@ -282,4 +281,4 @@ class Mate:
         Method in charge of finding the root folder of the project and reading the content of mate.json
         """
         self.root_folder, self.config = io.find_root()
-        self.root_save_folder = self.config.results_folder
+        # self.root_save_folder = self.config.results

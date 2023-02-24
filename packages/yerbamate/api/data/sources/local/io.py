@@ -5,10 +5,8 @@ import sys
 from typing import Optional
 import ipdb
 
-from .....mate_config import MateConfig
 from .....utils.bunch import Bunch
 from .....utils.utils import once
-
 
 
 print_once = once(print)
@@ -23,7 +21,7 @@ def find_root():
     found = False
     i = 0
     root_folder = ""
-    config: Optional[MateConfig] = None
+    config = None
     while not found and i < 2:
         if os.path.exists(os.path.join(current_path, "mate.json")):
             conf_path = os.path.join(current_path, "mate.json")
@@ -43,7 +41,6 @@ def find_root():
     # self.root_save_folder = self.root_folder
     sys.path.insert(0, os.getcwd())
     return root_folder, config
-
 
 
 def list_packages(root_folder: str, folder: str):
@@ -126,12 +123,20 @@ def list_experiment_names(root_folder: str, model_name: str):
 
 def load_mate_config(path):
     with open(path) as f:
-        config = MateConfig(json.load(f))
+        config = json.load(f)
         # assert (
         #    "results_folder" in config
         # ), 'Please add "results_folder":<path> in mate.json'
         # assert "project" in config, 'Please add "project":<project name> in mate.json'
-    return config
+
+    # for e ach key, set attribute
+
+    conf =  Bunch(config)
+    # for key in config:
+    #     setattr(conf, key, config[key])
+    # conf.__dict__ = config
+
+    return conf
 
 
 def remove(root_folder: str, model_name: str):

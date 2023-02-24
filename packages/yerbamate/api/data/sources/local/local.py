@@ -1,6 +1,5 @@
 import json
 import sys
-from yerbamate.mate_config import MateConfig
 from yerbamate.utils.bunch import Bunch
 from ..source import DataSource
 from glob import glob
@@ -14,7 +13,7 @@ from typing import Any
 class LocalDataSource(DataSource):
     def __init__(
         self,
-        config: MateConfig,
+        config,
         # root_dir: str = ".",  # a different root (".mate") is used while installing a packaage installing a package, we can use the root dir of the package
     ):
         super().__init__()

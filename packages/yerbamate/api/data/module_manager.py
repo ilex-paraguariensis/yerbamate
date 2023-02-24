@@ -4,7 +4,7 @@ import os
 import re
 from shutil import copytree, rmtree
 import validators
-from yerbamate.mate_config import MateConfig
+
 
 from .utils.gitdir import download
 import ipdb
@@ -13,7 +13,7 @@ import ipdb
 class ModuleManager:
     root_path: str = ""
 
-    def __init__(self, conf: MateConfig):
+    def __init__(self, conf):
         self.conf = conf
 
         self.init_package_cache()

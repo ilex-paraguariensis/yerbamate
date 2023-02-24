@@ -12,7 +12,6 @@ mate init my_project venv=false
 ```
 
 """
-from .mate_config import MateConfig
 from .utils import print_markdown, remove_indent
 from .mate import Mate
 import inspect
