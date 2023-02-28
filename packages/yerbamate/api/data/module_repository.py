@@ -229,23 +229,56 @@ class ModuleRepository:
         # create latex table
 
         # ipdb.set_trace()
-        # # l_table = [t for t in table if t["type"] == "models"]
-        # # remove url from table
-        # ltable = table
+        # l_table = [t for t in table if t["type"] == "models"]
+        # remove url from table
+        ltable = table
         # for item in ltable:
         #     del item["url"]
         #     for dep in item["dependencies"]:
         #         if "--extra" in dep:
         #             item["dependencies"].remove(dep)
-        #         if "https" in dep:
+        #         # if "https" in dep:
 
-        
+
+        # create latex table
+        # recreate table to remove url
+        ltable = []
+
+        for item in table:
+            # remove --extra from dep
+            if "dependencies" in item:
+                # if --extra in dep
+                new_dep = []
+                for dep in item["dependencies"]:
+                    if "--extra" in dep:
+                        continue
+                    new_dep.append(dep)
+                ltable.append(
+                    {
+                        "name": item["name"],
+                        "type": item["type"],
+                        "short_url": item["short_url"],
+                        "dependencies": new_dep,
+                    }
+                )
+            else:
+                ltable.append(
+                    {
+                        "name": item["name"],
+                        "type": item["type"],
+                        "short_url": item["short_url"],
+                        "dependencies": item["dependencies"],
+                    }
+                )
+
+        # ipdb.set_trace()
+
         latex_table = tabulate.tabulate(
-                  table,
+            ltable,
             headers="keys",
-            tablefmt="latex_booktabs",
-            showindex=False,
-            disable_numparse=False,
+            tablefmt="latex",
+            showindex="never"
+            # disable_numparse=False,
         )
 
         table = tabulate.tabulate(
@@ -257,16 +290,14 @@ class ModuleRepository:
         )
 
         # save table to export.md
-    
+
         with open("export.md", "w") as f:
             f.write(table)
 
-        with open("export.tex", "w") as f:
+        with open("exports.tex", "w") as f:
             f.write(latex_table)
 
         print("Exported to export.md")
-
-
 
     def __generate_sub_pip_reqs(self):
 
