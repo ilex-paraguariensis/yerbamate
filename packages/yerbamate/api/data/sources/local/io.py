@@ -9,6 +9,7 @@ from .....utils.bunch import Bunch
 from .....utils.utils import once
 
 
+
 print_once = once(print)
 
 
@@ -26,7 +27,7 @@ def find_root():
         if os.path.exists(os.path.join(current_path, "mate.json")):
             conf_path = os.path.join(current_path, "mate.json")
             config = load_mate_config(conf_path)
-            root_folder = config.project
+            root_folder = config["project"]
             # self.__import_submodules(self.root_folder)
             found = True
         else:
@@ -40,7 +41,14 @@ def find_root():
 
     # self.root_save_folder = self.root_folder
     sys.path.insert(0, os.getcwd())
-    return root_folder, config
+    return root_folder, Bunch(config)
+
+
+def decorator_dict_to_object(func):
+    def wrapper(*args, **kwargs):
+        return Bunch(func(*args, **kwargs))
+
+    return wrapper
 
 
 def list_packages(root_folder: str, folder: str):
@@ -129,14 +137,9 @@ def load_mate_config(path):
         # ), 'Please add "results_folder":<path> in mate.json'
         # assert "project" in config, 'Please add "project":<project name> in mate.json'
 
-    # for e ach key, set attribute
-
-    conf =  Bunch(config)
-    # for key in config:
-    #     setattr(conf, key, config[key])
-    # conf.__dict__ = config
-
-    return conf
+    # for
+    
+    return config
 
 
 def remove(root_folder: str, model_name: str):

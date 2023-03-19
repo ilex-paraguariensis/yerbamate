@@ -244,6 +244,10 @@ class ModuleRepository:
         # recreate table to remove url
         ltable = []
 
+
+        with open("exports.json", "w") as f:
+            json.dump(table, f, indent=4)
+
         for item in table:
             # remove --extra from dep
             if "dependencies" in item:
@@ -296,6 +300,7 @@ class ModuleRepository:
 
         with open("exports.tex", "w") as f:
             f.write(latex_table)
+
 
         print("Exported to export.md")
 

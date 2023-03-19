@@ -143,15 +143,20 @@ codebase that is easy to maintain and is sharable out-of-the-box.
 The modular structure of the framework involves organizing the project directory in a hierarchical tree structure, with an arbitrary name given to the root project directory by the user. The project is then broken down into distinct concerns such as models, data, trainers, experiments, analyzers, and simulators, each with its own subdirectory. Within each concern, modules can be defined with their own subdirectories, such as specific models, trainers, data loaders, data augmentations, or loss functions.
 
 ```bash
-/project_name/
-|-- models/
-|   |-- __init__.py
-|-- experiments/
-|   |-- __init__.py
-|-- trainers/
-|   |-- __init__.py
-|-- data/
-|   |-- __init__.py
+└── project_name
+    ├── data
+    │   ├── my_independent_data_loader
+    │   └── __init__.py
+    ├── experiments
+    │   ├── my_awesome_experiment
+    │   └── __init__.py
+    ├── __init__.py
+    ├── models
+    │   ├── awesomenet
+    │   └── __init__.py
+    └── trainers
+        ├── big_brain_trainer
+        └── __init__.py
 ```
 
 ### Modularity

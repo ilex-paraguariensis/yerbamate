@@ -18,7 +18,7 @@ class LocalDataSource(DataSource):
     ):
         super().__init__()
 
-        root_dir = config.project
+        root_dir = config["project"]
         self.root_folder = root_dir
         self.config = config
         self.map = None
