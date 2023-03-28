@@ -22,21 +22,20 @@ class Package:
     # Destination could be a local path, for example "models", "trainers", "data", "models/vit", "models/cnn/resnet"
     def __init__(
         self,
-        params: Optional[Bunch] = None,
-        root: Optional[str] = None,
-        backbone: Optional[str] = None,
-        source: Optional[str] = None,
-        package: Optional[str] = None,
-        type: Optional[str] = None,
-        url: Optional[str] = None,
-        export: Optional[Bunch] = None,
-        description: Optional[str] = None,
-        version: Optional[str] = None,
-        author: Optional[str] = None,
-        license: Optional[str] = None,
-        pip: Optional[Bunch] = None,
+        params: Bunch = None,
+        root: str = None,
+        backbone: str = None,
+        source: str = None,
+        package: str = None,
+        type: str = None,
+        url: str = None,
+        export: Bunch = None,
+        description: str = None,
+        version: str = None,
+        author: str = None,
+        license: str = None,
+        pip: Bunch = None,
     ):
-        ipdb.set_trace()
         self.type = type
         self.source = source  # find a way to read the source
         self.root = root
@@ -88,4 +87,33 @@ class Package:
         return f"Package: {self.type} {self.source}"
 
 
+class PLTrainerPackage(Package):
 
+    # TODO automatically parse root, package, version from mate config
+
+    # only params are required
+    def __init__(
+        self,
+        params: Bunch = None,
+        root: str = None,
+        backbone: str = "torch",
+        source: str = "local",
+        package: str = None,
+        type: str = "pl_train",
+        url: str = None,
+        export: Bunch = None,
+        description: str = None,
+        version: str = None,
+    ):
+        super().__init__(
+            root=root,
+            backbone=backbone,
+            source=source,
+            package=package,
+            type=type,
+            url=url,
+            params=params,
+            export=export,
+            description=description,
+            version=version,
+        )

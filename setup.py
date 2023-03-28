@@ -1,35 +1,42 @@
 from setuptools import setup, find_packages
 
+from pathlib import Path
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
+
+
 setup(
     name="yerbamate",
-    description="A cowsay clone for python in one file.",
+    description=" A python module and experiment manager for deep learning",
     author="Giulio Zani, Ali Rahimi",
     author_email="yerba.mate.dl@proton.me",
-    url="https://github.com/ilex-paraguariensis/yerbamate",
+    url="https://github.com/oalee/yerbamate",
     python_requires=">=3.9",
-    version="0.8.12",
+    version="0.9.21",
     packages=find_packages("packages", exclude=["tests"]),
     include_package_data=True,
     package_dir={"": "packages/"},
     license="Apache License 2.0",
-    license_files=("LICENSE.md",),
+    license_files=("LICENSE",),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     install_requires=[
-        "bomba",
-        "flask",
+        "colorama",
+        "GitPython",
+        "validators",
         "ipdb",
-        "websockets",
-        "flask_cors",
         "pipreqs",
         "dirhash",
+        "rich",
         "docstring-parser",
     ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: Apache Software License",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3"
     ],
-    scripts=["./src/mate", "./src/mateboard"],
+    scripts=["./src/mate"],
 )

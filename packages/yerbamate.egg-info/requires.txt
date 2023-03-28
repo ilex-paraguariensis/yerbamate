@@ -1,8 +1,8 @@
-bomba
-flask
+colorama
+GitPython
+validators
 ipdb
-websockets
-flask_cors
 pipreqs
 dirhash
+rich
 docstring-parser

@@ -1,8 +1,0 @@
-#!env python
-
-print("Hello world")
-
-from yerbamate.mateboard.server import run
-
-run()
-# from yerbamate import main
