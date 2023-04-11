@@ -29,6 +29,7 @@ setup(
         "dirhash",
         "rich",
         "docstring-parser",
+        "tabulate"
     ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
