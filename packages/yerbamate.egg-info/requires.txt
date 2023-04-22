@@ -6,3 +6,4 @@ pipreqs
 dirhash
 rich
 docstring-parser
+tabulate
