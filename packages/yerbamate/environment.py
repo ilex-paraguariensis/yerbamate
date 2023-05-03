@@ -25,6 +25,8 @@ class Environment(dict):
             setattr(self, sys.argv[1], True)
         except:
             pass
+        
+        self.args = sys.argv[1:]
 
         self._root = self.__find_root()
 
@@ -90,7 +92,7 @@ class Environment(dict):
         if result is None:
             return
         if not os.path.exists(result):
-            os.makedirs(result)
+            os.makedirs(result, exist_ok=True)
 
         save_file = os.path.join(result, "experiment.py")
         # copy from self._path to save_file
