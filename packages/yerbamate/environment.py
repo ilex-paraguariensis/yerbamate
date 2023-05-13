@@ -25,7 +25,7 @@ class Environment(dict):
             setattr(self, sys.argv[1], True)
         except:
             pass
-        
+
         self.args = sys.argv[1:]
 
         self._root = self.__find_root()
@@ -36,6 +36,10 @@ class Environment(dict):
                 continue
             key, value = arg.split("=")
             value = self.convert_str_to_data(value)
+
+            if key.startswith("--"):
+                key = key[2:]
+
             setattr(self, key, value)
             self.hparams[key] = value
 
@@ -176,18 +180,64 @@ class Environment(dict):
         setattr(self, "env", env)
 
     def __getitem__(self, key):
+
+        # default to environment variables
+
+        res = os.environ.get(key, None)
+
+        if res is not None:
+            return res
+
         if not key in self:
             # ipdb.set_trace()
+
             if key in self.env:
                 return self.env[key]
-            res = os.environ.get(key, None)
+
+            if key in self.hparams:
+                return self.hparams[key]
+
+            if key in self.__dict__:
+                return self.__dict__[key]
 
             if res is None or res == "":
                 print(
                     f"Environment variable {key} not found. Set it in env.json or in your shell.")
+                print(
+                    "Or set as an argument to the script: python -m module.train arg=1 arg2=2")
                 print("Exiting...")
                 sys.exit(1)
             else:
                 return res
 
         return super().__getitem__(key)
+
+    def __getitem__(self, key, default=None):
+
+        # default to environment variables
+        res = os.environ.get(key, None)
+
+        if res is not None:
+            return res
+
+        if key in self:
+            return super().__getitem__(key)
+
+            # ipdb.set_trace()
+
+        if key in self.env:
+            return self.env[key]
+
+        if key in self.hparams:
+            return self.hparams[key]
+
+        if key in self.__dict__:
+            return self.__dict__[key]
+
+        return default
+
+    def get_item(self, key, default=None):
+        return self.__getitem__(key, default)
+
+    def get_hparam(self, key, default=None):
+        return self.__getitem__(key, default)

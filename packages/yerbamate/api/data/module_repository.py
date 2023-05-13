@@ -173,13 +173,15 @@ class ModuleRepository:
             if type(value) is list:
                 table.append([{"type": key, "name": name} for name in value])
             elif type(value) is dict:
-                table.append([{"type": key, "name": name} for name in value.keys()])
+                table.append([{"type": key, "name": name}
+                             for name in value.keys()])
 
         # ipdb.set_trace()
 
         table = [item for sublist in table for item in sublist]
 
         # add url to each item in table
+        deps = set()
 
         base_url = parse_url_from_git()
         user_name = base_url.split("/")[3]
@@ -219,6 +221,7 @@ class ModuleRepository:
                         item["dependencies"] += json.load(f)["dependencies"]
                     else:
                         item["dependencies"] = json.load(f)["dependencies"]
+
                     # item["module_dependencies"] = json.load(f)
 
             if "dependencies" in item:
@@ -226,11 +229,26 @@ class ModuleRepository:
                     dep.replace("\n", "") for dep in item["dependencies"]
                 ]
 
-        # create latex table
+            deps.update(item["dependencies"])
 
-        # ipdb.set_trace()
-        # l_table = [t for t in table if t["type"] == "models"]
-        # remove url from table
+        # remove github urls from dependencies
+        deps = [dep for dep in deps if not "https://github" in dep]
+        # set index urls should be on top, sort so that --extra-index-url is on top
+        deps = sorted(
+            deps, key=lambda x: "--extra-index-url" in x, reverse=True)
+        # remove empty lines
+        deps = [dep for dep in deps if dep != "\n" or dep != " " or dep != ""]
+
+        # save deps in requirements.txt
+        with open("requirements.txt", "w") as f:
+            for dep in deps:
+                f.write(dep + "\n")
+
+            # create latex table
+
+            # ipdb.set_trace()
+            # l_table = [t for t in table if t["type"] == "models"]
+            # remove url from table
         ltable = table
         # for item in ltable:
         #     del item["url"]
@@ -239,11 +257,11 @@ class ModuleRepository:
         #             item["dependencies"].remove(dep)
         #         # if "https" in dep:
 
-
         # create latex table
         # recreate table to remove url
         ltable = []
 
+        # combine dependenices, make a set, remove urls, and save as requirements.txt
 
         with open("exports.json", "w") as f:
             json.dump(table, f, indent=4)
@@ -301,7 +319,6 @@ class ModuleRepository:
         with open("exports.tex", "w") as f:
             f.write(latex_table)
 
-
         print("Exported to export.md")
 
     def __generate_sub_pip_reqs(self):
@@ -327,12 +344,14 @@ class ModuleRepository:
     def __generate_mate_dependencies(self, path):
         # ipdb.set_trace()
 
-        files = [f for f in os.listdir(path) if f.endswith(".py") and "__" not in f]
+        files = [f for f in os.listdir(
+            path) if f.endswith(".py") and "__" not in f]
         original_files = [file.replace(".py", "") for file in files] + [
             f for f in os.listdir(path) if "__" not in f
         ]
 
-        relative_imports = [get_relative_imports(os.path.join(path, f)) for f in files]
+        relative_imports = [get_relative_imports(
+            os.path.join(path, f)) for f in files]
         # flatten array to unique set
         relative_imports = set(
             [item for sublist in relative_imports for item in sublist]
@@ -422,7 +441,8 @@ class ModuleRepository:
             pipreqs.generate_requirements_file(
                 os.path.join(path, "requirements.txt"), import_info_local, "~="
             )
-            self.__add_index_url_to_requirements(os.path.join(path, "requirements.txt"))
+            self.__add_index_url_to_requirements(
+                os.path.join(path, "requirements.txt"))
             print(f"Generated requirements.txt for {path}")
 
         for im in import_info_local:
