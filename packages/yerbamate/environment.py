@@ -1,4 +1,3 @@
-
 import json
 import os
 import shutil
@@ -10,25 +9,26 @@ ENV_KEY = "env"
 
 
 class Environment(dict):
-
     def __init__(self):
-
         # default restart, test to False
         self.restart = False
         self.test = False
         self.train = False
         self.sample = False
         self.hparams = {}
+        self.action = None
 
         # set command to True
         try:
             setattr(self, sys.argv[1], True)
+            setattr(self, "action", sys.argv[1])
         except:
             pass
 
         self.args = sys.argv[1:]
 
         self._root = self.__find_root()
+        self._root_dir = os.path.dirname(self._root)
 
         # parse python -m module train arg=1 arg2=2
         for arg in sys.argv:
@@ -47,11 +47,12 @@ class Environment(dict):
         if "bin/mate" in self._path:
             self.name = os.path.join(*sys.argv[2:4])
             self._path = os.path.join(
-                self._root, "experiments", sys.argv[2],  sys.argv[3] + ".py")
+                self._root, "experiments", sys.argv[2], sys.argv[3] + ".py"
+            )
             # detect path to experiment
         else:
             self.name = self._path.split("/")[-2:]
-            self.name = os.path.join(*self.name)[: -3]
+            self.name = os.path.join(*self.name)[:-3]
 
         self.__set_env()
 
@@ -82,12 +83,31 @@ class Environment(dict):
 
             return os.path.join(path, conf["project"])
 
+        # if not found, try to go up up two levels
+        max_recursion = 3
+        for i in range(max_recursion):
+            # os.getcwd is a dir, go up one level
+            path = os.path.dirname(path)
+            # print(path)
+            if os.path.exists(os.path.join(path, "mate.json")):
+                conf = json.load(open(os.path.join(path, "mate.json"), "r"))
+
+                return os.path.join(path, conf["project"])
+
+        raise Exception("Could not find root of project")
+
         return None
 
     def __generate_experiment(self):
         # copies the experiment to the results folder
-        results = ["results", "results_path",
-                   "results_dir", "save", "save_path", "save_dir"]
+        results = [
+            "results",
+            "results_path",
+            "results_dir",
+            "save",
+            "save_path",
+            "save_dir",
+        ]
         result = None
         for key in results:
             if key in self.env:
@@ -112,10 +132,10 @@ class Environment(dict):
                 json.dump(dict(self.hparams), f, indent=4)
 
     def __set_env(self):
-        mate_conf_path = os.path.join("mate.json")
+        mate_conf_path = os.path.join(self._root_dir, "mate.json")
         conf = json.load(open(mate_conf_path, "r"))
 
-        env_path = os.path.join("env.json")
+        env_path = os.path.join(self._root_dir, "env.json")
         if not os.path.exists(env_path):
             print("Environment file not found, creating one with defaults: env.json")
 
@@ -151,9 +171,14 @@ class Environment(dict):
 
         if len(env_not_found) > 0:
             print(
-                f"Environment variables not found. Set them in env.json or in your shell.")
+                f"Environment variables not found. Set them in env.json or in your shell."
+            )
             for key in env_not_found:
-                desc = conf[ENV_KEY][key] if key in conf[ENV_KEY] else "Required environment variable"
+                desc = (
+                    conf[ENV_KEY][key]
+                    if key in conf[ENV_KEY]
+                    else "Required environment variable"
+                )
                 print(f"{key} : {desc}")
 
             print("Exiting...")
@@ -166,22 +191,28 @@ class Environment(dict):
                 env[key] = os.path.join(env[key], *self.name.split("/"))
                 # env["results"] = env[key]
                 break
-            if os.environ.get(key, None) is not None and os.environ.get(key, None) != "":
+            if (
+                os.environ.get(key, None) is not None
+                and os.environ.get(key, None) != ""
+            ):
                 env[key] = os.environ.get(key)
                 # env["results"] = env[key]
                 break
 
         if len(env) == 0:
             print(
-                f"results/save_dir/save environment variable is empty. Set it in env.json or in your shell.")
+                f"results/save_dir/save environment variable is empty. Set it in env.json or in your shell."
+            )
             print("Exiting...")
             sys.exit(1)
 
         setattr(self, "env", env)
 
     def __getitem__(self, key):
-
         # default to environment variables
+
+        if key in self.hparams:
+            return self.hparams[key]
 
         res = os.environ.get(key, None)
 
@@ -202,9 +233,11 @@ class Environment(dict):
 
             if res is None or res == "":
                 print(
-                    f"Environment variable {key} not found. Set it in env.json or in your shell.")
+                    f"Environment variable {key} not found. Set it in env.json or in your shell."
+                )
                 print(
-                    "Or set as an argument to the script: python -m module.train arg=1 arg2=2")
+                    "Or set as an argument to the script: python -m module.train arg=1 arg2=2"
+                )
                 print("Exiting...")
                 sys.exit(1)
             else:
@@ -213,6 +246,9 @@ class Environment(dict):
         return super().__getitem__(key)
 
     def __getitem__(self, key, default=None):
+        # default to hparams
+        if key in self.hparams:
+            return self.hparams[key]
 
         # default to environment variables
         res = os.environ.get(key, None)
@@ -228,8 +264,8 @@ class Environment(dict):
         if key in self.env:
             return self.env[key]
 
-        if key in self.hparams:
-            return self.hparams[key]
+        # if key in self.hparams:
+        #     return self.hparams[key]
 
         if key in self.__dict__:
             return self.__dict__[key]
@@ -241,3 +277,15 @@ class Environment(dict):
 
     def get_hparam(self, key, default=None):
         return self.__getitem__(key, default)
+
+    def print_info(self):
+        # print info about the experiment
+        print(f"Experiment: {self.name}")
+
+        print("Hyperparameters:")
+        for key, value in self.hparams.items():
+            print(f"{key} : {value}")
+
+        print("Environment variables:")
+        for key, value in self.env.items():
+            print(f"{key} : {value}")

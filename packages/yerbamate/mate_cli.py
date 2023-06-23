@@ -271,7 +271,6 @@ def collect_args(args: list[str], annotations: tuple[Callable]) -> tuple[list, d
 
     if len(annotations) < len(args):
         annotations = annotations + (good_guess_type,) * (len(args) - len(annotations))
-    from typing import Union
 
     for i, (arg, annotation) in enumerate(zip(args, annotations)):
         if annotation == bool:
@@ -340,6 +339,7 @@ def main():
                 mate = Mate()
                 if hasattr(mate, action):
                     getattr(mate, action)(*pos_args, **kwargs)
-                else:
-                    if len(pos_args) == 2:
+                elif len(pos_args) == 2:
                         mate.train(*pos_args)
+                else:
+                    mate.run_module(sys.argv[1], sys.argv[2], sys.argv[3])

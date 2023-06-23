@@ -181,6 +181,24 @@ class Mate:
     def snapshot(self, model_name: str):
         pass
 
+    def data(self, base_module, sub_module):
+
+        module = [self.config.project, 'data', base_module, sub_module]
+        module = ".".join(module)
+
+        try:
+            __import__(module)
+        except Exception as e:
+            print(f"Error in loading {base_module}/{sub_module}")
+            print("Available experiments:")
+            self.list(base_module)
+            traceback.print_exc()
+
+            # print(e)
+            sys.exit(1)
+
+
+
     def train(self, exp_module: str, exp: str, *args, **kwargs):
         """
         Executes an experiment.
