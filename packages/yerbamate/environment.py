@@ -30,6 +30,9 @@ class Environment(dict):
         self._root = self.__find_root()
         self._root_dir = os.path.dirname(self._root)
 
+        if self._root_dir not in sys.path:
+            sys.path.append(self._root_dir)
+
         # parse python -m module train arg=1 arg2=2
         for arg in sys.argv:
             if "=" not in arg:
