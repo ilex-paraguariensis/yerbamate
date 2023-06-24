@@ -117,7 +117,7 @@ class ModuleRepository:
             for line in lines
             if not ".egg>=info" in line
             and not ".egg==info" in line
-            and not ".egg~=info" in line
+            and not ".egg>=info" in line
         ]
 
         # remove +cu{numbers} version form lines
@@ -168,6 +168,9 @@ class ModuleRepository:
         for key, value in modules.items():
             if type(value) is list:
                 table.append([{"type": key, "name": name} for name in value])
+                # if empty list, type and name are the same
+                if len(value) == 0:
+                    table.append([{"type": key, "name": key}])
             elif type(value) is dict:
                 table.append([{"type": key, "name": name} for name in value.keys()])
 
@@ -206,6 +209,10 @@ class ModuleRepository:
                 self.config.project, item["type"], item["name"], "dependencies.json"
             )
 
+            root_dep_path = os.path.join(
+                self.config.project, item["type"], "requirements.txt"
+            )
+
             if os.path.exists(path):
                 with open(path, "r") as f:
                     item["dependencies"] = f.readlines()
@@ -217,16 +224,21 @@ class ModuleRepository:
                         item["dependencies"] = json.load(f)["dependencies"]
 
                     # item["module_dependencies"] = json.load(f)
+            if os.path.exists(root_dep_path):
+                with open(root_dep_path, "r") as f:
+                    item["dependencies"] = f.readlines()
 
             if "dependencies" in item:
                 item["dependencies"] = [
                     dep.replace("\n", "") for dep in item["dependencies"]
                 ]
 
-            deps.update(item["dependencies"])
+                deps.update(item["dependencies"])
 
-        # remove github urls from dependencies if it 
-        deps = [dep for dep in deps if not ("https://github" in dep and "+git" in dep)]
+        # remove github urls from dependencies if it
+        deps = [
+            dep for dep in deps if not ("https://github" in dep and not "+git" in dep)
+        ]
         # set index urls should be on top, sort so that --extra-index-url is on top
         deps = sorted(deps, key=lambda x: "--extra-index-url" in x, reverse=True)
         # remove empty lines
@@ -419,7 +431,7 @@ class ModuleRepository:
             print(f"Error generating requirements.txt for {path}")
             print(e)
             # raise e
-            return{}
+            return {}
 
         self.__generate_mate_dependencies(path)
 
@@ -427,13 +439,13 @@ class ModuleRepository:
 
         if path == self.config.project:
             pipreqs.generate_requirements_file(
-                "requirements.txt", import_info_local, "~="
+                "requirements.txt", import_info_local, ">="
             )
             self.__add_index_url_to_requirements("requirements.txt")
 
         else:
             pipreqs.generate_requirements_file(
-                os.path.join(path, "requirements.txt"), import_info_local, "~="
+                os.path.join(path, "requirements.txt"), import_info_local, ">="
             )
             self.__add_index_url_to_requirements(os.path.join(path, "requirements.txt"))
             print(f"Generated requirements.txt for {path}")
