@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import subprocess
 import sys
 
 import tabulate
@@ -20,6 +21,7 @@ import ipdb
 class ModuleRepository:
     def __init__(self, config, run_local_api_server: bool = False):
         self.config = config
+        self.__load_git_dependencies()
         self.package_manager = ModuleManager(config)
         self.remote = RemoteDataSource()
         self.local = LocalDataSource(config)
@@ -108,31 +110,80 @@ class ModuleRepository:
 
         return indexes
 
+    def __load_git_dependencies(self):
+        try:
+            result = subprocess.run(
+                ["pip", "freeze", "-l"], capture_output=True, text=True
+            )
+            output = result.stdout.strip().split("\n")
+
+            # only +git packages
+            output = [line for line in output if "git+" in line]
+
+            self._git_deps = output
+
+        except Exception as e:
+            print(e)
+            print("Failed to read git dependencies")
+            self._git_deps = []
+
     def __add_index_url_to_requirements(self, path: str):
         with open(os.path.join(path), "r") as f:
             lines = f.readlines()
         linecount = len(lines)
-        lines = [
-            line
-            for line in lines
-            if not ".egg>=info" in line
-            and not ".egg==info" in line
-            and not ".egg>=info" in line
-        ]
+
+        yerbamate_is_req = False
+        for line in lines:
+            if "yerbamate" in line:
+                yerbamate_is_req = True
+                break
+        # lines = [
+        #     line
+        #     for line in lines
+        #     if not ".egg>=info" in line
+        #     and not ".egg==info" in line
+        #     and not ".egg>=info" in line
+        # ]
 
         # remove +cu{numbers} version form lines
         # regex for numbers with at least 1 digit
         regex = re.compile(r"\+cu\d+")
         lines = [regex.sub("", line) for line in lines]
 
+        # Check if package versions need to be updated using pip freeze
+        for i, line in enumerate(lines):
+            package_name = line.strip().split("==")[0] if "==" in line else line.strip()  # type: ignore
+            # check if >= or ~= is used
+            if ">=" in package_name:
+                package_name = package_name.split(">=")[0]
+            if "~=" in package_name:
+                package_name = package_name.split("~=")[0]
+
+            if package_name == "":
+                continue
+
+            # if package_name == "snscrape":
+            #     ipdb.set_trace()
+            if package_name.endswith(".egg"):
+                package_name = package_name.split(".egg")[0]
+
+            for freeze_line in self._git_deps:
+                if freeze_line.lower().endswith(package_name.lower()):
+                    lines[i] = freeze_line + "\n"
+
         urls = self.__parse_index_urls(lines)
+        lines = set(lines)
+
+        # if yerbamate_is_req and not "yerbamate" in lines:
+        #     lines.append("yerbamate\n")
+
         if len(urls) > 0:
             with open(os.path.join(path), "w") as f:
                 for url in urls:
                     f.write(f"--extra-index-url {url}\n")
                 for line in lines:
                     f.write(line)
-        elif linecount != len(lines):
+        else:
             with open(os.path.join(path), "w") as f:
                 for line in lines:
                     f.write(line)
@@ -239,10 +290,20 @@ class ModuleRepository:
         deps = [
             dep for dep in deps if not ("https://github" in dep and not "+git" in dep)
         ]
+
+        # remove .egg>=info from dependencies
+        # deps = [
+        #     dep for dep in deps if not ".egg>=info" in dep and not ".egg==info" in dep
+        # ]
+
         # set index urls should be on top, sort so that --extra-index-url is on top
         deps = sorted(deps, key=lambda x: "--extra-index-url" in x, reverse=True)
         # remove empty lines
         deps = [dep for dep in deps if dep != "\n" or dep != " " or dep != ""]
+
+        # add yerbamate to deps if not already there
+        # if not "yerbamate" in deps:
+        #     deps.append("yerbamate")
 
         # save deps in requirements.txt
         with open("requirements.txt", "w") as f:
@@ -424,7 +485,8 @@ class ModuleRepository:
         try:
             imports = pipreqs.get_all_imports(path)
 
-            # import_info_remote = pipreqs.get_imports_info(imports)
+            # # import_info_remote = pipreqs.get_imports_info(imports)
+            # ipdb.set_trace()
 
             import_info_local = pipreqs.get_import_local(imports)
         except Exception as e:
@@ -449,6 +511,8 @@ class ModuleRepository:
             )
             self.__add_index_url_to_requirements(os.path.join(path, "requirements.txt"))
             print(f"Generated requirements.txt for {path}")
+
+        # ipdb.set_trace()
 
         for im in import_info_local:
             name = im["name"]

@@ -87,7 +87,7 @@ class Environment(dict):
             return os.path.join(path, conf["project"])
 
         # if not found, try to go up up two levels
-        max_recursion = 3
+        max_recursion = 4
         for i in range(max_recursion):
             # os.getcwd is a dir, go up one level
             path = os.path.dirname(path)

@@ -18,8 +18,8 @@ if ! command -v "${PREFIX}twine" &>/dev/null ; then
     exit 1
 fi
 
-${PREFIX}python setup.py sdist
-${PREFIX}twine upload dist/*
+python setup.py sdist
+twine upload dist/*
 
 # If you want to test first
 #${PREFIX}twine upload --repository testpypi  dist/*
