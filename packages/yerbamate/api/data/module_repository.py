@@ -27,7 +27,6 @@ class ModuleRepository:
 
     @staticmethod
     def init_project(project_name: str):
-
         if not os.path.exists(project_name):
             os.mkdir(project_name)
             os.chdir(project_name)
@@ -69,7 +68,6 @@ class ModuleRepository:
             print(e)
 
     def install_url(self, url: str, *args, **kwargs):
-
         self.package_manager.install_package(url, *args, **kwargs)
 
     def auto(self, command: str, *args):
@@ -140,7 +138,6 @@ class ModuleRepository:
                     f.write(line)
 
     def __generate_deps_in_depth(self, root_path):
-
         # init__path = os.path.join(path, "__init__.py")
 
         for dir in os.listdir(root_path):
@@ -162,7 +159,6 @@ class ModuleRepository:
                 self.__generate_deps_in_depth(path)
 
     def __export(self, *args, **kwargs):
-
         self.__generate_sub_pip_reqs()
 
         modules = self.list()
@@ -173,8 +169,7 @@ class ModuleRepository:
             if type(value) is list:
                 table.append([{"type": key, "name": name} for name in value])
             elif type(value) is dict:
-                table.append([{"type": key, "name": name}
-                             for name in value.keys()])
+                table.append([{"type": key, "name": name} for name in value.keys()])
 
         # ipdb.set_trace()
 
@@ -187,7 +182,6 @@ class ModuleRepository:
         user_name = base_url.split("/")[3]
         repo_name = base_url.split("/")[4]
         for item in table:
-
             item[
                 "url"
             ] = f"{base_url}{self.config.project}/{item['type']}/{item['name']}"
@@ -231,11 +225,10 @@ class ModuleRepository:
 
             deps.update(item["dependencies"])
 
-        # remove github urls from dependencies
-        deps = [dep for dep in deps if not "https://github" in dep]
+        # remove github urls from dependencies if it 
+        deps = [dep for dep in deps if not ("https://github" in dep and "+git" in dep)]
         # set index urls should be on top, sort so that --extra-index-url is on top
-        deps = sorted(
-            deps, key=lambda x: "--extra-index-url" in x, reverse=True)
+        deps = sorted(deps, key=lambda x: "--extra-index-url" in x, reverse=True)
         # remove empty lines
         deps = [dep for dep in deps if dep != "\n" or dep != " " or dep != ""]
 
@@ -322,7 +315,6 @@ class ModuleRepository:
         print("Exported to export.md")
 
     def __generate_sub_pip_reqs(self):
-
         root_path = self.config.project
         self.__generate_deps_in_depth(root_path)
 
@@ -344,14 +336,12 @@ class ModuleRepository:
     def __generate_mate_dependencies(self, path):
         # ipdb.set_trace()
 
-        files = [f for f in os.listdir(
-            path) if f.endswith(".py") and "__" not in f]
+        files = [f for f in os.listdir(path) if f.endswith(".py") and "__" not in f]
         original_files = [file.replace(".py", "") for file in files] + [
             f for f in os.listdir(path) if "__" not in f
         ]
 
-        relative_imports = [get_relative_imports(
-            os.path.join(path, f)) for f in files]
+        relative_imports = [get_relative_imports(os.path.join(path, f)) for f in files]
         # flatten array to unique set
         relative_imports = set(
             [item for sublist in relative_imports for item in sublist]
@@ -371,7 +361,6 @@ class ModuleRepository:
 
         deps = set()
         for module in relative_imports:
-
             if module.endswith(".py"):
                 continue
             # if its a python file, return parent module
@@ -397,7 +386,6 @@ class ModuleRepository:
             return
 
         try:
-
             deps_json = os.path.join(path, "dependencies.json")
             if os.path.exists(deps_json):
                 with open(deps_json, "r") as f:
@@ -420,12 +408,18 @@ class ModuleRepository:
             print(f"Generated dependencies.json for {path}")
 
     def __generate_pip_requirements(self, path):
-
         # ipdb.set_trace()
-        imports = pipreqs.get_all_imports(path)
-        # import_info_remote = pipreqs.get_imports_info(imports)
+        try:
+            imports = pipreqs.get_all_imports(path)
 
-        import_info_local = pipreqs.get_import_local(imports)
+            # import_info_remote = pipreqs.get_imports_info(imports)
+
+            import_info_local = pipreqs.get_import_local(imports)
+        except Exception as e:
+            print(f"Error generating requirements.txt for {path}")
+            print(e)
+            # raise e
+            return{}
 
         self.__generate_mate_dependencies(path)
 
@@ -441,12 +435,10 @@ class ModuleRepository:
             pipreqs.generate_requirements_file(
                 os.path.join(path, "requirements.txt"), import_info_local, "~="
             )
-            self.__add_index_url_to_requirements(
-                os.path.join(path, "requirements.txt"))
+            self.__add_index_url_to_requirements(os.path.join(path, "requirements.txt"))
             print(f"Generated requirements.txt for {path}")
 
         for im in import_info_local:
-
             name = im["name"]
             version = im["version"]
 
