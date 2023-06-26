@@ -169,7 +169,7 @@ class ModuleRepository:
 
             for freeze_line in self._git_deps:
                 if freeze_line.lower().endswith(package_name.lower()):
-                    lines[i] = freeze_line + "\n"
+                    lines[i] = freeze_line.replace("ssh://", "https://") + "\n" # auto replace ssh with https
 
         urls = self.__parse_index_urls(lines)
         lines = set(lines)
