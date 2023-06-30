@@ -181,7 +181,7 @@ class Mate:
     def snapshot(self, model_name: str):
         pass
 
-    def data(self, base_module, sub_module):
+    def data(self, base_module, sub_module, *args, **kwargs):
 
         module = [self.config.project, 'data', base_module, sub_module]
         module = ".".join(module)
