@@ -3,3 +3,5 @@ from .environment import Environment
 
 version = version("yerbamate")
 __version__ = version
+
+env = Environment()
